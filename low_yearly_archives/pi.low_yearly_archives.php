@@ -2,7 +2,7 @@
 
 $plugin_info = array(
 	'pi_name'			=> 'Low Yearly Archives',
-	'pi_version'		=> '2.0',
+	'pi_version'		=> '2.1',
 	'pi_author'			=> 'Lodewijk Schutte ~ Low',
 	'pi_author_url'		=> 'http://loweblog.com/software/low-yearly-archives/',
 	'pi_description'	=> 'For displaying yearly archives',
@@ -13,7 +13,7 @@ $plugin_info = array(
 * Low Yearly Archives Plugin Class
 *
 * @package			low-title-ee2_addon
-* @version			2.0
+* @version			2.1
 * @author			Lodewijk Schutte ~ Low <low@loweblog.com>
 * @link				http://loweblog.com/software/low-yearly-archives/
 * @license			http://creativecommons.org/licenses/by-sa/3.0/
@@ -59,6 +59,7 @@ class Low_yearly_archives {
 		
 		$status	= $this->EE->TMPL->fetch_param('status', 'open');
 		$channel= $this->EE->TMPL->fetch_param('channel', '');
+		$site_id= $this->EE->TMPL->fetch_param('site_id', $this->EE->config->item('site_id'));
 		
 		/** -------------------------------------
 		/**  Get timeframe params
@@ -80,6 +81,7 @@ class Low_yearly_archives {
 		$sql_future	 = ($this->EE->TMPL->fetch_param('show_future_entries') == 'yes')	? "" : "AND entry_date < '{$sql_now}'";
 		$sql_status	 = $this->EE->functions->sql_andor_string($status, 'status');
 		$sql_channel = $this->EE->functions->sql_andor_string($channel, 'channel_name');
+		$sql_site_id = $this->EE->db->escape_str($site_id);
 		
 		/** -------------------------------------
 		/**  Get Category params
@@ -109,7 +111,8 @@ class Low_yearly_archives {
 			ON
 				t.channel_id = w.channel_id
 				{$sql_cat_join}
-			WHERE 1
+			WHERE
+				w.site_id = '{$sql_site_id}'
 				{$sql_category}
 				{$sql_expired}
 				{$sql_future}
