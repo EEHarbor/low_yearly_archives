@@ -1,8 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+// Include config file
+require PATH_THIRD.'low_yearly_archives/config.php';
+
 $plugin_info = array(
-	'pi_name'			=> 'Low Yearly Archives',
-	'pi_version'		=> '2.1',
+	'pi_name'			=> $config['name'],
+	'pi_version'		=> $config['version'],
 	'pi_author'			=> 'Lodewijk Schutte ~ Low',
 	'pi_author_url'		=> 'http://loweblog.com/software/low-yearly-archives/',
 	'pi_description'	=> 'For displaying yearly archives',
@@ -13,7 +16,7 @@ $plugin_info = array(
 * Low Yearly Archives Plugin Class
 *
 * @package			low-title-ee2_addon
-* @version			2.1
+* @version			2.2
 * @author			Lodewijk Schutte ~ Low <low@loweblog.com>
 * @link				http://loweblog.com/software/low-yearly-archives/
 * @license			http://creativecommons.org/licenses/by-sa/3.0/
@@ -251,14 +254,25 @@ class Low_yearly_archives {
 				$tmp_month = $this->EE->localize->localize_month($month);
 				
 				// result array
-				$row['months'][] = array(
+				$data = array(
 					'month'				=> $this->EE->lang->line($tmp_month[1]),
 					'month_num'			=> $month,
 					'month_short'		=> $this->EE->lang->line($tmp_month[0]),
 					'month_num_short'	=> intval($month),
 					'month_count'		=> ++$month_count,
-					'num_entries'		=> ((isset($months[$year.$month])) ? $months[$year.$month] : 0) // got entries for current month?
+					'num_entries'		=> ((isset($months[$year.$month])) ? $months[$year.$month] : 0), // got entries for current month?
+					// Courtesy of Leevi Graham
+					'num_entries_percentage' => 0,
+					'num_entries_percentage_rounded' => 0
 				);
+				
+				if ($data['num_entries'] > 0)
+				{
+					$data['num_entries_percentage'] = $data['num_entries'] / $row['entries_in_year'] * 100;
+					$data['num_entries_percentage_rounded'] = round($data['num_entries_percentage']);
+				}
+				
+				$row['months'][] = $data;
 			}
 			
 			$result[] = $row;
@@ -287,7 +301,7 @@ class Low_yearly_archives {
 	{
 		ob_start(); 
 		?>
-			Attributes:
+			Parameters:
 			- channel="blog|news"
 			- status="not closed"
 			- category="15|16"
@@ -316,6 +330,8 @@ class Low_yearly_archives {
 			- {month_num_short} *
 			- {month_count} *
 			- {num_entries} *
+			- {num_entries_percentage} *
+			- {num_entries_percentage_rounded} *
 
 			Tags marked with * are available in between the {months} tag pair only.
 
