@@ -274,6 +274,8 @@ class Low_yearly_archives {
 				
 				$row['months'][] = $data;
 			}
+
+			$row['months_reverse'] = array_reverse($row['months']);
 			
 			$result[] = $row;
 			
