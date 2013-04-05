@@ -275,12 +275,11 @@ class Low_yearly_archives {
 				
 				$row['months'][] = $data;
 
+				// flip the month_count around for months_reverse
 				$data['month_count'] = $row['total_months'] - $data['month_count'] + 1;
 
-				$row['months_reverse'][] = $data;
+				array_unshift($row['months_reverse'], $data);
 			}
-
-			$row['months_reverse'] = array_reverse($row['months_reverse']);
 			
 			$result[] = $row;
 			
