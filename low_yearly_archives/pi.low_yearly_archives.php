@@ -206,7 +206,8 @@ class Low_yearly_archives {
 				'year_count'		=> ++$year_count,
 				'entries_in_year'	=> (isset($years[$year]) ? $years[$year] : 0),
 				'leap_year'			=> date("L", strtotime("{$year}-01-01 12:00:00")), // leap_year: 1 or 0
-				'months'			=> array()
+				'months'			=> array(),
+				'months_reverse'    => array(),
 			);
 			
 			// init months
@@ -273,9 +274,13 @@ class Low_yearly_archives {
 				}
 				
 				$row['months'][] = $data;
+
+				$data['month_count'] = $row['total_months'] - $data['month_count'] + 1;
+
+				$row['months_reverse'][] = $data;
 			}
 
-			$row['months_reverse'] = array_reverse($row['months']);
+			$row['months_reverse'] = array_reverse($row['months_reverse']);
 			
 			$result[] = $row;
 			
