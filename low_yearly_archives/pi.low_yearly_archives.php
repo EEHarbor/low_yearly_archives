@@ -13,82 +13,83 @@ $plugin_info = array(
 );
 
 /**
-* Low Yearly Archives Plugin Class
-*
-* @package			low-title-ee2_addon
-* @version			2.2
-* @author			Lodewijk Schutte ~ Low <low@loweblog.com>
-* @link				http://loweblog.com/software/low-yearly-archives/
-* @license			http://creativecommons.org/licenses/by-sa/3.0/
-*/
-
+ * Low Yearly Archives Plugin Class
+ *
+ * @package        low_yearly_archives
+ * @author         Lodewijk Schutte <hi@gotolow.com>
+ * @link           http://gotolow.com/addons/low-yearly-archives
+ * @license        http://creativecommons.org/licenses/by-sa/3.0/
+ */
 class Low_yearly_archives {
 
-	/**
-	* Plugin return data
-	*
-	* @var	string
-	*/
-	var $return_data;
-	
+	public  $return_data;
+	private $EE;
+
 	// --------------------------------------------------------------------
 
 	/**
-	* PHP4 Constructor
-	*
-	* @see	__construct()
-	*/
-	function Low_yearly_archives()
+	 * PHP4 Constructor
+	 *
+	 * @see	__construct()
+	 */
+	public function Low_yearly_archives()
 	{
 		$this->__construct();
 	}
 
-	// --------------------------------------------------------------------
-
 	/**
-	* PHP5 Constructor
-	*/
-	function __construct()
+	 * PHP5 Constructor
+	 */
+	public function __construct()
 	{
-		/** -------------------------------------
-		/**  Get global instance
-		/** -------------------------------------*/
+		// -------------------------------------
+		//   Get global instance
+		// -------------------------------------
 
 		$this->EE =& get_instance();
-		
-		/** -------------------------------------
-		/**  Get some params
-		/** -------------------------------------*/
-		
-		$status	= $this->EE->TMPL->fetch_param('status', 'open');
-		$channel= $this->EE->TMPL->fetch_param('channel', '');
-		$site_id= $this->EE->TMPL->fetch_param('site_id', $this->EE->config->item('site_id'));
-		
-		/** -------------------------------------
-		/**  Get timeframe params
-		/** -------------------------------------*/
+
+		// -------------------------------------
+		//   Get some params
+		// -------------------------------------
+
+		$status	 = $this->EE->TMPL->fetch_param('status', 'open');
+		$channel = $this->EE->TMPL->fetch_param('channel', '');
+		$site_id = $this->EE->TMPL->fetch_param('site_id', $this->EE->config->item('site_id'));
+
+		// -------------------------------------
+		//   Get timeframe params
+		// -------------------------------------
 
 		$timeframe = array(
 			'start_year'	=> $this->EE->TMPL->fetch_param('start_year'),
 			'end_year'		=> $this->EE->TMPL->fetch_param('end_year'),
-			'start_month'	=> $this->EE->TMPL->fetch_param('start_month'),	
+			'start_month'	=> $this->EE->TMPL->fetch_param('start_month'),
 			'end_month'		=> $this->EE->TMPL->fetch_param('end_month')
 		);
-		
-		/** -------------------------------------
-		/**  Get SQL params
-		/** -------------------------------------*/
-		
+
+		// -------------------------------------
+		//   Get SQL params
+		// -------------------------------------
+
 		$sql_now	 = $this->EE->db->escape_str( (string) $this->EE->localize->now );
 		$sql_expired = ($this->EE->TMPL->fetch_param('show_expired') == 'yes')		? "" : "AND ( expiration_date = 0 OR expiration_date > '{$sql_now}' )";
 		$sql_future	 = ($this->EE->TMPL->fetch_param('show_future_entries') == 'yes')	? "" : "AND entry_date < '{$sql_now}'";
 		$sql_status	 = $this->EE->functions->sql_andor_string($status, 'status');
 		$sql_channel = $this->EE->functions->sql_andor_string($channel, 'channel_name');
 		$sql_site_id = $this->EE->db->escape_str($site_id);
-		
-		/** -------------------------------------
-		/**  Get Category params
-		/** -------------------------------------*/
+		$sql_author  = '';
+
+		if ($author = $this->EE->TMPL->fetch_param('author_id'))
+		{
+			if ($author == 'NOT_CURRENT_USER') $author = 'not '.$this->EE->session->userdata('member_id');
+			if ($author == 'CURRENT_USER') $author = $this->EE->session->userdata('member_id');
+
+			$sql_author = $this->EE->functions->sql_andor_string($author, 'author_id');
+		}
+
+		// -------------------------------------
+		//   Get Category params
+		// -------------------------------------
 
 		if ($category = $this->EE->TMPL->fetch_param('category'))
 		{
@@ -100,9 +101,9 @@ class Low_yearly_archives {
 			$sql_cat_join = $sql_category = '';
 		}
 
-		/** -------------------------------------
-		/**  Compose query
-		/** -------------------------------------*/
+		// -------------------------------------
+		//   Compose query
+		// -------------------------------------
 
 		$sql = "SELECT
 				CONCAT(t.year,t.month) AS ym,
@@ -121,25 +122,26 @@ class Low_yearly_archives {
 				{$sql_future}
 				{$sql_status}
 				{$sql_channel}
+				{$sql_author}
 			GROUP BY
 				ym
 			ORDER BY
 				ym ASC
 		";
 		$query = $this->EE->db->query($sql);
-		
-		/** -------------------------------------
-		/**  No results? bail.
-		/** -------------------------------------*/
-		
+
+		// -------------------------------------
+		//   No results? bail.
+		// -------------------------------------
+
 		if ($query->num_rows() == 0)
 		{
 			return;
 		}
 
-		/** -------------------------------------
-		/**  loop thru results and drop 'em like it's hot
-		/** -------------------------------------*/
+		// -------------------------------------
+		//   loop thru results and drop 'em like it's hot
+		// -------------------------------------
 
 		$years = $months = $result = array();
 
@@ -147,16 +149,16 @@ class Low_yearly_archives {
 		{
 			// array with 'yearmonth' => 'number_of_entries_in_month'
 			$months[$row['ym']] = $row['num_entries'];
-			
+
 			// get year, add number of entries to total amount per year
 			$tmp_year = substr($row['ym'],0,4);
 			if (!isset($years[$tmp_year])) { $years[$tmp_year] = 0; }
 			$years[$tmp_year] += $row['num_entries'];
 		}
-		
-		/** -------------------------------------
-		/**  Get first and last months, set timeframe
-		/** -------------------------------------*/
+
+		// -------------------------------------
+		//   Get first and last months, set timeframe
+		// -------------------------------------
 
 		$first = key($months);	// get first key = first month
 		end($months);			// go to the last element in array
@@ -167,10 +169,10 @@ class Low_yearly_archives {
 		if (!$timeframe['start_month'])	{ $timeframe['start_month']	= substr($first, -2);	}
 		if (!$timeframe['end_month'])	{ $timeframe['end_month']	= substr($last,	-2);	}
 
-		/** -------------------------------------
-		/**  ASC or DESC, to put in range() function
-		/**  Notice how we don't use anymore queries
-		/** -------------------------------------*/
+		// -------------------------------------
+		//   ASC or DESC, to put in range() function
+		//   Notice how we don't use anymore queries
+		// -------------------------------------
 
 		if ($this->EE->TMPL->fetch_param('sort') == 'asc')
 		{
@@ -185,17 +187,17 @@ class Low_yearly_archives {
 			$year_end = 'start_year';
 		}
 
-		/** -------------------------------------
-		/**  Compose nice little nested array with all the results - loop thru years first
-		/** -------------------------------------*/
-		
+		// -------------------------------------
+		//   Compose nice little nested array with all the results - loop thru years first
+		// -------------------------------------
+
 		// Get array of years to loop through
 		$loop_years = range( intval($timeframe[$year_start]), intval($timeframe[$year_end]) );
-		
-		// Set some vars 
+
+		// Set some vars
 		$total_years = count($loop_years);
 		$year_count = 0;
-		
+
 		foreach ($loop_years AS $year)
 		{
 			// init result entry
@@ -208,11 +210,11 @@ class Low_yearly_archives {
 				'leap_year'			=> date("L", strtotime("{$year}-01-01 12:00:00")), // leap_year: 1 or 0
 				'months'			=> array()
 			);
-			
+
 			// init months
 			$ms = 01;	// first month
 			$me = 12;	// last month - Duh
-		
+
 			// override month start if we're at the start year and a start month has been defined
 			if ($year == $timeframe['start_year'] && $timeframe['start_month'] >= 1 && $timeframe['start_month'] <= 12)
 			{
@@ -224,7 +226,7 @@ class Low_yearly_archives {
 			{
 				$me = $timeframe['end_month'];
 			}
-			
+
 			// month sorting
 			if ($this->EE->TMPL->fetch_param('monthsort') == 'desc')
 			{
@@ -236,10 +238,10 @@ class Low_yearly_archives {
 				$monthstart	= 'ms';
 				$monthend	= 'me';
 			}
-			
+
 			// get months for this year
 			$months_loop = range( intval($$monthstart), intval($$monthend) );
-			
+
 			// init month count
 			$row['total_months'] = count($months_loop);
 			$month_count = 0;
@@ -249,10 +251,10 @@ class Low_yearly_archives {
 			{
 				// leading zero...
 				if (strlen($month) == 1) { $month = '0'.$month; }
-				
+
 				// nice month names
 				$tmp_month = $this->EE->localize->localize_month($month);
-				
+
 				// result array
 				$data = array(
 					'month'				=> $this->EE->lang->line($tmp_month[1]),
@@ -265,32 +267,32 @@ class Low_yearly_archives {
 					'num_entries_percentage' => 0,
 					'num_entries_percentage_rounded' => 0
 				);
-				
+
 				if ($data['num_entries'] > 0)
 				{
 					$data['num_entries_percentage'] = $data['num_entries'] / $row['entries_in_year'] * 100;
 					$data['num_entries_percentage_rounded'] = round($data['num_entries_percentage']);
 				}
-				
+
 				$row['months'][] = $data;
 			}
-			
+
 			$result[] = $row;
-			
+
 		} // done looping thru years
-		
-		/** -------------------------------------
-		/**  Boom. Parse variables.
-		/** -------------------------------------*/
-	
+
+		// -------------------------------------
+		//   Boom. Parse variables.
+		// -------------------------------------
+
 		$this->return_data = $this->EE->TMPL->parse_variables($this->EE->TMPL->tagdata, $result);
-	
+
 		//return $this->return_data;
-	
+
 	}
 	// END constructor
-	
-	
+
+
 	// ----------------------------------------
 	//	Plugin Usage
 	// ----------------------------------------
@@ -299,7 +301,7 @@ class Low_yearly_archives {
 
 	function usage()
 	{
-		ob_start(); 
+		ob_start();
 		?>
 			Parameters:
 			- channel="blog|news"
@@ -357,8 +359,8 @@ class Low_yearly_archives {
 			{/exp:low_yearly_archives}
 		<?php
 		$buffer = ob_get_contents();
-	
-		ob_end_clean(); 
+
+		ob_end_clean();
 
 		return $buffer;
 	}
