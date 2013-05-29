@@ -1,15 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-// Include config file
-require PATH_THIRD.'low_yearly_archives/config.php';
+// include config file
+include(PATH_THIRD.'low_yearly_archives/config.php');
 
 $plugin_info = array(
-	'pi_name'			=> $config['name'],
-	'pi_version'		=> $config['version'],
-	'pi_author'			=> 'Lodewijk Schutte ~ Low',
-	'pi_author_url'		=> 'http://loweblog.com/software/low-yearly-archives/',
-	'pi_description'	=> 'For displaying yearly archives',
-	'pi_usage'			=> Low_yearly_archives::usage()
+	'pi_name'        => LOW_YA_NAME,
+	'pi_version'     => LOW_YA_VERSION,
+	'pi_author'      => 'Lodewijk Schutte ~ Low',
+	'pi_author_url'  => LOW_YA_DOCS,
+	'pi_description' => 'Monthly archive listings grouped by year.',
+	'pi_usage'       => 'See '.LOW_YA_DOCS.' for more info.'
 );
 
 /**
@@ -22,142 +22,68 @@ $plugin_info = array(
  */
 class Low_yearly_archives {
 
-	public  $return_data;
-	private $EE;
-
+	// --------------------------------------------------------------------
+	// PROPERTIES
 	// --------------------------------------------------------------------
 
 	/**
-	 * PHP4 Constructor
-	 *
-	 * @see	__construct()
+	 * Plugin return data
 	 */
-	public function Low_yearly_archives()
-	{
-		$this->__construct();
-	}
+	public $return_data;
+
+	// --------------------------------------------------------------------
+	// METHODS
+	// --------------------------------------------------------------------
 
 	/**
-	 * PHP5 Constructor
+	 * Constructor
 	 */
 	public function __construct()
 	{
 		// -------------------------------------
-		//   Get global instance
+		// Get the entries. No results? bail.
 		// -------------------------------------
 
-		$this->EE =& get_instance();
-
-		// -------------------------------------
-		//   Get some params
-		// -------------------------------------
-
-		$status	 = $this->EE->TMPL->fetch_param('status', 'open');
-		$channel = $this->EE->TMPL->fetch_param('channel', '');
-		$site_id = $this->EE->TMPL->fetch_param('site_id', $this->EE->config->item('site_id'));
-
-		// -------------------------------------
-		//   Get timeframe params
-		// -------------------------------------
-
-		$timeframe = array(
-			'start_year'	=> $this->EE->TMPL->fetch_param('start_year'),
-			'end_year'		=> $this->EE->TMPL->fetch_param('end_year'),
-			'start_month'	=> $this->EE->TMPL->fetch_param('start_month'),
-			'end_month'		=> $this->EE->TMPL->fetch_param('end_month')
-		);
-
-		// -------------------------------------
-		//   Get SQL params
-		// -------------------------------------
-
-		$sql_now	 = $this->EE->db->escape_str( (string) $this->EE->localize->now );
-		$sql_expired = ($this->EE->TMPL->fetch_param('show_expired') == 'yes')		? "" : "AND ( expiration_date = 0 OR expiration_date > '{$sql_now}' )";
-		$sql_future	 = ($this->EE->TMPL->fetch_param('show_future_entries') == 'yes')	? "" : "AND entry_date < '{$sql_now}'";
-		$sql_status	 = $this->EE->functions->sql_andor_string($status, 'status');
-		$sql_channel = $this->EE->functions->sql_andor_string($channel, 'channel_name');
-		$sql_site_id = $this->EE->db->escape_str($site_id);
-		$sql_author  = '';
-
-		if ($author = $this->EE->TMPL->fetch_param('author_id'))
+		if ( ! ($entries = $this->_get_entries()))
 		{
-			if ($author == 'NOT_CURRENT_USER') $author = 'not '.$this->EE->session->userdata('member_id');
-			if ($author == 'CURRENT_USER') $author = $this->EE->session->userdata('member_id');
-
-			$sql_author = $this->EE->functions->sql_andor_string($author, 'author_id');
-		}
-
-		// -------------------------------------
-		//   Get Category params
-		// -------------------------------------
-
-		if ($category = $this->EE->TMPL->fetch_param('category'))
-		{
-			$sql_cat_join = "INNER JOIN exp_category_posts p ON t.entry_id = p.entry_id";
-			$sql_category = $this->EE->functions->sql_andor_string($category, 'p.cat_id');
-		}
-		else
-		{
-			$sql_cat_join = $sql_category = '';
-		}
-
-		// -------------------------------------
-		//   Compose query
-		// -------------------------------------
-
-		$sql = "SELECT
-				CONCAT(t.year,t.month) AS ym,
-				COUNT(*) AS num_entries
-			FROM
-				exp_channel_titles t
-			INNER JOIN
-				exp_channels w
-			ON
-				t.channel_id = w.channel_id
-				{$sql_cat_join}
-			WHERE
-				w.site_id = '{$sql_site_id}'
-				{$sql_category}
-				{$sql_expired}
-				{$sql_future}
-				{$sql_status}
-				{$sql_channel}
-				{$sql_author}
-			GROUP BY
-				ym
-			ORDER BY
-				ym ASC
-		";
-		$query = $this->EE->db->query($sql);
-
-		// -------------------------------------
-		//   No results? bail.
-		// -------------------------------------
-
-		if ($query->num_rows() == 0)
-		{
+			$this->return_data = ee()->TMPL->no_results();
 			return;
 		}
 
 		// -------------------------------------
-		//   loop thru results and drop 'em like it's hot
+		// Get timeframe params
 		// -------------------------------------
 
-		$years = $months = $result = array();
+		$timeframe = array(
+			'start_year'	=> ee()->TMPL->fetch_param('start_year'),
+			'end_year'		=> ee()->TMPL->fetch_param('end_year'),
+			'start_month'	=> ee()->TMPL->fetch_param('start_month'),
+			'end_month'		=> ee()->TMPL->fetch_param('end_month')
+		);
 
-		foreach ($query->result_array() AS $row)
+		// -------------------------------------
+		// loop thru results and drop 'em like it's hot
+		// -------------------------------------
+
+		$years = $result = array();
+
+		// array with 'yearmonth' => 'number_of_entries_in_month'
+		$months = $this->_flatten_results($entries, 'num_entries', 'ym');
+
+		foreach ($months AS $key => $val)
 		{
-			// array with 'yearmonth' => 'number_of_entries_in_month'
-			$months[$row['ym']] = $row['num_entries'];
+			// Get the year
+			$year = substr($key, 0, 4);
 
-			// get year, add number of entries to total amount per year
-			$tmp_year = substr($row['ym'],0,4);
-			if (!isset($years[$tmp_year])) { $years[$tmp_year] = 0; }
-			$years[$tmp_year] += $row['num_entries'];
+			// Initiate the count if not there
+			$years[$year] = $val + (int) @$years[$year];
 		}
 
+		// Back to top
+		reset($months);
+
 		// -------------------------------------
-		//   Get first and last months, set timeframe
+		// Get first and last months, set timeframe
 		// -------------------------------------
 
 		$first = key($months);	// get first key = first month
@@ -174,7 +100,7 @@ class Low_yearly_archives {
 		//   Notice how we don't use anymore queries
 		// -------------------------------------
 
-		if ($this->EE->TMPL->fetch_param('sort') == 'asc')
+		if (ee()->TMPL->fetch_param('sort') == 'asc')
 		{
 			// if ASC, we start with start, and end with end.
 			$year_start = 'start_year';
@@ -228,7 +154,7 @@ class Low_yearly_archives {
 			}
 
 			// month sorting
-			if ($this->EE->TMPL->fetch_param('monthsort') == 'desc')
+			if (ee()->TMPL->fetch_param('monthsort') == 'desc')
 			{
 				$monthstart	= 'me';
 				$monthend	= 'ms';
@@ -253,13 +179,13 @@ class Low_yearly_archives {
 				if (strlen($month) == 1) { $month = '0'.$month; }
 
 				// nice month names
-				$tmp_month = $this->EE->localize->localize_month($month);
+				$tmp_month = ee()->localize->localize_month($month);
 
 				// result array
 				$data = array(
-					'month'				=> $this->EE->lang->line($tmp_month[1]),
+					'month'				=> ee()->lang->line($tmp_month[1]),
 					'month_num'			=> $month,
-					'month_short'		=> $this->EE->lang->line($tmp_month[0]),
+					'month_short'		=> ee()->lang->line($tmp_month[0]),
 					'month_num_short'	=> intval($month),
 					'month_count'		=> ++$month_count,
 					'num_entries'		=> ((isset($months[$year.$month])) ? $months[$year.$month] : 0), // got entries for current month?
@@ -285,87 +211,212 @@ class Low_yearly_archives {
 		//   Boom. Parse variables.
 		// -------------------------------------
 
-		$this->return_data = $this->EE->TMPL->parse_variables($this->EE->TMPL->tagdata, $result);
+		$this->return_data = ee()->TMPL->parse_variables(ee()->TMPL->tagdata, $result);
 
 		//return $this->return_data;
 
 	}
-	// END constructor
 
-
-	// ----------------------------------------
-	//	Plugin Usage
-	// ----------------------------------------
-
-	// This function describes how the plugin is used.
-
-	function usage()
+	/**
+	 * Query DB for entries
+	 */
+	private function _get_entries()
 	{
-		ob_start();
-		?>
-			Parameters:
-			- channel="blog|news"
-			- status="not closed"
-			- category="15|16"
-			- show_expired="yes"
-			- show_future_entries="yes"
-			- sort="asc"
-			- monthsort="desc"
-			- start_month="1" (defaults to the month of the oldest entry)
-			- end_month="12" (defaults to the month of the newest entry)
-			- start_year="2000" (defaults to the year of the oldest entry)
-			- end_year="2010" (defaults to the year of the newest entry)
+		// -------------------------------------
+		// When's this?
+		// -------------------------------------
 
-			Tag pairs:
-			- {months backspace="1"}{/months}
+		$now = ee()->localize->now;
 
-			Single tags:
-			- {year}
-			- {year_short}
-			- {year_count}
-			- {total_years}
-			- {leap_year}
-			- {total_months}
-			- {month} *
-			- {month_num} *
-			- {month_short} *
-			- {month_num_short} *
-			- {month_count} *
-			- {num_entries} *
-			- {num_entries_percentage} *
-			- {num_entries_percentage_rounded} *
+		// -------------------------------------
+		// Start building query
+		// -------------------------------------
 
-			Tags marked with * are available in between the {months} tag pair only.
+		$select = array(
+			'CONCAT(t.year,t.month) AS ym',
+			'COUNT(*) AS num_entries'
+		);
 
-			Example:
+		// Basic query stuff
+		ee()->db->select($select)
+			->from('channel_titles t')
+			->where_in('t.site_id', ee()->TMPL->site_ids)
+			->group_by('ym')
+			->order_by('ym', 'asc');
 
-			{exp:low_yearly_archives channel="blog" start_month="1" status="not closed" sort="desc"}
-			{if "{year_count}" == "1"}<ul>{/if}
-				<li>
-					{year}
-					<ul>
-					{months}
-						<li>
-						{if "{num_entries}" != "0"}
-							<a href="{path="blog/archive/{year}/{month_num}"}" title="{num_entries} entries in {month} {year}">{month_short}</a>
-						{if:else}
-							{month_short}
-						{/if}
-						</li>
-					{/months}
-					</ul>
-				</li>
-			{if "{year_count}" == "{total_years}"}</ul>{/if}
-			{/exp:low_yearly_archives}
-		<?php
-		$buffer = ob_get_contents();
+		// --------------------------------------
+		// Filter by channel
+		// --------------------------------------
 
-		ob_end_clean();
+		if ($channels = ee()->TMPL->fetch_param('channel'))
+		{
+			// Determine which channels to filter by
+			list($channels, $in) = $this->_explode_param($channels);
 
-		return $buffer;
+			// Join channels table
+			ee()->db->join('channels c', 't.channel_id = c.channel_id');
+			ee()->db->{($in ? 'where_in' : 'where_not_in')}('c.channel_name', $channels);
+		}
+
+		// --------------------------------------
+		// Filter by status - defaults to open
+		// --------------------------------------
+
+		if ($status = ee()->TMPL->fetch_param('status', 'open'))
+		{
+			// Determine which statuses to filter by
+			list($status, $in) = $this->_explode_param($status);
+
+			// Adjust query accordingly
+			ee()->db->{($in ? 'where_in' : 'where_not_in')}('t.status', $status);
+		}
+
+		// --------------------------------------
+		// Filter by expired entries
+		// --------------------------------------
+
+		if (ee()->TMPL->fetch_param('show_expired') != 'yes')
+		{
+			ee()->db->where("(t.expiration_date = '0' OR t.expiration_date > '{$now}')");
+		}
+
+		// --------------------------------------
+		// Filter by future entries
+		// --------------------------------------
+
+		if (ee()->TMPL->fetch_param('show_future_entries') != 'yes')
+		{
+			ee()->db->where("t.entry_date < '{$now}'");
+		}
+
+		// --------------------------------------
+		// Filter by author
+		// --------------------------------------
+
+		if ($author = ee()->TMPL->fetch_param('author_id'))
+		{
+			if ($author == 'NOT_CURRENT_USER') $author = 'not '.ee()->session->userdata('member_id');
+			if ($author == 'CURRENT_USER') $author = ee()->session->userdata('member_id');
+
+			// Change to proper param
+			list($author, $in) = $this->_explode_param($author);
+
+			// Adjust query accordingly
+			ee()->db->{($in ? 'where_in' : 'where_not_in')}('t.author_id', $author);
+		}
+
+		// --------------------------------------
+		// Filter by category
+		// --------------------------------------
+
+		if ($categories_param = ee()->TMPL->fetch_param('category'))
+		{
+			// Determine which categories to filter by
+			list($categories, $in) = $this->_explode_param($categories_param);
+
+			if (strpos($categories_param, '&'))
+			{
+				// Execute query the old-fashioned way, so we don't interfere with active record
+				// Get the entry ids that have all given categories assigned
+				$query = ee()->db->query(
+					"SELECT entry_id, COUNT(*) AS num
+					FROM exp_category_posts
+					WHERE cat_id IN (".implode(',', $categories).")
+					GROUP BY entry_id HAVING num = ". count($categories));
+
+				// If no entries are found, make sure we limit the query accordingly
+				if ( ! ($entry_ids = $this->_flatten_results($query->result_array(), 'entry_id')))
+				{
+					$entry_ids = array(0);
+				}
+
+				ee()->db->where_in('t.entry_id', $entry_ids);
+			}
+			else
+			{
+				// Join category table
+				ee()->db->join('category_posts cp', 'cp.entry_id = t.entry_id');
+				ee()->db->{($in ? 'where_in' : 'where_not_in')}('cp.cat_id', $categories);
+			}
+		}
+
+		// -------------------------------------
+		// Get the query
+		// -------------------------------------
+
+		$query = ee()->db->get();
+
+		return $query->result_array();
 	}
-	// END
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Converts EE parameter to workable php vars
+	 *
+	 * @access     private
+	 * @param      string    String like 'not 1|2|3' or '40|15|34|234'
+	 * @return     array     [0] = array of ids, [1] = boolean whether to include or exclude: TRUE means include, FALSE means exclude
+	 */
+	private function _explode_param($str)
+	{
+		// --------------------------------------
+		// Initiate $in var to TRUE
+		// --------------------------------------
+
+		$in = TRUE;
+
+		// --------------------------------------
+		// Check if parameter is "not bla|bla"
+		// --------------------------------------
+
+		if (strtolower(substr($str, 0, 4)) == 'not ')
+		{
+			// Change $in var accordingly
+			$in = FALSE;
+
+			// Strip 'not ' from string
+			$str = substr($str, 4);
+		}
+
+		// --------------------------------------
+		// Return two values in an array
+		// --------------------------------------
+
+		return array(preg_split('/(&&?|\|)/', $str), $in);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Flatten results
+	 *
+	 * Given a DB result set, this will return an (associative) array
+	 * based on the keys given
+	 *
+	 * @param      array
+	 * @param      string    key of array to use as value
+	 * @param      string    key of array to use as key (optional)
+	 * @return     array
+	 */
+	private function _flatten_results($resultset, $val, $key = FALSE)
+	{
+		$array = array();
+
+		foreach ($resultset AS $row)
+		{
+			if ($key !== FALSE)
+			{
+				$array[$row[$key]] = $row[$val];
+			}
+			else
+			{
+				$array[] = $row[$val];
+			}
+		}
+
+		return $array;
+	}
 
 }
 // END CLASS
-?>
