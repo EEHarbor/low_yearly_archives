@@ -79,8 +79,9 @@ class Low_yearly_archives {
 			$years[$year] = $val + (int) @$years[$year];
 		}
 
-		// Back to top
+		// Back to top, clean up
 		reset($months);
+		unset($entries);
 
 		// -------------------------------------
 		// Get first and last months, set timeframe
@@ -96,8 +97,8 @@ class Low_yearly_archives {
 		if (!$timeframe['end_month'])	{ $timeframe['end_month']	= substr($last,	-2);	}
 
 		// -------------------------------------
-		//   ASC or DESC, to put in range() function
-		//   Notice how we don't use anymore queries
+		// ASC or DESC, to put in range() function
+		// Notice how we don't use anymore queries
 		// -------------------------------------
 
 		if (ee()->TMPL->fetch_param('sort') == 'asc')
@@ -114,7 +115,7 @@ class Low_yearly_archives {
 		}
 
 		// -------------------------------------
-		//   Compose nice little nested array with all the results - loop thru years first
+		// Compose nice little nested array with all the results - loop thru years first
 		// -------------------------------------
 
 		// Get array of years to loop through
@@ -208,17 +209,20 @@ class Low_yearly_archives {
 		} // done looping thru years
 
 		// -------------------------------------
-		//   Boom. Parse variables.
+		// Boom. Parse variables.
 		// -------------------------------------
 
 		$this->return_data = ee()->TMPL->parse_variables(ee()->TMPL->tagdata, $result);
 
-		//return $this->return_data;
-
 	}
+
+	// --------------------------------------------------------------------
 
 	/**
 	 * Query DB for entries
+	 *
+	 * @access     private
+	 * @return     array
 	 */
 	private function _get_entries()
 	{
