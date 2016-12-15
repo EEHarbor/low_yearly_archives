@@ -1,17 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-// include config file
-include(PATH_THIRD.'low_yearly_archives/config.php');
-
-$plugin_info = array(
-	'pi_name'        => LOW_YA_NAME,
-	'pi_version'     => LOW_YA_VERSION,
-	'pi_author'      => 'Lodewijk Schutte ~ Low',
-	'pi_author_url'  => LOW_YA_DOCS,
-	'pi_description' => 'Monthly archive listings grouped by year.',
-	'pi_usage'       => 'See '.LOW_YA_DOCS.' for more info.'
-);
-
 /**
  * Low Yearly Archives Plugin Class
  *
