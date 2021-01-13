@@ -307,9 +307,9 @@ class Low_yearly_archives
                 // Get the entry ids that have all given categories assigned
                 $query = ee()->db->query(
                     "SELECT entry_id, COUNT(*) AS num
-					FROM exp_category_posts
-					WHERE cat_id IN (".implode(',', $categories).")
-					GROUP BY entry_id HAVING num = ". count($categories)
+                    FROM exp_category_posts
+                    WHERE cat_id IN (".implode(',', $categories).")
+                    GROUP BY entry_id HAVING num = ". count($categories)
                 );
 
                 // If no entries are found, make sure we limit the query accordingly
