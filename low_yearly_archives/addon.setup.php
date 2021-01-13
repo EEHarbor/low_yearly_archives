@@ -10,11 +10,11 @@
  */
 
 return array(
-	'author'         => 'Low',
-	'author_url'     => 'http://gotolow.com/',
-	'docs_url'       => 'http://gotolow.com/addons/low-yearly-archives',
-	'name'           => 'Low Yearly Archives',
-	'description'    => 'Monthly archive listings grouped by year.',
-	'version'        => '3.0.0',
-	'namespace'      => 'Low\YearlyArchives'
+    'author'         => 'Low',
+    'author_url'     => 'http://gotolow.com/',
+    'docs_url'       => 'http://gotolow.com/addons/low-yearly-archives',
+    'name'           => 'Low Yearly Archives',
+    'description'    => 'Monthly archive listings grouped by year.',
+    'version'        => '3.0.0',
+    'namespace'      => 'Low\YearlyArchives'
 );
