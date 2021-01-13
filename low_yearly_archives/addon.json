@@ -1,0 +1,14 @@
+{
+  "name": "Low Yearly Archives",
+  "shortname": "low_yearly_archives",
+  "version": "3.0.0",
+  "foundation_version": "",
+  "description": "Monthly archive listings grouped by year.",
+  "license": "EEHarbor",
+  "namespace": "Low\\YearlyArchives",
+  "require": {
+    "php": ">=5.6.*",
+    "expressionengine/core": ">=3"
+  },
+  "resources": {}
+}
