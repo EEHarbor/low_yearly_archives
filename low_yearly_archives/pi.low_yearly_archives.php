@@ -10,7 +10,11 @@
  * @link           http://gotolow.com/addons/low-yearly-archives
  * @license        http://creativecommons.org/licenses/by-sa/3.0/
  */
-class Low_yearly_archives
+
+include_once "addon.setup.php";
+use Low\YearlyArchives\FluxCapacitor\Base\Pi;
+
+class Low_yearly_archives extends Pi
 {
 
     // --------------------------------------------------------------------
@@ -31,6 +35,8 @@ class Low_yearly_archives
      */
     public function __construct()
     {
+        parent::__construct();
+
         // -------------------------------------
         // Get the entries. No results? bail.
         // -------------------------------------
@@ -45,10 +51,10 @@ class Low_yearly_archives
         // -------------------------------------
 
         $timeframe = array(
-            'start_year'	=> ee()->TMPL->fetch_param('start_year'),
-            'end_year'		=> ee()->TMPL->fetch_param('end_year'),
-            'start_month'	=> ee()->TMPL->fetch_param('start_month'),
-            'end_month'		=> ee()->TMPL->fetch_param('end_month')
+            'start_year'    => ee()->TMPL->fetch_param('start_year'),
+            'end_year'      => ee()->TMPL->fetch_param('end_year'),
+            'start_month'   => ee()->TMPL->fetch_param('start_month'),
+            'end_month'     => ee()->TMPL->fetch_param('end_month')
         );
 
         // -------------------------------------
@@ -76,21 +82,21 @@ class Low_yearly_archives
         // Get first and last months, set timeframe
         // -------------------------------------
 
-        $first = key($months);	// get first key = first month
-        end($months);			// go to the last element in array
-        $last  = key($months);	// and get that key too
+        $first = key($months);  // get first key = first month
+        end($months);           // go to the last element in array
+        $last  = key($months);  // and get that key too
 
         if (!$timeframe['start_year']) {
-            $timeframe['start_year']	= substr($first, 0, 4);
+            $timeframe['start_year']    = substr($first, 0, 4);
         }
         if (!$timeframe['end_year']) {
-            $timeframe['end_year']	= substr($last, 0, 4);
+            $timeframe['end_year']  = substr($last, 0, 4);
         }
         if (!$timeframe['start_month']) {
-            $timeframe['start_month']	= substr($first, -2);
+            $timeframe['start_month']   = substr($first, -2);
         }
         if (!$timeframe['end_month']) {
-            $timeframe['end_month']	= substr($last, -2);
+            $timeframe['end_month'] = substr($last, -2);
         }
 
         // -------------------------------------
@@ -122,18 +128,18 @@ class Low_yearly_archives
         foreach ($loop_years as $year) {
             // init result entry
             $row = array(
-                'year'				=> $year,
-                'year_short'		=> substr($year, -2),
-                'total_years'		=> $total_years,
-                'year_count'		=> ++$year_count,
-                'entries_in_year'	=> (isset($years[$year]) ? $years[$year] : 0),
-                'leap_year'			=> date("L", strtotime("{$year}-01-01 12:00:00")), // leap_year: 1 or 0
-                'months'			=> array()
+                'year'              => $year,
+                'year_short'        => substr($year, -2),
+                'total_years'       => $total_years,
+                'year_count'        => ++$year_count,
+                'entries_in_year'   => (isset($years[$year]) ? $years[$year] : 0),
+                'leap_year'         => date("L", strtotime("{$year}-01-01 12:00:00")), // leap_year: 1 or 0
+                'months'            => array()
             );
 
             // init months
-            $ms = 01;	// first month
-            $me = 12;	// last month - Duh
+            $ms = 01;   // first month
+            $me = 12;   // last month - Duh
 
             // override month start if we're at the start year and a start month has been defined
             if ($year == $timeframe['start_year'] && $timeframe['start_month'] >= 1 && $timeframe['start_month'] <= 12) {
@@ -147,11 +153,11 @@ class Low_yearly_archives
 
             // month sorting
             if (ee()->TMPL->fetch_param('monthsort') == 'desc') {
-                $monthstart	= 'me';
-                $monthend	= 'ms';
+                $monthstart = 'me';
+                $monthend   = 'ms';
             } else {
-                $monthstart	= 'ms';
-                $monthend	= 'me';
+                $monthstart = 'ms';
+                $monthend   = 'me';
             }
 
             // get months for this year
@@ -173,12 +179,12 @@ class Low_yearly_archives
 
                 // result array
                 $data = array(
-                    'month'				=> ee()->lang->line($tmp_month[1]),
-                    'month_num'			=> $month,
-                    'month_short'		=> ee()->lang->line($tmp_month[0]),
-                    'month_num_short'	=> intval($month),
-                    'month_count'		=> ++$month_count,
-                    'num_entries'		=> ((isset($months[$year.$month])) ? $months[$year.$month] : 0), // got entries for current month?
+                    'month'             => ee()->lang->line($tmp_month[1]),
+                    'month_num'         => $month,
+                    'month_short'       => ee()->lang->line($tmp_month[0]),
+                    'month_num_short'   => intval($month),
+                    'month_count'       => ++$month_count,
+                    'num_entries'       => ((isset($months[$year.$month])) ? $months[$year.$month] : 0), // got entries for current month?
                     // Courtesy of Leevi Graham
                     'num_entries_percentage' => 0,
                     'num_entries_percentage_rounded' => 0
