@@ -1,20 +1,15 @@
 <?php
 
-/**
- * Low Yearly Archives config file
- *
- * @package        low_yearly_archives
- * @author         Lodewijk Schutte <hi@gotolow.com>
- * @link           http://gotolow.com/
- * @copyright      Copyright (c) 2016, Low
- */
+require_once 'autoload.php';
+$addonJson = json_decode(file_get_contents(__DIR__ . '/addon.json'));
 
 return array(
-	'author'         => 'Low',
-	'author_url'     => 'http://gotolow.com/',
-	'docs_url'       => 'http://gotolow.com/addons/low-yearly-archives',
-	'name'           => 'Low Yearly Archives',
-	'description'    => 'Monthly archive listings grouped by year.',
-	'version'        => '3.0.0',
-	'namespace'      => 'Low\YearlyArchives'
+    'name'              => $addonJson->name,
+    'description'       => $addonJson->description,
+    'version'           => $addonJson->version,
+    'namespace'         => $addonJson->namespace,
+    'author'            => 'EEHarbor',
+    'author_url'        => 'http://eeharbor.com/low_yearly_archives',
+    'docs_url'          => 'http://eeharbor.com/low_yearly_archives/documentation',
+    'settings_exist'    => false,
 );
