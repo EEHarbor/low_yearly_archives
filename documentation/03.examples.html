@@ -1,0 +1,32 @@
+---
+title: Examples
+---
+
+<h1>Example</h1>
+
+<pre>
+    <code>
+        {exp:low_yearly_archives channel="blog" start_month="1" status="not closed" sort="desc"}
+        {if year_count == 1}&LT;ul>{/if}
+        &LT;li>
+            {year}
+            &LT;ul>
+            {months}
+            &LT;li>
+            {if num_entries != 0}
+                &LT;a href="{path=blog/archive}{year}/{month_num}/"
+                title="{num_entries} entries in {month} {year}">{month_short}&LT;/a>
+            {if:else}
+                {month_short}
+            {/if}
+            &LT;/li>
+            {/months}
+            &LT;/ul>
+        &LT;/li>
+        {if year_count == total_years}&LT;/ul>{/if}
+        {/exp:low_yearly_archives}
+    </code>
+</pre>
+
+
+
