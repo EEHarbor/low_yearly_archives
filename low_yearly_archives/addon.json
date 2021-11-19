@@ -1,8 +1,8 @@
 {
     "name": "Low Yearly Archives",
     "shortname": "low_yearly_archives",
-    "version": "4.0.0",
-    "foundation_version": "4.6.1",
+    "version": "4.0.1",
+    "foundation_version": "4.9.0",
     "description": "Monthly archive listings grouped by year.",
     "license": "EEHarbor",
     "namespace": "Low\\YearlyArchives",
@@ -11,5 +11,6 @@
         "expressionengine/core": ">=3"
     },
     "resources": {
+        
     }
 }
