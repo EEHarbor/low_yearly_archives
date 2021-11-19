@@ -1,4 +1,6 @@
-<?php if (! defined('BASEPATH')) {
+<?php
+
+if (! defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
@@ -171,7 +173,7 @@ class Low_yearly_archives extends Pi
             foreach ($months_loop as $month) {
                 // leading zero...
                 if (strlen($month) == 1) {
-                    $month = '0'.$month;
+                    $month = '0' . $month;
                 }
 
                 // nice month names
@@ -184,7 +186,7 @@ class Low_yearly_archives extends Pi
                     'month_short'       => ee()->lang->line($tmp_month[0]),
                     'month_num_short'   => intval($month),
                     'month_count'       => ++$month_count,
-                    'num_entries'       => ((isset($months[$year.$month])) ? $months[$year.$month] : 0), // got entries for current month?
+                    'num_entries'       => ((isset($months[$year . $month])) ? $months[$year . $month] : 0), // got entries for current month?
                     // Courtesy of Leevi Graham
                     'num_entries_percentage' => 0,
                     'num_entries_percentage_rounded' => 0
@@ -287,7 +289,7 @@ class Low_yearly_archives extends Pi
 
         if ($author = ee()->TMPL->fetch_param('author_id')) {
             if ($author == 'NOT_CURRENT_USER') {
-                $author = 'not '.ee()->session->userdata('member_id');
+                $author = 'not ' . ee()->session->userdata('member_id');
             }
             if ($author == 'CURRENT_USER') {
                 $author = ee()->session->userdata('member_id');
@@ -314,8 +316,8 @@ class Low_yearly_archives extends Pi
                 $query = ee()->db->query(
                     "SELECT entry_id, COUNT(*) AS num
                     FROM exp_category_posts
-                    WHERE cat_id IN (".implode(',', $categories).")
-                    GROUP BY entry_id HAVING num = ". count($categories)
+                    WHERE cat_id IN (" . implode(',', $categories) . ")
+                    GROUP BY entry_id HAVING num = " . count($categories)
                 );
 
                 // If no entries are found, make sure we limit the query accordingly
