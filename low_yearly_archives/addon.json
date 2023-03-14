@@ -2,7 +2,7 @@
     "name": "Low Yearly Archives",
     "shortname": "low_yearly_archives",
     "version": "4.0.2",
-    "foundation_version": "4.9.0",
+    "foundation_version": "4.10.0",
     "description": "Monthly archive listings grouped by year.",
     "license": "EEHarbor",
     "namespace": "Low\\YearlyArchives",
