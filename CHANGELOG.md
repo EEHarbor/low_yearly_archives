@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [4.1.1] - 2025-03-04
+### Fixed
+- PHP Warnings
+
 ## [4.1.0] - 2023-03-14
 ### Changed
 - Updated Foundation Version
 - PHP 8.2 Compatibilty
+
 ## [4.0.2] - 2022-09-27
 - Verified ExpressionEngine 7 Compatibility
 

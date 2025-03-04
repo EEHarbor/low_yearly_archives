@@ -72,6 +72,10 @@ class Low_yearly_archives extends Pi
             // Get the year
             $year = substr($key, 0, 4);
 
+            if (!isset($years[$year])) {
+                $years[$year] = 0;
+            }
+
             // Initiate the count if not there
             $years[$year] = $val + (int) @$years[$year];
         }
