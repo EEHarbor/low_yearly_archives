@@ -15,25 +15,25 @@ Baseline: `0f61057a193e7a7e82156038bfe892f87f95bbaa`, freshly fetched/pulled `or
 
 ## Behavior and vectors
 
-167 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
+203 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
 
 Native subprocess tests compile all 27 source units with E_ALL (archive entries are hashed copies for CLI lint), load every dispatcher branch for EE2–EE7, and execute direct access, foreign namespaces, missing archive/class and actual self-extracting fallback behavior. Each child uses the selected `PHP_BINARY`, E_ALL and its own temporary directory; only its own tree is removed.
 
 ## Full configured PHP matrix
 
-Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-99knina7/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
+Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-vulot65f/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
 
 | PHP | Tests | Assertions | Errors | Failures | Warnings | Risky | Skipped | Incomplete |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 7.4.33 | 167 | 907 | 16 | 11 | 0 | 0 | 0 | 0 |
-| 8.0.30 | 167 | 907 | 16 | 11 | 0 | 0 | 0 | 0 |
-| 8.1.33 | 167 | 906 | 17 | 11 | 0 | 0 | 0 | 0 |
-| 8.2.30 | 167 | 891 | 20 | 11 | 0 | 0 | 0 | 0 |
-| 8.3.28 | 167 | 891 | 20 | 11 | 0 | 0 | 0 | 0 |
-| 8.4.15 | 167 | 891 | 20 | 11 | 0 | 0 | 0 | 0 |
-| 8.5.0 | 167 | 891 | 20 | 11 | 0 | 0 | 0 | 0 |
+| 7.4.33 | 203 | 1152 | 16 | 15 | 0 | 0 | 0 | 0 |
+| 8.0.30 | 203 | 1123 | 16 | 16 | 0 | 0 | 0 | 0 |
+| 8.1.33 | 203 | 1122 | 17 | 16 | 0 | 0 | 0 | 0 |
+| 8.2.30 | 203 | 1107 | 20 | 16 | 0 | 0 | 0 | 0 |
+| 8.3.28 | 203 | 1107 | 20 | 16 | 0 | 0 | 0 | 0 |
+| 8.4.15 | 203 | 1107 | 20 | 16 | 0 | 0 | 0 | 0 |
+| 8.5.0 | 203 | 1107 | 20 | 16 | 0 | 0 | 0 | 0 |
 
-All failures/errors are the unchanged source diagnostics/defects below. Each of the 13 test files was also replayed alone on PHP 7.4 and 8.5; no class-loading or fixture-order errors were found (`tests/reports/focused-6ic0p4pz/`, before the final cache datasets). No source diagnostic is expected merely to make a test pass. Active test-support diagnostics and suppressed deprecations also fail; native lint output is checked for warnings/deprecations regardless of process exit code.
+All failures/errors are the unchanged source diagnostics/defects below. Each of the 18 test files was also replayed alone on PHP 7.4 and 8.5; no class-loading or fixture-order errors were found (`tests/reports/focused-ee2-6ieuqvst/`). Random seed 20261023 on those runtimes reproduced the complete suite counts in the same directory. No source diagnostic is expected merely to make a test pass. Active test-support diagnostics and suppressed deprecations also fail; native lint output is checked for warnings/deprecations regardless of process exit code.
 
 ## Confirmed source defects
 
@@ -52,14 +52,14 @@ All failures/errors are the unchanged source diagnostics/defects below. Each of 
 
 The repository had no PHPUnit harness or tests before this work; read-only preflight reported missing harness/tool files. Initial executable baseline was therefore unavailable until bootstrap.
 
-PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-base-revised-coverage.wUTG9w/`. Commands and reproduction are in `README.md`. Reports include fresh runtime-specific Clover and skill method JSON with magic methods enabled; prior follow-ups also retained serialized PHPUnit coverage.
+PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-ee2-coverage-fc202skd/`. Commands and reproduction are in `README.md`. Reports include fresh runtime-specific Clover and skill method JSON with magic methods enabled; prior follow-ups also retained serialized PHPUnit coverage.
 
 - All four plugin methods have 100% executable lines (skill report: 4/4 at its line target). The skill helper emits `branch_percent: null`; its `at_target` label does not close actual branch requirements.
-- Archived method report: 222 methods, 154 at the helper's line target, 62 below its floor and 6 above floor. Entire inventory: 27 files, 1,588/2,182 executable statements covered. These aggregates are progress, not completion.
-- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-base-revised-coverage.wUTG9w/native82.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
+- Archived method report: 222 methods, 171 at the helper's line target, 45 below its floor and 6 above floor. Entire inventory: 27 files, 1,652/2,182 executable statements covered. These aggregates are progress, not completion.
+- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-ee2-coverage-fc202skd/native82.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
 - Raw plugin `_explode_param` outgoing edges: 3/3; `_get_entries`: 46/46. Constructor: 69/74 raw exits, with missing exits at source lines 47, 56, 128, 134 and 170; flatten helper: 8/9, missing loop exit at 398. Some zero-count terminal/loop paths remain despite explicit empty/no-results vectors and require instrumentation interpretation. All raw zeros remain visible.
-- Top-level Xdebug basic-block counters and synthetic `2147483645` terminal exits can remain zero despite execution. They are not discarded or counted as covered. Child coverage is not merged into the parent; native dispatcher/guard/fallback behavior has assertions but its child branches remain a coverage gap.
-- Uncovered units include PHAR stub fallback/error/platform paths, autoloader variants, MCP save/paginate routes, navigation conduit, EE2 bridge APIs, remaining modern bridge adapters/nav/view paths, fieldtype EE2/context branches, updater constructor/extension paths and archive entrypoint. The complete Clover/method reports retain exact lines. These require additional tests and measurement; they are not claimed blocked solely because more work is needed.
+- Top-level Xdebug basic-block counters and synthetic `2147483645` terminal exits can remain zero despite execution. They are not discarded or counted as covered. Child graphs are retained separately beside the parent and are not merged across contexts; full child branch closure remains incomplete. The early direct-access guard and lint children do not produce raw graphs.
+- Uncovered units include PHAR stub fallback/error/platform paths, autoloader variants, MCP save routes, navigation conduit, further EE2 settings/formatting/dynamic-view APIs, remaining raw modern bridge outcomes, fieldtype EE2/context branches, updater extension paths and archive entrypoint. The complete Clover/method reports retain exact lines. These require additional tests and measurement; they are not claimed blocked solely because more work is needed.
 - A full source-immutable 100% line result is blocked by the `Pi::info()` error at its first metadata access; subsequent metadata lines cannot execute through that API on the shipped source. No production repair is authorized. Windows-only stub paths cannot be natively exercised on this macOS host.
 
 ## Review/publication
@@ -103,6 +103,20 @@ A separate five-case test file exercises the real updater constructor, navigatio
 
 New source blockers: `Conduit/McpNav.php:7` includes an absent add-on navigation file under `@`, so the abstract conduit cannot load under the required diagnostics policy; its methods remain blocked without source changes. `Base/Mcp.php:165` creates undeclared `$data`, emitting a dynamic-property deprecation on PHP 8.2–8.5. Correct pagination tests stay red there. The updater constructor runs normally, including the real encrypted update pixel.
 
-Coverage runs stay separate by runtime: fresh PHP 8.2 Clover is `clover82.xml` and raw evidence `native82.json` under `/private/tmp/low-yearly-base-revised-coverage.wUTG9w/`; PHP 7.4 Clover is `clover74.xml`. PHP 7.4 shows 1,604/2,180 statements and pagination 19/20 lines (95%); its missing line is the `PHP_VERSION_ID < 50306` compatibility branch, unreachable on every required runtime. PHP 8.2 Clover excludes the errored pagination cases, so its method report stays at zero for that method; direct raw evidence retains the reached instructions. No incompatible graphs/reports are merged, and no complete-coverage claim is made. This follow-up awaits independent exact-diff review before publication.
+Coverage runs stay separate by runtime: fresh PHP 8.2 Clover is `clover82.xml` and raw evidence `native82.json` under `/private/tmp/low-yearly-base-revised-coverage.wUTG9w/`; PHP 7.4 Clover is `clover74.xml`. PHP 7.4 shows 1,604/2,180 statements and pagination 19/20 lines (95%); its missing line is the `PHP_VERSION_ID < 50306` compatibility branch, unreachable on every required runtime. PHP 8.2 Clover excludes the errored pagination cases, so its method report stays at zero for that method; direct raw evidence retains the reached instructions. No incompatible graphs/reports are merged, and no complete-coverage claim is made. Independent review approved exact diff SHA256 `d36757d930f58c09b3f70f34f6a4e0933fb6051c7824e7400d1d7d3482057812` atop `fc48de43233050c47258259e9b8896ab4bbdd14f`. The reviewer reconstructed a private snapshot, verified tooling, replayed all seven full suites and the new file alone on PHP 7.4/8.5, inspected separate raw/Clover provenance, and found no remaining actionable issue. The scoped test commit `e79dbb8` and evidence commit `3c278be0b4379bc1b6e5a4eb17545e727ab7db75` were pushed to `origin/unit-tests-2026`, with exact HEAD/tracking parity `0 0` and an empty production diff.
 
-Base-API review correction: pagination render expectations now require `/listing` for explicit URLs and independently require a `LowYearlyUrl` with the caller-derived route for the null URL. The expected route is composed from the known package route and the test caller name, without invoking the source URL builder. Refreshed full seven-version matrix counts are unchanged; fresh raw PHP 8.2 and separate PHP 7.4/8.2 Clover/method evidence are in `/private/tmp/low-yearly-base-revised-coverage.wUTG9w/`. Exact-diff re-review is pending.
+Base-API review correction: pagination render expectations now require `/listing` for explicit URLs and independently require a `LowYearlyUrl` with the caller-derived route for the null URL. The expected route is composed from the known package route and the test caller name, without invoking the source URL builder. Refreshed full seven-version matrix counts are unchanged; fresh raw PHP 8.2 and separate PHP 7.4/8.2 Clover/method evidence are in `/private/tmp/low-yearly-base-revised-coverage.wUTG9w/`. The dedicated reviewer independently confirmed the exact render constraints and approved the replacement before publication.
+
+
+## EE2 and native-process follow-up
+
+Thirty-six new cases cover EE2 collaborator delegation, request/persistent cache routing, page/offset input shapes, legacy pagination, query context, module checks, view delegation, native CP route mappings and cookie/session/fingerprint URL modes. EE session userdata now follows the real default-value contract. Native execution uses file-backed output capped at 128 KiB per stream, a 15-second deadline, explicit selected runtime, and finally cleanup of the unique child tree. Independent harness vectors verify exit/stdout/stderr separation and excessive-output rejection. The matrix now uses the SHA-verified launcher, records the absolute Herd binary in each result, and pins its EE/request context; it rejects missing, empty or stale JUnit reports.
+
+New source regressions stay red: EE2.php:47 uses the invalid `=<` version comparison, silently choosing the wrong session setting on PHP 7.4 and throwing ValueError on PHP 8+. EE2.php:136 concatenates raw query values, allowing an ampersand in one value to inject another route argument. EE2.php:281–286 deletes only request cache state when persistent deletion was requested, leaving the native storage boundary untouched.
+
+Fresh evidence is `/private/tmp/low-yearly-ee2-coverage-fc202skd/`: PHP 8.2 raw parent plus 32 child graphs (33 reports total), each retaining its runtime, EE/request context, timestamp, source hashes and raw out/out_hit/path arrays. The parent and children are separate observations; no cross-context merge or 100% branch claim is made. The raw parent reaches all 27 source keys and retains 15,674 paths. The child reports retain native dispatcher/loader and EE2 URL-route outcomes; synthetic exits and zero counters remain unknown.
+
+Separate PHP 7.4 Clover/method reports show 1,668/2,180 statements and 171/222 archive methods at the line target; PHP 8.2 shows 1,652/2,182 and 171/222. EE2 cache, request, delegation and pagination methods now reach 100% executable lines in the parent measurement. Native URL methods remain zero in parent Clover and are evidenced only in their individual child raw reports. Further actual outgoing outcomes, EE2 settings/formatting/dynamic-view variants, MCP licensing and platform-dependent paths remain incomplete. The source archive is unchanged. This follow-up is frozen for independent exact-diff review before commit/push.
+
+
+The independent first pass reconstructed the exact base plus the frozen diff with verified PHARs, reproduced all seven 203-case suites, replayed all eighteen files alone on PHP 7.4/8.5, and independently retained the parent plus 32 child raw contexts. Parent totals matched 27 source keys, 15,674 paths, 1,275 basic blocks and 1,632 outgoing outcomes. No additional source/test/fixture/isolation issue was found. The self-review provenance correction records the absolute PHP binary in each matrix row; the replacement exact diff awaits final bounded re-review before publication.
