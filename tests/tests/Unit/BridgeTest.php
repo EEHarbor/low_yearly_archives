@@ -47,9 +47,10 @@ final class BridgeTest extends LowYearlyTestCase
         $pagination->method('currentPage')->willReturnSelf();
         $pagination->expects(self::once())->method('displayPageLinks')->with(7)->willReturnSelf();
         $pagination->expects(self::once())->method('queryStringVariable')->with('offset')->willReturnSelf();
-        $pagination->expects(self::exactly(2))->method('render')->with('/archive')->willReturn('pagination links');
+        $baseUrl = new LowYearlyUrl('archive');
+        $pagination->expects(self::exactly(2))->method('render')->with(self::identicalTo($baseUrl))->willReturn('pagination links');
         $this->ee->services['CP/Pagination'] = $pagination;
-        $options = array('total_rows' => 42, 'per_page' => 10, 'current_page' => 3, 'base_url' => '/archive');
+        $options = array('total_rows' => 42, 'per_page' => 10, 'current_page' => 3, 'base_url' => $baseUrl);
         self::assertSame('pagination links', $bridge->pagination($options));
         self::assertSame('pagination links', $bridge->pagination($options + array('page_links' => 7, 'page_query_string' => 'offset')));
     }

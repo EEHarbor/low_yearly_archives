@@ -111,12 +111,12 @@ final class ArchivedRemainingApiTest extends LowYearlyTestCase
      * Count on a cloned model, render links and apply the original query window.
      *
      * @param mixed $page
-     * @param string|null $url
+     * @param string|null $urlPath
      * @param int $expectedPage
      * @return void
      * @dataProvider paginationInputs
      */
-    public function testMcpPaginationPreservesOriginalCountQuery($page, $url, $expectedPage): void
+    public function testMcpPaginationPreservesOriginalCountQuery($page, $urlPath, $expectedPage): void
     {
         $this->ee->input->values['custom_page'] = $page;
         $pagination = $this->getMockBuilder(stdClass::class)->addMethods(array('perPage', 'currentPage', 'displayPageLinks', 'queryStringVariable', 'render'))->getMock();
@@ -124,7 +124,8 @@ final class ArchivedRemainingApiTest extends LowYearlyTestCase
         $pagination->expects(self::once())->method('currentPage')->with($expectedPage)->willReturnSelf();
         $pagination->expects(self::once())->method('displayPageLinks')->with(7)->willReturnSelf();
         $pagination->expects(self::once())->method('queryStringVariable')->with('custom_page')->willReturnSelf();
-        $urlConstraint = $url;
+        $url = $urlPath === null ? null : new LowYearlyUrl($urlPath);
+        $urlConstraint = self::identicalTo($url);
         if ($url === null) {
             $expectedPath = 'addons/settings/low_yearly_archives/' . __FUNCTION__;
             $urlConstraint = self::callback(function ($value) use ($expectedPath) {
@@ -149,6 +150,6 @@ final class ArchivedRemainingApiTest extends LowYearlyTestCase
      */
     public static function paginationInputs(): array
     {
-        return array(array(null, null, 1), array('0', '/listing', 1), array('3', '/listing', 3));
+        return array(array(null, null, 1), array('0', 'listing', 1), array('3', 'listing', 3));
     }
 }
