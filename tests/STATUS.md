@@ -15,23 +15,23 @@ Baseline: `0f61057a193e7a7e82156038bfe892f87f95bbaa`, freshly fetched/pulled `or
 
 ## Behavior and vectors
 
-134 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
+162 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
 
 Native subprocess tests compile all 27 source units with E_ALL (archive entries are hashed copies for CLI lint), load every dispatcher branch for EE2–EE7, and execute direct access, foreign namespaces, missing archive/class and actual self-extracting fallback behavior. Each child uses the selected `PHP_BINARY`, E_ALL and its own temporary directory; only its own tree is removed.
 
 ## Full configured PHP matrix
 
-Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-yol79b_k/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
+Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-x8yyu_i5/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
 
 | PHP | Tests | Assertions | Errors | Failures | Warnings | Risky | Skipped | Incomplete |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 7.4.33 | 134 | 704 | 15 | 7 | 0 | 0 | 0 | 0 |
-| 8.0.30 | 134 | 704 | 15 | 7 | 0 | 0 | 0 | 0 |
-| 8.1.33 | 134 | 703 | 16 | 7 | 0 | 0 | 0 | 0 |
-| 8.2.30 | 134 | 703 | 16 | 7 | 0 | 0 | 0 | 0 |
-| 8.3.28 | 134 | 703 | 16 | 7 | 0 | 0 | 0 | 0 |
-| 8.4.15 | 134 | 703 | 16 | 7 | 0 | 0 | 0 | 0 |
-| 8.5.0 | 134 | 703 | 16 | 7 | 0 | 0 | 0 | 0 |
+| 7.4.33 | 162 | 887 | 15 | 11 | 0 | 0 | 0 | 0 |
+| 8.0.30 | 162 | 887 | 15 | 11 | 0 | 0 | 0 | 0 |
+| 8.1.33 | 162 | 886 | 16 | 11 | 0 | 0 | 0 | 0 |
+| 8.2.30 | 162 | 886 | 16 | 11 | 0 | 0 | 0 | 0 |
+| 8.3.28 | 162 | 886 | 16 | 11 | 0 | 0 | 0 | 0 |
+| 8.4.15 | 162 | 886 | 16 | 11 | 0 | 0 | 0 | 0 |
+| 8.5.0 | 162 | 886 | 16 | 11 | 0 | 0 | 0 | 0 |
 
 All failures/errors are the unchanged source diagnostics/defects below. Each of the 13 test files was also replayed alone on PHP 7.4 and 8.5; no class-loading or fixture-order errors were found (`tests/reports/focused-6ic0p4pz/`, before the final cache datasets). No source diagnostic is expected merely to make a test pass. Active test-support diagnostics and suppressed deprecations also fail; native lint output is checked for warnings/deprecations regardless of process exit code.
 
@@ -52,11 +52,11 @@ All failures/errors are the unchanged source diagnostics/defects below. Each of 
 
 The repository had no PHPUnit harness or tests before this work; read-only preflight reported missing harness/tool files. Initial executable baseline was therefore unavailable until bootstrap.
 
-PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-final-review-coverage.sS5cio/`. Commands and reproduction are in `README.md`. Reports include fresh Clover, serialized PHPUnit coverage and skill method JSON with magic methods enabled.
+PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-adapters-revised-coverage.C38Z9R/`. Commands and reproduction are in `README.md`. Reports include fresh Clover, serialized PHPUnit coverage and skill method JSON with magic methods enabled.
 
 - All four plugin methods have 100% executable lines (skill report: 4/4 at its line target). The skill helper emits `branch_percent: null`; its `at_target` label does not close actual branch requirements.
-- Archived method report: 222 methods, 113 at the helper's line target, 102 below its floor and 7 above floor. Entire inventory: 27 files, 1,446/2,182 executable statements covered. These aggregates are progress, not completion.
-- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-final-review-coverage.sS5cio/native.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
+- Archived method report: 222 methods, 153 at the helper's line target, 63 below its floor and 6 above floor. Entire inventory: 27 files, 1,583/2,182 executable statements covered. These aggregates are progress, not completion.
+- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-adapters-revised-coverage.C38Z9R/native.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
 - Raw plugin `_explode_param` outgoing edges: 3/3; `_get_entries`: 46/46. Constructor: 69/74 raw exits, with missing exits at source lines 47, 56, 128, 134 and 170; flatten helper: 8/9, missing loop exit at 398. Some zero-count terminal/loop paths remain despite explicit empty/no-results vectors and require instrumentation interpretation. All raw zeros remain visible.
 - Top-level Xdebug basic-block counters and synthetic `2147483645` terminal exits can remain zero despite execution. They are not discarded or counted as covered. Child coverage is not merged into the parent; native dispatcher/guard/fallback behavior has assertions but its child branches remain a coverage gap.
 - Uncovered units include PHAR stub fallback/error/platform paths, autoloader variants, MCP save/paginate routes, navigation conduit, EE2 bridge APIs, remaining modern bridge adapters/nav/view paths, fieldtype EE2/context branches, updater constructor/extension paths and archive entrypoint. The complete Clover/method reports retain exact lines. These require additional tests and measurement; they are not claimed blocked solely because more work is needed.
@@ -86,3 +86,13 @@ Publication: `git push -u origin unit-tests-2026` succeeded after an authorized 
 - `bcb0c9b` tests(low_yearly_archives): cover static-cache storage lifecycle
 - `2f0fbbc` tests(low_yearly_archives): cover license persistence schema and update pixels
 - `9833c19` tests(low_yearly_archives): retain known production regressions as failing tests
+
+## Modern bridge adapter follow-up
+
+After the reviewed checkpoint at `641527933fbcbb53f69fdbd9279a130c024a9ed4`, a separate 28-case test file covers modern bridge collaborator delegation, text/security/variable adapters, stored/dynamic views, internal/external sidebar links and active mappings. The sidebar Header/withUrl/withButton/isActive contracts were checked against EE core. No production changes. All seven full suites and standalone PHP 7.4/8.5 runs completed with the current counts above; no harness diagnostics.
+
+New source regression: `Bridge/EE3.php:96/101`, `EE4.php:96/101` and `EE5.php:96/101` (inherited by EE6) assign the active sidebar Header object to `cp_page_title` for an active-map alias. The correct title remains a text label; four version-specific regressions stay red. All other tested methods in those three bridge files now have 100% executable lines except `initiateSettings()` (92.3077%). Raw outgoing decision closure remains incomplete. This follow-up received independent exact-diff approval from the Wygwam reviewer after the fixture corrections below.
+
+Adapter review corrections: the test facade now mirrors real EE `Facade::set()` rejection of already-loaded names, including null services, and verifies rejected replacement preserves state. The sidebar header now stores the actual single `button` payload and verifies a second button replaces the first. The revised full seven-version matrix and standalone new-file PHP 7.4/8.5 runs (28 cases, 183 assertions, four source failures) completed without harness diagnostics; exact-diff re-review approved SHA256 `5196dc291c6f40a483177cf08eb1dca419585d146854326c02aed27e134271e9` atop `641527933fbcbb53f69fdbd9279a130c024a9ed4`. The reviewer rebuilt `/private/tmp/low-yearly-adapters-revised-25ratpd4`, verified the pinned PHARs and real EE contracts, reproduced all seven matrix rows and standalone PHP 7.4/8.5 results, and found no remaining actionable follow-up issue. Full branch/source coverage remains incomplete.
+
+Reviewed adapter test commit: `5e8cafb5797149d83776e380c6191bb198fe0ff4`. Its documentation and publication evidence are recorded in this follow-up commit and pushed to the existing `origin/unit-tests-2026` branch.
