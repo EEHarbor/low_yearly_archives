@@ -91,6 +91,58 @@ final class VersionTest extends LowYearlyTestCase
     }
 
     /**
+     * Update a license inserted earlier in the same request without another insert.
+     *
+     * @return void
+     */
+    public function testRepeatedWritesRefreshLicenseExistence(): void
+    {
+        $version = new Version();
+        $version->saveLicenseKey(array('license_key' => 'first'));
+        $this->ee->db->count = 1;
+        $version->saveLicenseKey(array('license_key' => 'second'));
+        $writes = array_values(array_filter($this->ee->db->calls, function ($call) {
+            return in_array($call[0], array('insert', 'update'), true);
+        }));
+
+        self::assertSame(array('insert', 'update'), array_column($writes, 0));
+    }
+
+    /**
+     * Refresh the existence predicate after successfully deleting its database row.
+     *
+     * @return void
+     */
+    public function testDeletedLicenseDoesNotRemainInExistenceCache(): void
+    {
+        $version = new Version();
+        $this->ee->db->count = 1;
+        self::assertTrue($version->keyExistsForAddon());
+        $version->deleteLicenseKey();
+        $this->ee->db->count = 0;
+
+        self::assertFalse($version->keyExistsForAddon());
+    }
+
+    /**
+     * Restore healthy schema state on a new instance that reuses cached verification.
+     *
+     * @return void
+     */
+    public function testCachedHealthySchemaPreservesInstanceFlag(): void
+    {
+        $first = new Version();
+        $second = new Version();
+        $property = new ReflectionProperty(Version::class, 'table_corrupt');
+        if (PHP_VERSION_ID < 80100) {
+            $property->setAccessible(true);
+        }
+
+        self::assertFalse($property->getValue($first));
+        self::assertFalse($property->getValue($second));
+    }
+
+    /**
      * Sanitize stored license keys and preserve ignored-site flags.
      *
      * @return void
