@@ -70,6 +70,10 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         $insert['license_key'] = 'low-yearly-archives-ignore-site-1';
         $insert['ignore_site'] = 1;
         $cases['ignore site'] = array($input, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
+        $input['licenses'] = array($same);
+        $input['check_key_rows'] = array();
+        $input['count'] = 1;
+        $cases['ignore existing site'] = array($input, array(array('update', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
         $input = $base;
         $input['licenses'] = array($same);
         $input['count'] = 1;
@@ -103,7 +107,25 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         $input['check_key_rows'] = array();
         $input['count'] = 1;
         $cases['stop ignoring site'] = array($input, array(array('delete', array('eeharbor_licenses'))), $success, 'asSuccess');
+        $input['licenses'] = array($same);
+        $insert = $data;
+        $insert['license_key'] = '';
+        $cases['clear ordinary key'] = array($input, array(array('update', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
 
         return $cases;
+    }
+
+    /**
+     * Construct the real CP controller when this package has no optional sidebar class.
+     *
+     * @return void
+     */
+    public function testNativeControlPanelConstructorWithoutNav(): void
+    {
+        $input = array('site_id' => 1, 'post' => array(), 'licenses' => array(), 'sites' => array(), 'count' => 0);
+        list($status, $stdout, $stderr) = LowYearlyNativeProcess::run(array(__DIR__ . '/../../support/native.php', 'mcp-constructor', '7.5.17', json_encode($input, JSON_THROW_ON_ERROR)));
+        self::assertSame(0, $status, $stdout . $stderr);
+        self::assertSame('', $stderr);
+        self::assertSame(array('version' => '4.1.1', 'nav' => null), json_decode($stdout, true, 512, JSON_THROW_ON_ERROR));
     }
 }
