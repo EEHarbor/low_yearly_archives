@@ -22,7 +22,7 @@ if ($scenario === 'guard') {
 define('PATH_THIRD', $scenario === 'missing-archive' ? sys_get_temp_dir() . '/missing-low-yearly/' : $root . '/');
 define('BASEPATH', $root . '/');
 define('APP_VER', isset($argv[2]) ? $argv[2] : '7.5.17');
-define('REQ', in_array($scenario, array('save-license', 'mcp-constructor'), true) ? 'CP' : 'PAGE');
+define('REQ', in_array($scenario, array('save-license', 'mcp-constructor', 'cp-bases'), true) ? 'CP' : 'PAGE');
 define('PATH_CACHE', sys_get_temp_dir() . '/cache/');
 define('DIR_WRITE_MODE', 0700);
 define('FILE_WRITE_MODE', 0600);
@@ -39,6 +39,46 @@ if ($scenario === 'fallback-loader') {
     stream_wrapper_unregister('phar');
 }
 require $root . '/low_yearly_archives/autoload.php';
+
+if ($scenario === 'cp-bases') {
+    $GLOBALS['low_yearly_ee'] = (object) array(
+        'db' => new LowYearlyDatabase(), 'settings_db' => new LowYearlyDatabase(),
+        'config' => new LowYearlyConfig(), 'services' => array(), 'service_calls' => array(),
+    );
+    ee()->db->tableExists = true;
+    ee()->db->queryRows = array(array('Column_name' => 'license_key', 'Non_unique' => '0'));
+    ee()->cp = new class {
+        public $footer_item = array();
+
+        /**
+         * Return EE's shared footer storage for duplicate-pixel detection.
+         *
+         * @return array
+         */
+        public function get_foot() { return $this->footer_item; }
+
+        /**
+         * Append a pixel or script through the real CP footer boundary.
+         *
+         * @param string $html
+         * @return void
+         */
+        public function add_to_foot($html) { $this->footer_item[] = $html; }
+    };
+    $menu = new LowYearlySpy(array('addItem' => null));
+    $extension = new Low\YearlyArchives\FluxCapacitor\Base\Ext();
+    $extension->cpCustomMenu($menu);
+    $extension->cp_custom_menu($menu);
+    $tab = new Low\YearlyArchives\FluxCapacitor\Base\Tab();
+    $tabFooter = ee()->cp->footer_item;
+    $fieldtype = new class extends Low\YearlyArchives\FluxCapacitor\Base\Ft {};
+    echo json_encode(array(
+        'menu' => $menu->calls, 'tab_version' => $tab->version,
+        'fieldtype_version' => $fieldtype->version, 'fieldtype_info' => $fieldtype->info,
+        'tab_footer' => $tabFooter, 'footer' => ee()->cp->footer_item,
+    ), JSON_THROW_ON_ERROR);
+    exit;
+}
 
 if ($scenario === 'legacy-formatting') {
     $GLOBALS['low_yearly_helper_calls'] = array();
