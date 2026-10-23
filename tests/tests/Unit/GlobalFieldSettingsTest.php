@@ -66,4 +66,39 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
 
         self::assertNull((new GlobalFieldSettings())->getSetting('missing'));
     }
+
+    /**
+     * Normalize empty stored settings and reject malformed bytes without native diagnostics.
+     *
+     * @param string|null $stored
+     * @return void
+     * @dataProvider storedSettingsBoundaries
+     */
+    public function testStoredSettingsBoundaries($stored): void
+    {
+        $this->ee->db->rows = array(array('settings' => $stored));
+
+        self::assertSame(array(), (new GlobalFieldSettings())->getSettings());
+        self::assertSame(array(
+            array('select', array('settings')),
+            array('where', array('name', 'low_yearly_archives')),
+            array('get', array('fieldtypes')),
+        ), $this->ee->db->calls);
+    }
+
+    /**
+     * Include legacy null storage, empty/non-base64 bytes and valid empty serialized values.
+     *
+     * @return array
+     */
+    public static function storedSettingsBoundaries(): array
+    {
+        return array(
+            'null storage' => array(null), 'empty bytes' => array(''),
+            'invalid base64 bytes' => array('%%%'),
+            'invalid serialized bytes' => array(base64_encode('not serialized')),
+            'serialized zero' => array(base64_encode(serialize(0))),
+            'serialized empty array' => array(base64_encode(serialize(array()))),
+        );
+    }
 }
