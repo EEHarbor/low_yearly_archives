@@ -206,6 +206,72 @@ final class LegacyBridgeTest extends LowYearlyTestCase
     }
 
     /**
+     * Persist EE2 settings through isolated query clones while refreshing request data.
+     *
+     * @return void
+     */
+    public function testSettingsWriteClonesPreserveOriginalQueryState(): void
+    {
+        $observer = (object) array('copies' => array());
+        $this->ee->db->cloneObserver = $observer;
+        $this->ee->db->data_cache['table_names'] = array('stale');
+        $bridge = $this->bridge();
+        self::assertSame('4.1.1', $bridge->getConfig('version'));
+        $observer->copies = array();
+        $bridge->setConfig('limit', 0);
+        self::assertCount(1, $observer->copies);
+        self::assertSame(array(array('table_exists', array('low_yearly_archives_settings'))), $observer->copies[0]->calls);
+        self::assertSame(0, $bridge->getConfig('limit'));
+        $this->ee->db->tableExists = true;
+        $observer->copies = array();
+        $bridge->setConfig('limit', 3);
+        self::assertCount(1, $observer->copies);
+        self::assertContains(array('insert', array('low_yearly_archives_settings', array('site_id' => 1, 'limit' => 3))), $observer->copies[0]->calls);
+        self::assertArrayNotHasKey('table_names', $observer->copies[0]->data_cache);
+        $this->ee->db->count = 1;
+        $observer->copies = array();
+        $bridge->setConfig('limit', 4);
+        self::assertCount(1, $observer->copies);
+        self::assertSame(array(
+            array('table_exists', array('low_yearly_archives_settings')),
+            array('where', array('site_id', 1)),
+            array('count_all_results', array('low_yearly_archives_settings')),
+            array('where', array('site_id', 1)),
+            array('update', array('low_yearly_archives_settings', array('site_id' => 1, 'limit' => 4))),
+        ), $observer->copies[0]->calls);
+        self::assertSame(4, $bridge->getConfig('limit'));
+        self::assertSame(array('table_names' => array('stale')), $this->ee->db->data_cache);
+        self::assertSame(array(), $this->ee->db->calls);
+        unset($this->ee->db->data_cache['table_names']);
+        $observer->copies = array();
+        $bridge->setConfig('limit', 5);
+        self::assertCount(1, $observer->copies);
+        self::assertSame(5, $bridge->getConfig('limit'));
+        self::assertSame(array(), $this->ee->db->data_cache);
+        self::assertSame(array(), $this->ee->db->calls);
+    }
+
+    /**
+     * Delegate EE2 text helpers without relying on discovery of another test file.
+     *
+     * @return void
+     */
+    public function testTextHelperDelegation(): void
+    {
+        $GLOBALS['low_yearly_helper_calls'] = array();
+        try {
+            $this->ee->load = new LowYearlySpy(array('helper' => null));
+            $bridge = $this->bridge();
+            self::assertSame('slug:example title', $bridge->url_title('  EXAMPLE Title '));
+            self::assertSame('slashes:https://example.test//path', $bridge->reduce_double_slashes('https://example.test//path'));
+            self::assertSame(array(array('url_title', 'example title'), array('reduce_double_slashes', 'https://example.test//path')), $GLOBALS['low_yearly_helper_calls']);
+            self::assertSame(array(array('helper', array('string'))), $this->ee->load->calls);
+        } finally {
+            unset($GLOBALS['low_yearly_helper_calls']);
+        }
+    }
+
+    /**
      * Construct the actual shipped EE2 adapter independently of current EE dispatch.
      *
      * @return EE2

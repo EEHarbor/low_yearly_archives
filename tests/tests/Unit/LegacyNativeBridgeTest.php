@@ -108,6 +108,38 @@ final class LegacyNativeBridgeTest extends LowYearlyTestCase
     }
 
     /**
+     * Keep the legacy function/library switch at its actual EE 2.6 boundary.
+     *
+     * @param string $version
+     * @param bool $legacy
+     * @return void
+     * @dataProvider formattingVersions
+     */
+    public function testNativeFormattingBoundary($version, $legacy): void
+    {
+        $data = $this->probe('legacy-formatting', $version, array());
+        self::assertSame('slug:example title', $data['slug']);
+        self::assertSame($legacy ? 'legacy slashes' : 'slashes:https://example.test//path', $data['slashes']);
+        self::assertSame($legacy ? array(array('remove_double_slashes', array('https://example.test//path'))) : array(), $data['functions']);
+        self::assertSame($legacy ? array() : array(array('helper', array('string'))), $data['loader']);
+        $helpers = array(array('url_title', 'example title'));
+        if (!$legacy) {
+            $helpers[] = array('reduce_double_slashes', 'https://example.test//path');
+        }
+        self::assertSame($helpers, $data['helpers']);
+    }
+
+    /**
+     * Include EE releases on each side of the helper migration.
+     *
+     * @return array
+     */
+    public static function formattingVersions(): array
+    {
+        return array(array('2.5.5', true), array('2.6.0', false));
+    }
+
+    /**
      * Run native shipped-source execution and reject diagnostics before decoding its output.
      *
      * @param string $scenario
