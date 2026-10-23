@@ -88,6 +88,30 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Read a documented composite key in either its array or scalar form.
+     *
+     * @return void
+     */
+    public function testCompositeKeyRoundTrip(): void
+    {
+        self::assertTrue(PersistentCache::set(array('channel', 'entry'), 'value'));
+        self::assertSame('value', PersistentCache::get('channel:entry'));
+        self::assertSame('value', PersistentCache::get(array('channel', 'entry')));
+    }
+
+    /**
+     * Recognize an existing file when the caller explicitly supplies a processed key.
+     *
+     * @return void
+     */
+    public function testProcessedKeyExistenceFlag(): void
+    {
+        self::assertTrue(PersistentCache::set('entry', 'value'));
+        self::assertTrue(PersistentCache::has('entry'));
+        self::assertTrue(PersistentCache::has(sha1('entry'), true));
+    }
+
+    /**
      * Fail gracefully when the generic or module parent path cannot be created.
      *
      * @param bool $modulePath
