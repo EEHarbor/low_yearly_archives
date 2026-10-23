@@ -1,44 +1,5 @@
 <?php
 
-/**
- * Record the EE3 string-helper boundary without testing EE's implementation.
- *
- * @param string $value
- * @return string
- */
-function url_title($value)
-{
-    $GLOBALS['low_yearly_helper_calls'][] = array('url_title', $value);
-
-    return 'slug:' . $value;
-}
-
-/**
- * Record the EE3 URL-helper boundary.
- *
- * @param string $value
- * @return string
- */
-function prep_url($value)
-{
-    $GLOBALS['low_yearly_helper_calls'][] = array('prep_url', $value);
-
-    return 'url:' . $value;
-}
-
-/**
- * Record the legacy slash-normalization helper boundary.
- *
- * @param string $value
- * @return string
- */
-function reduce_double_slashes($value)
-{
-    $GLOBALS['low_yearly_helper_calls'][] = array('reduce_double_slashes', $value);
-
-    return 'slashes:' . $value;
-}
-
 final class LowYearlyMutableFacade extends stdClass
 {
     /**

@@ -224,6 +224,19 @@ final class LowYearlyDatabase
     public $count = 0;
     public $tableRows = array();
     public $resultQueues = array();
+    public $cloneObserver;
+
+    /**
+     * Expose cloned query objects for tests without sharing their mutable query state.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        if ($this->cloneObserver !== null) {
+            $this->cloneObserver->copies[] = $this;
+        }
+    }
 
     /**
      * Record the Active Record calls without executing customer SQL.
@@ -231,6 +244,7 @@ final class LowYearlyDatabase
      * @param string $method
      * @param array $arguments
      * @return mixed
+     * @throws LogicException
      */
     public function __call($method, array $arguments)
     {
@@ -640,4 +654,43 @@ function write_file($path, $data)
     fclose($handle);
 
     return true;
+}
+
+/**
+ * Record the EE3 string-helper boundary without testing EE's implementation.
+ *
+ * @param string $value
+ * @return string
+ */
+function url_title($value)
+{
+    $GLOBALS['low_yearly_helper_calls'][] = array('url_title', $value);
+
+    return 'slug:' . $value;
+}
+
+/**
+ * Record the EE3 URL-helper boundary.
+ *
+ * @param string $value
+ * @return string
+ */
+function prep_url($value)
+{
+    $GLOBALS['low_yearly_helper_calls'][] = array('prep_url', $value);
+
+    return 'url:' . $value;
+}
+
+/**
+ * Record the legacy slash-normalization helper boundary.
+ *
+ * @param string $value
+ * @return string
+ */
+function reduce_double_slashes($value)
+{
+    $GLOBALS['low_yearly_helper_calls'][] = array('reduce_double_slashes', $value);
+
+    return 'slashes:' . $value;
 }

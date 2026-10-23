@@ -22,7 +22,7 @@ if ($scenario === 'guard') {
 define('PATH_THIRD', $scenario === 'missing-archive' ? sys_get_temp_dir() . '/missing-low-yearly/' : $root . '/');
 define('BASEPATH', $root . '/');
 define('APP_VER', isset($argv[2]) ? $argv[2] : '7.5.17');
-define('REQ', 'PAGE');
+define('REQ', in_array($scenario, array('save-license', 'mcp-constructor'), true) ? 'CP' : 'PAGE');
 define('PATH_CACHE', sys_get_temp_dir() . '/cache/');
 define('DIR_WRITE_MODE', 0700);
 define('FILE_WRITE_MODE', 0600);
@@ -40,6 +40,23 @@ if ($scenario === 'fallback-loader') {
 }
 require $root . '/low_yearly_archives/autoload.php';
 
+if ($scenario === 'legacy-formatting') {
+    $GLOBALS['low_yearly_helper_calls'] = array();
+    $GLOBALS['low_yearly_ee'] = (object) array(
+        'functions' => new LowYearlySpy(array('remove_double_slashes' => 'legacy slashes')),
+        'load' => new LowYearlySpy(array('helper' => null)),
+    );
+    $bridge = new Low\YearlyArchives\FluxCapacitor\Bridge\EE2(array('module' => 'low_yearly_archives', 'module_name' => 'Low Yearly Archives'));
+    echo json_encode(array(
+        'slug' => $bridge->url_title('  EXAMPLE Title '),
+        'slashes' => $bridge->reduce_double_slashes('https://example.test//path'),
+        'helpers' => $GLOBALS['low_yearly_helper_calls'],
+        'functions' => ee()->functions->calls,
+        'loader' => ee()->load->calls,
+    ), JSON_THROW_ON_ERROR);
+    exit;
+}
+
 if ($scenario === 'legacy-fieldtype') {
     $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
     $GLOBALS['low_yearly_ee'] = (object) array(
@@ -55,7 +72,7 @@ if ($scenario === 'legacy-fieldtype') {
     exit;
 }
 
-if ($scenario === 'save-license') {
+if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
     $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
     $GLOBALS['low_yearly_ee'] = (object) array(
         'db' => new LowYearlyDatabase(), 'settings_db' => new LowYearlyDatabase(),
@@ -83,6 +100,10 @@ if ($scenario === 'save-license') {
         }
     };
     $mcp = new Low\YearlyArchives\FluxCapacitor\Base\Mcp();
+    if ($scenario === 'mcp-constructor') {
+        echo json_encode(array('version' => $mcp->version, 'nav' => $mcp->nav), JSON_THROW_ON_ERROR);
+        exit;
+    }
     $mcp->save_license();
     throw new RuntimeException('The license action did not redirect.');
 }
