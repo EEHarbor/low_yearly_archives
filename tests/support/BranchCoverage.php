@@ -38,8 +38,9 @@ final class LowYearlyBranchCoverage
         $current = xdebug_get_code_coverage();
         xdebug_stop_code_coverage();
         foreach ($current as $file => $coverage) {
-            $source = strpos($file, PATH_THIRD . 'low_yearly_archives/') !== false
-                || strpos($file, PATH_THIRD . 'tests/.coverage-source/') !== false;
+            $root = dirname(__DIR__, 2) . '/';
+            $source = strpos($file, $root . 'low_yearly_archives/') !== false
+                || strpos($file, $root . 'tests/.coverage-source/') !== false;
             if (!$source) {
                 continue;
             }
@@ -81,7 +82,8 @@ final class LowYearlyBranchCoverage
      */
     public static function write(): void
     {
-        $report = array('php' => PHP_VERSION, 'xdebug' => phpversion('xdebug'), 'files' => array());
+        $scenario = basename($GLOBALS['argv'][0] ?? '') === 'native.php' ? ($GLOBALS['argv'][1] ?? null) : 'suite';
+        $report = array('php' => PHP_VERSION, 'xdebug' => phpversion('xdebug'), 'pid' => getmypid(), 'created' => microtime(true), 'ee' => APP_VER, 'request' => REQ, 'scenario' => $scenario, 'files' => array());
         foreach (self::$coverage as $file => $coverage) {
             $report['files'][$file] = array('sha256' => hash_file('sha256', $file), 'coverage' => $coverage);
         }

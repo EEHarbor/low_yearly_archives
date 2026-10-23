@@ -280,11 +280,13 @@ final class LowYearlyConfig
      * Return a configuration path with a trailing slash.
      *
      * @param string $key
-     * @return string
+     * @return string|false
      */
     public function slash_item($key)
     {
-        return rtrim($this->item($key), '/') . '/';
+        $value = $this->item($key);
+
+        return $value === false ? false : rtrim($value, '/') . '/';
     }
 }
 
@@ -331,19 +333,17 @@ final class LowYearlySession
 {
     public $cache = array();
     public $flash = array();
+    public $userdata = array('member_id' => 42, 'session_id' => 'session-token', 'fingerprint' => 'fingerprint-token');
     /**
-     * Return the fixture's logged-in member ID.
+     * Read EE session userdata with the supplied missing-value default.
      *
      * @param string $key
-     * @return int
+     * @param mixed $default
+     * @return mixed
      */
-    public function userdata($key)
+    public function userdata($key, $default = false)
     {
-        if ($key !== 'member_id') {
-            throw new LogicException('Unexpected userdata: ' . $key);
-        }
-
-        return 42;
+        return isset($this->userdata[$key]) ? $this->userdata[$key] : $default;
     }
 
     /**

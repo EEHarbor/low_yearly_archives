@@ -112,39 +112,10 @@ final class NativeLoadingTest extends LowYearlyTestCase
      * @param array $arguments
      * @param string|null $sourceBytes
      * @return array
+     * @throws RuntimeException
      */
     private function process(array $arguments, $sourceBytes = null): array
     {
-        $temporary = sys_get_temp_dir() . '/low-yearly-native-' . bin2hex(random_bytes(8));
-        mkdir($temporary, 0700);
-        if ($sourceBytes !== null) {
-            $source = $temporary . '/archived-source.php';
-            file_put_contents($source, $sourceBytes);
-            self::assertSame(hash('sha256', $sourceBytes), hash_file('sha256', $source));
-            $arguments = array_map(function ($argument) use ($source) { return $argument === '{source}' ? $source : $argument; }, $arguments);
-        }
-        $command = array_merge(array(PHP_BINARY, '-d', 'error_reporting=-1', '-d', 'display_errors=1', '-d', 'display_startup_errors=1', '-d', 'sys_temp_dir=' . $temporary), $arguments);
-        $environment = getenv();
-        $environment['TMPDIR'] = $temporary;
-        $process = proc_open($command, array(1 => array('pipe', 'w'), 2 => array('pipe', 'w')), $pipes, PATH_THIRD, $environment);
-        if (!is_resource($process)) {
-            rmdir($temporary);
-            throw new RuntimeException('Could not start native PHP process.');
-        }
-        try {
-            $stdout = stream_get_contents($pipes[1]);
-            $stderr = stream_get_contents($pipes[2]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            $status = proc_close($process);
-
-            return array($status, $stdout, $stderr);
-        } finally {
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($temporary, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-            foreach ($files as $file) {
-                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
-            }
-            rmdir($temporary);
-        }
+        return LowYearlyNativeProcess::run($arguments, $sourceBytes);
     }
 }

@@ -15,6 +15,7 @@ define('APPPATH', sys_get_temp_dir() . '/low-yearly-no-app/');
 
 require __DIR__ . '/support/ExpressionEngine.php';
 require __DIR__ . '/support/BranchCoverage.php';
+require __DIR__ . '/support/NativeProcess.php';
 require __DIR__ . '/support/TestCase.php';
 if (getenv('LOW_YEARLY_MEASURE_ARCHIVE')) {
     spl_autoload_register(function ($class) {

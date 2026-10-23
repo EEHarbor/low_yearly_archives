@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parent.parent
@@ -19,11 +20,18 @@ for version in ("74", "80", "81", "82", "83", "84", "85"):
     binary = herd / ("php" + version)
     runtime = subprocess.run([str(binary), "-r", "echo PHP_VERSION;"], capture_output=True, text=True, check=True).stdout
     junit = report_dir / ("php" + version + ".xml")
-    command = [str(binary), "-d", "error_reporting=-1", "-d", "display_errors=1", str(root / "tests/.phpunit/phpunit-9.phar"), "-c", str(root / "phpunit.xml"), "--log-junit", str(junit)]
-    process = subprocess.run(command, cwd=str(root), capture_output=True, text=True, timeout=300)
+    environment = os.environ.copy()
+    environment["PHP_BIN"] = str(binary)
+    environment["LOW_YEARLY_EE_VERSION"] = "7.5.17"
+    environment["LOW_YEARLY_REQUEST"] = "PAGE"
+    environment.pop("LOW_YEARLY_RAW_COVERAGE", None)
+    environment.pop("LOW_YEARLY_MEASURE_ARCHIVE", None)
+    command = [str(root / "tests/.phpunit/run-phpunit.sh"), "-c", str(root / "phpunit.xml"), "--log-junit", str(junit)]
+    started = time.time()
+    process = subprocess.run(command, cwd=str(root), env=environment, capture_output=True, text=True, timeout=300)
     (report_dir / ("php" + version + ".log")).write_text(process.stdout + process.stderr)
     counts = {}
-    if junit.is_file():
+    if junit.is_file() and junit.stat().st_size and junit.stat().st_mtime >= started:
         suite = ET.parse(junit).getroot().find("testsuite")
         if suite is not None:
             counts = {key: int(suite.attrib.get(key, 0)) for key in ("tests", "assertions", "errors", "failures", "warnings", "skipped")}
@@ -32,7 +40,7 @@ for version in ("74", "80", "81", "82", "83", "84", "85"):
     for label in ("risky", "incomplete"):
         match = re.search(label + r": (\d+)", process.stdout, re.IGNORECASE)
         counts[label] = int(match.group(1)) if match else 0
-    result = {"php": runtime, "command": command, "exit": process.returncode, "counts": counts, "log": str(report_dir / ("php" + version + ".log"))}
+    result = {"php": runtime, "php_binary": str(binary), "command": command, "exit": process.returncode, "counts": counts, "log": str(report_dir / ("php" + version + ".log"))}
     results.append(result)
     print(json.dumps(result), flush=True)
 (report_dir / "summary.json").write_text(json.dumps(results, indent=2) + "\n")

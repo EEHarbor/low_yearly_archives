@@ -26,12 +26,40 @@ define('REQ', 'PAGE');
 define('PATH_CACHE', sys_get_temp_dir() . '/cache/');
 define('DIR_WRITE_MODE', 0700);
 define('FILE_WRITE_MODE', 0600);
+define('APPPATH', sys_get_temp_dir() . '/legacy-app/');
 require __DIR__ . '/ExpressionEngine.php';
+require __DIR__ . '/BranchCoverage.php';
+if (getenv('LOW_YEARLY_RAW_COVERAGE')) {
+    register_shutdown_function(array(LowYearlyBranchCoverage::class, 'stop'));
+    LowYearlyBranchCoverage::start();
+}
 
 if ($scenario === 'fallback-loader') {
     stream_wrapper_unregister('phar');
 }
 require $root . '/low_yearly_archives/autoload.php';
+
+if ($scenario === 'legacy-url' || $scenario === 'legacy-routes') {
+    $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
+    define('BASE', $input['base']);
+    define('AMP', '&amp;');
+    $GLOBALS['low_yearly_ee'] = (object) array(
+        'config' => new LowYearlyConfig(), 'session' => new LowYearlySession(),
+        'cp' => new LowYearlySpy(array('set_right_nav' => null)),
+    );
+    ee()->config->values = array_merge(ee()->config->values, $input['config']);
+    $bridge = new Low\YearlyArchives\FluxCapacitor\Bridge\EE2(array('module' => 'low_yearly_archives', 'module_name' => 'Low Yearly Archives'));
+    if ($scenario === 'legacy-url') {
+        echo json_encode(array('base' => $bridge->getBaseURL('/'), 'route' => $bridge->getBaseURL('settings', AMP . 'extra=1')));
+        exit;
+    }
+    $url = $input['module']
+        ? $bridge->moduleURL($input['mode'], $input['variables'])
+        : $bridge->cpURL($input['path'], $input['mode'], $input['variables']);
+    $bridge->getNav(array('settings' => 'Settings', 'https://example.test/docs' => 'Docs'));
+    echo json_encode(array('url' => $url, 'nav' => ee()->cp->calls));
+    exit;
+}
 
 if ($scenario === 'unrelated-loader') {
     $loaders = spl_autoload_functions();
