@@ -27,6 +27,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
             'input' => new LowYearlyInput(),
             'uri' => new LowYearlyUri(),
             'services' => array(),
+            'service_calls' => array(),
         );
         $GLOBALS['low_yearly_ee'] = $this->ee;
         set_error_handler(array(self::class, 'handleSourceDiagnostic'));

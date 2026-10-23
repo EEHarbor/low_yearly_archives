@@ -11,6 +11,7 @@ function ee($service = null)
     if ($service === null) {
         return $GLOBALS['low_yearly_ee'];
     }
+    $GLOBALS['low_yearly_ee']->service_calls[] = func_get_args();
 
     if ($service === 'db') {
         return $GLOBALS['low_yearly_ee']->settings_db;
