@@ -15,25 +15,25 @@ Baseline: `0f61057a193e7a7e82156038bfe892f87f95bbaa`, freshly fetched/pulled `or
 
 ## Behavior and vectors
 
-229 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
+237 tests cover archive rendering/year gaps/sort/date bounds/counts/percentages/localization, no-results handling, complete query ordering, filter includes/excludes/current member, category unions/intersections/empty matches, parameter delimiters and scalar boundaries, result flattening and duplicate keys, both license views, setup metadata, source and support diagnostics, extension lifecycle/aliases, tab aliases, updater install/uninstall, bridge URL/pagination/cache/settings/alerts/request contexts, serialized field settings, licensing schema/persistence/readback and encrypted update-pixel idempotence, persistent/static cache behavior, fieldtype settings and basic MCP license rendering.
 
 Native subprocess tests compile all 27 source units with E_ALL (archive entries are hashed copies for CLI lint), load every dispatcher branch for EE2–EE7, and execute direct access, foreign namespaces, missing archive/class and actual self-extracting fallback behavior. Each child uses the selected `PHP_BINARY`, E_ALL and its own temporary directory; only its own tree is removed.
 
 ## Full configured PHP matrix
 
-Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-pci487xw/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
+Command: `python3 tests/run-matrix.py`. Native PHAR execution; explicit Herd binaries; no runtime/service changes. Current report directory: `tests/reports/matrix-2r2q8j0q/` (ignored local artifact). Every row ran the complete configured suite and all native compilation/loading cases.
 
 | PHP | Tests | Assertions | Errors | Failures | Warnings | Risky | Skipped | Incomplete |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 7.4.33 | 229 | 1327 | 17 | 16 | 0 | 0 | 0 | 0 |
-| 8.0.30 | 229 | 1298 | 17 | 17 | 0 | 0 | 0 | 0 |
-| 8.1.33 | 229 | 1297 | 18 | 17 | 0 | 0 | 0 | 0 |
-| 8.2.30 | 229 | 1282 | 21 | 17 | 0 | 0 | 0 | 0 |
-| 8.3.28 | 229 | 1282 | 21 | 17 | 0 | 0 | 0 | 0 |
-| 8.4.15 | 229 | 1282 | 21 | 17 | 0 | 0 | 0 | 0 |
-| 8.5.0 | 229 | 1282 | 21 | 17 | 0 | 0 | 0 | 0 |
+| 7.4.33 | 237 | 1350 | 18 | 17 | 0 | 0 | 0 | 0 |
+| 8.0.30 | 237 | 1321 | 18 | 18 | 0 | 0 | 0 | 0 |
+| 8.1.33 | 237 | 1318 | 20 | 18 | 0 | 0 | 0 | 0 |
+| 8.2.30 | 237 | 1303 | 23 | 18 | 0 | 0 | 0 | 0 |
+| 8.3.28 | 237 | 1303 | 23 | 18 | 0 | 0 | 0 | 0 |
+| 8.4.15 | 237 | 1303 | 23 | 18 | 0 | 0 | 0 | 0 |
+| 8.5.0 | 237 | 1303 | 23 | 18 | 0 | 0 | 0 | 0 |
 
-All failures/errors are the unchanged source diagnostics/defects below. Each of the 19 test files was also replayed alone on PHP 7.4 and 8.5; no class-loading or fixture-order errors were found (`tests/reports/licensing-validation-4a220ib9/`). Random seed 20261023 on those runtimes reproduced the complete suite counts in the same directory. No source diagnostic is expected merely to make a test pass. Active test-support diagnostics and suppressed deprecations also fail; native lint output is checked for warnings/deprecations regardless of process exit code.
+All failures/errors are the unchanged source diagnostics/defects below. Each of the 20 test files was also replayed alone on PHP 7.4 and 8.5; no class-loading or fixture-order errors were found (`tests/reports/cp-boundary-validation-0em41kso/`). Random seed 20261023 on those runtimes reproduced the complete suite counts in the same directory. No source diagnostic is expected merely to make a test pass. Active test-support diagnostics and suppressed deprecations also fail; native lint output is checked for warnings/deprecations regardless of process exit code.
 
 ## Confirmed source defects
 
@@ -47,16 +47,18 @@ All failures/errors are the unchanged source diagnostics/defects below. Each of 
 7. Archived `Base/Upd.php:64`: a normal upgrade includes the absent optional extension under `@`, emitting a missing-file diagnostic.
 8. Archived `Conduit/PersistentCache.php:196/215`: uncreatable generic/module directories emit `@mkdir()` diagnostics. Each get/set/delete/clear operation is tested independently so one failing operation cannot hide another.
 9. Native PHAR stub line 177 emits `@mkdir(): File exists` during ordinary self-extraction. The native regression remains red under the strict diagnostic policy.
+10. Archived `Base/Ext.php:192`: `unregister_extension()` resets an explicitly supplied hook to null, deleting the default hook instead. The correct custom-hook deletion regression stays red.
+11. Archived `Conduit/GlobalFieldSettings.php:33`: malformed serialized settings emit an `@unserialize()` warning on every runtime. Null stored settings pass null to `base64_decode()` and emit a deprecation on PHP 8.1–8.5. Correct empty-settings fallback assertions remain red for those diagnostics; empty/non-base64 bytes, serialized zero and an empty array remain passing controls.
 
 ## Coverage evidence and limitations
 
 The repository had no PHPUnit harness or tests before this work; read-only preflight reported missing harness/tool files. Initial executable baseline was therefore unavailable until bootstrap.
 
-PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-licensing-final-coverage-emcreloj/`. Commands and reproduction are in `README.md`. Reports include fresh runtime-specific Clover and skill method JSON with magic methods enabled; prior follow-ups also retained serialized PHPUnit coverage.
+PHP 8.2/Xdebug measurement report: `/private/tmp/low-yearly-cp-boundary-coverage-0eo9f0pi/`. Commands and reproduction are in `README.md`. Reports include fresh runtime-specific Clover and skill method JSON with magic methods enabled; prior follow-ups also retained serialized PHPUnit coverage.
 
 - All four plugin methods have 100% executable lines (skill report: 4/4 at its line target). The skill helper emits `branch_percent: null`; its `at_target` label does not close actual branch requirements.
 - Archived method report: 222 methods, 173 at the helper's line target, 41 below its floor and 8 above floor. Entire inventory: 27 files, 1,676/2,182 executable statements covered. These aggregates are progress, not completion.
-- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-licensing-final-coverage-emcreloj/native82.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
+- Direct raw Xdebug run: `LOW_YEARLY_RAW_COVERAGE=/private/tmp/low-yearly-cp-boundary-coverage-0eo9f0pi/native82.json` with the explicit PHP8.2/Xdebug flags in `README.md`. It retains source hashes, raw path arrays and actual `out`/`out_hit` for each method and merges only the same process's opcode graph. The PHPUnit serialized driver's outgoing counters were insufficient; they are not used as branch proof.
 - Raw plugin `_explode_param` outgoing edges: 3/3; `_get_entries`: 46/46. Constructor: 69/74 raw exits, with missing exits at source lines 47, 56, 128, 134 and 170; flatten helper: 8/9, missing loop exit at 398. Some zero-count terminal/loop paths remain despite explicit empty/no-results vectors and require instrumentation interpretation. All raw zeros remain visible.
 - Top-level Xdebug basic-block counters and synthetic `2147483645` terminal exits can remain zero despite execution. They are not discarded or counted as covered. Child graphs are retained separately beside the parent and are not merged across contexts; full child branch closure remains incomplete. The early direct-access guard and lint children do not produce raw graphs.
 - Uncovered units include PHAR stub fallback/error/platform paths, autoloader variants, MCP save routes, navigation conduit, further EE2 settings/formatting/dynamic-view APIs, remaining raw modern bridge outcomes, fieldtype EE2/context branches, updater extension paths and archive entrypoint. The complete Clover/method reports retain exact lines. These require additional tests and measurement; they are not claimed blocked solely because more work is needed.
@@ -157,3 +159,16 @@ Independent first-pass review reproduced all seven suites, all nineteen standalo
 
 
 Reviewed CP/settings/lifecycle commits: `761b4b1` (shared helpers and native contexts), `9245ec0` (EE2 settings/formatting), `ed7d91e` (pagination URL contracts), `b8040c0` (CP/license behavior), `70e6537` (outer process lifecycle), and `77c77be53161a5ed2878db6ee677f5c7e1d13f30` (evidence). A fresh origin fetch confirmed prior parity before publication. Push used only `origin/unit-tests-2026`; live `git ls-remote` returned exact `77c77be53161a5ed2878db6ee677f5c7e1d13f30`, tracking parity was `0 0`, the tree was clean, and production diff against the pinned baseline remained empty. This update records publication evidence only.
+
+
+## CP base constructors and stored-settings boundaries
+
+Eight additional cases execute both CP extension-menu aliases, native tab/fieldtype constructors, legacy unregister-hook propagation and six serialized-settings input shapes. The CP child uses the real shipped classes and a shared EE footer array. It asserts both exact menu labels/routes, package versions/fieldtype metadata, encrypted pixel shape plus script, and unchanged footer contents after the second constructor. The menu boundary accepts either a string or CP URL object, matching EE Service/CustomMenu/Menu.php:26; the test records the actual passed URL object's path and variables. The footer boundary matches EE's get_foot/add_to_foot storage semantics. Real SQL, a complete installed EE route and browser execution of the script are outside this unit fixture.
+
+The global-settings vectors include legacy null storage, empty bytes, invalid base64 bytes, malformed serialized bytes, serialized zero and an empty array. They require the empty-array fallback and exact fieldtype query. New source regressions remain red for malformed serialized data on all runtimes, null deprecation on PHP 8.1+, and the custom-hook unregister alias described above. No error/deprecation is expected to make a regression pass.
+
+All seven full suites ran 237 cases in `tests/reports/matrix-2r2q8j0q/`, with the current table above. All twenty files also ran alone on PHP 7.4/8.5 and full random seed 20261023 matched, in `tests/reports/cp-boundary-validation-0em41kso/`. Source diagnostics are the only new errors; there are no support, discovery or order failures. Warnings, risky, skipped and incomplete counts remain zero.
+
+Fresh raw PHP 8.2 plus separate Clover/method evidence is `/private/tmp/low-yearly-cp-boundary-coverage-0eo9f0pi/`. Parent plus 53 children produce 54 separate graphs; the new cp-bases child is EE 7.5.17/CP and reaches fifteen original source keys. Parent still reaches all 27 keys with 15,674 retained paths. Parent Clover remains unchanged at 1,692/2,180 statements on PHP 7.4 and 1,676/2,182 on PHP 8.2, with 173/222 archive methods at the helper's line target. CP-only constructor/menu execution is retained in the separate child graph, without merging contexts or treating basic blocks/synthetic exits as completed branches. No full-coverage claim is made.
+
+Self-review found no actionable harness issue. The native fixture owns no external state, its selected-runtime process and temporary files remain bounded by the reviewed harness, shared source/cache state is isolated per child, and the original archive/source hashes remain unchanged. This exact five-path follow-up awaits independent review before publication. Remaining malformed/cache/settings/dynamic-view/native/platform and actual outgoing-outcome closure work continues.
