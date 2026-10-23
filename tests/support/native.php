@@ -27,6 +27,7 @@ define('PATH_CACHE', sys_get_temp_dir() . '/cache/');
 define('DIR_WRITE_MODE', 0700);
 define('FILE_WRITE_MODE', 0600);
 define('APPPATH', sys_get_temp_dir() . '/legacy-app/');
+define('SYSPATH', sys_get_temp_dir() . '/legacy-system/');
 require __DIR__ . '/ExpressionEngine.php';
 require __DIR__ . '/BranchCoverage.php';
 if (getenv('LOW_YEARLY_RAW_COVERAGE')) {
@@ -38,6 +39,53 @@ if ($scenario === 'fallback-loader') {
     stream_wrapper_unregister('phar');
 }
 require $root . '/low_yearly_archives/autoload.php';
+
+if ($scenario === 'legacy-fieldtype') {
+    $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
+    $GLOBALS['low_yearly_ee'] = (object) array(
+        'db' => new LowYearlyDatabase(), 'config' => new LowYearlyConfig(),
+        'input' => new LowYearlyInput(), 'table' => new LowYearlySpy(array('add_row' => null)),
+    );
+    ee()->input->values = $input;
+    $fieldtype = new class extends Low\YearlyArchives\FluxCapacitor\Base\Ft {};
+    $fieldtype->settings['field_channel_id'] = 9;
+    $fieldtype->displaySettingsRow('Label', '<input>', 'Description');
+    $fieldtype->_display_settings_add_row('Wide', '<select>', '', true);
+    echo json_encode(array('channel' => $fieldtype->getChannelId(), 'rows' => ee()->table->calls, 'settings' => $fieldtype->displaySettingsReturn()), JSON_THROW_ON_ERROR);
+    exit;
+}
+
+if ($scenario === 'save-license') {
+    $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
+    $GLOBALS['low_yearly_ee'] = (object) array(
+        'db' => new LowYearlyDatabase(), 'settings_db' => new LowYearlyDatabase(),
+        'config' => new LowYearlyConfig(), 'alert' => new LowYearlyAlert(),
+        'input' => new LowYearlyInput(), 'services' => array(), 'service_calls' => array(),
+    );
+    ee()->config->values['site_id'] = $input['site_id'];
+    ee()->input->values = $input['post'];
+    ee()->db->tableExists = true;
+    ee()->db->queryRows = array(array('Column_name' => 'license_key', 'Non_unique' => '0'));
+    ee()->db->count = $input['count'];
+    ee()->db->tableRows = array('eeharbor_licenses' => $input['licenses'], 'sites' => $input['sites']);
+    ee()->db->resultQueues['eeharbor_licenses'] = array($input['check_key_rows'] ?? $input['licenses']);
+    ee()->functions = new class {
+        /**
+         * Observe the redirect boundary and terminate the request as EE does.
+         *
+         * @param LowYearlyUrl $url
+         * @return void
+         */
+        public function redirect($url)
+        {
+            echo json_encode(array('redirect' => $url->path, 'database' => ee()->db->calls, 'alerts' => ee()->alert->calls), JSON_THROW_ON_ERROR);
+            exit;
+        }
+    };
+    $mcp = new Low\YearlyArchives\FluxCapacitor\Base\Mcp();
+    $mcp->save_license();
+    throw new RuntimeException('The license action did not redirect.');
+}
 
 if ($scenario === 'legacy-url' || $scenario === 'legacy-routes') {
     $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);

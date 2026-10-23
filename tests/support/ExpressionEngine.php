@@ -223,6 +223,7 @@ final class LowYearlyDatabase
     public $fieldExists = true;
     public $count = 0;
     public $tableRows = array();
+    public $resultQueues = array();
 
     /**
      * Record the Active Record calls without executing customer SQL.
@@ -238,6 +239,9 @@ final class LowYearlyDatabase
         }
         $this->calls[] = array($method, $arguments);
         if ($method === 'get' || $method === 'get_where') {
+            if (isset($arguments[0]) && !empty($this->resultQueues[$arguments[0]])) {
+                return new LowYearlyResult(array_shift($this->resultQueues[$arguments[0]]));
+            }
             if (isset($arguments[0], $this->tableRows[$arguments[0]])) {
                 return new LowYearlyResult($this->tableRows[$arguments[0]]);
             }
@@ -594,6 +598,16 @@ abstract class EE_Fieldtype
     {
         return $this->testContentId;
     }
+}
+
+/**
+ * Return the URI helper's request string through the actual EE collaborator boundary.
+ *
+ * @return string
+ */
+function uri_string()
+{
+    return ee()->uri->uri_string();
 }
 
 /**
