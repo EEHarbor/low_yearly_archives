@@ -68,7 +68,13 @@ if ($scenario === 'legacy-bootstrap') {
     exit;
 }
 
-define('PATH_THIRD', $scenario === 'missing-archive' ? sys_get_temp_dir() . '/missing-low-yearly/' : $root . '/');
+if ($scenario === 'legacy-view') {
+    $fixtureRoot = realpath(sys_get_temp_dir()) . '/view-fixture/';
+    mkdir($fixtureRoot . 'low_yearly_archives/views', 0700, true);
+    define('PATH_THIRD', $fixtureRoot);
+} else {
+    define('PATH_THIRD', $scenario === 'missing-archive' ? sys_get_temp_dir() . '/missing-low-yearly/' : $root . '/');
+}
 define('BASEPATH', $root . '/');
 define('APP_VER', isset($argv[2]) ? $argv[2] : '7.5.17');
 define('REQ', in_array($scenario, array('save-license', 'mcp-constructor', 'cp-bases'), true) ? 'CP' : 'PAGE');
@@ -87,7 +93,38 @@ if (getenv('LOW_YEARLY_RAW_COVERAGE')) {
 if ($scenario === 'fallback-loader') {
     stream_wrapper_unregister('phar');
 }
-require $root . '/low_yearly_archives/autoload.php';
+if ($scenario === 'legacy-view') {
+    $archive = 'phar://' . $root . '/low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Bridge/';
+    require $archive . 'AbstractBridge.php';
+    require $archive . 'EE2.php';
+} else {
+    require $root . '/low_yearly_archives/autoload.php';
+}
+
+if ($scenario === 'legacy-view') {
+    $input = json_decode($argv[3], true, 512, JSON_THROW_ON_ERROR);
+    $views = PATH_THIRD . 'low_yearly_archives/views';
+    $GLOBALS['low_yearly_ee'] = (object) array('load' => new LowYearlySpy(array('view' => 'rendered view')));
+    $bridge = new Low\YearlyArchives\FluxCapacitor\Bridge\EE2(array('module' => 'low_yearly_archives', 'module_name' => 'Low Yearly Archives'));
+    try {
+        chmod($views, $input['writable'] ? 0700 : 0500);
+        clearstatcache(true, $views);
+        if (is_writable($views) !== $input['writable']) {
+            throw new RuntimeException('Native view fixture permissions do not match the requested boundary.');
+        }
+        $result = $bridge->view('original', array('message' => 'value', 'ee_ver' => 'caller'), true, '<p>dynamic</p>');
+        echo json_encode(array(
+            'result' => $result, 'calls' => ee()->load->calls,
+            'contents' => is_file($views . '/dynamic.php') ? file_get_contents($views . '/dynamic.php') : null,
+            'directory' => PATH_THIRD,
+            'source_sha256' => hash_file('sha256', (new ReflectionClass($bridge))->getFileName()),
+            'loaded_from' => (new ReflectionClass($bridge))->getFileName(),
+        ), JSON_THROW_ON_ERROR);
+    } finally {
+        chmod($views, 0700);
+    }
+    exit;
+}
 
 if ($scenario === 'cp-bases') {
     $GLOBALS['low_yearly_ee'] = (object) array(

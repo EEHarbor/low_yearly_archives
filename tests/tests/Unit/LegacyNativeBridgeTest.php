@@ -140,6 +140,35 @@ final class LegacyNativeBridgeTest extends LowYearlyTestCase
     }
 
     /**
+     * Write dynamic templates only into an owned fixture while retaining the fallback view.
+     *
+     * @param bool $writable
+     * @return void
+     * @dataProvider viewPermissions
+     */
+    public function testNativeDynamicViews($writable): void
+    {
+        $data = $this->probe('legacy-view', '2.11.9', array('writable' => $writable));
+        self::assertSame('rendered view', $data['result']);
+        self::assertSame(array(array('view', array($writable ? 'dynamic' : 'original', array('message' => 'value', 'ee_ver' => '2'), true))), $data['calls']);
+        self::assertSame($writable ? '<p>dynamic</p>' : null, $data['contents']);
+        $source = 'phar://' . PATH_THIRD . 'low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Bridge/EE2.php';
+        self::assertSame(hash_file('sha256', $source), $data['source_sha256']);
+        self::assertSame($source, $data['loaded_from']);
+        self::assertDirectoryDoesNotExist($data['directory']);
+    }
+
+    /**
+     * Cover writable and permission-denied view directories in separate native children.
+     *
+     * @return array
+     */
+    public static function viewPermissions(): array
+    {
+        return array('writable' => array(true), 'read only' => array(false));
+    }
+
+    /**
      * Run native shipped-source execution and reject diagnostics before decoding its output.
      *
      * @param string $scenario
