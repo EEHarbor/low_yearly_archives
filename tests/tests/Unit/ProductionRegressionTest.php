@@ -73,6 +73,20 @@ final class ProductionRegressionTest extends LowYearlyTestCase
     }
 
     /**
+     * Remove the explicitly requested hook through the legacy extension alias.
+     *
+     * @return void
+     */
+    public function testLegacyUnregisterAliasPreservesHook(): void
+    {
+        $extension = new Ext();
+        self::assertTrue($this->invoke($extension, 'unregister_extension', array('publish', 'custom_hook')));
+        self::assertSame(array('delete', array('extensions', array(
+            'class' => Ext::class, 'method' => 'publish', 'hook' => 'custom_hook',
+        ))), end($this->ee->db->calls));
+    }
+
+    /**
      * Reject source deprecations for a null helper input on modern PHP versions.
      *
      * @return void
