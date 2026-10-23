@@ -19,6 +19,55 @@ if ($scenario === 'guard') {
     throw new RuntimeException('The direct-access guard did not exit.');
 }
 
+if ($scenario === 'legacy-bootstrap') {
+    define('PATH_THIRD', $root . '/');
+    define('BASEPATH', $root . '/');
+    define('REQ', 'PAGE');
+    $GLOBALS['low_yearly_legacy_instance'] = (object) array('config' => new class($argv[2]) {
+        public $calls = array();
+        private $version;
+
+        /**
+         * Supply EE's configured version before the APP_VER constant exists.
+         *
+         * @param string $version
+         * @return void
+         */
+        public function __construct($version) { $this->version = $version; }
+
+        /**
+         * Record the early legacy config lookup.
+         *
+         * @param string $name
+         * @return string|false
+         */
+        public function item($name) { $this->calls[] = $name; return $name === 'app_version' ? $this->version : false; }
+    });
+
+    /**
+     * Return the legacy singleton used by the source's ee() compatibility helper.
+     *
+     * @return object
+     */
+    function get_instance() { return $GLOBALS['low_yearly_legacy_instance']; }
+
+    require __DIR__ . '/BranchCoverage.php';
+    if (getenv('LOW_YEARLY_RAW_COVERAGE')) {
+        register_shutdown_function(array(LowYearlyBranchCoverage::class, 'stop'));
+        LowYearlyBranchCoverage::start();
+    }
+    $before = function_exists('ee');
+    require $root . '/low_yearly_archives/autoload.php';
+    $bridge = new Low\YearlyArchives\FluxCapacitor\Bridge\EE(array('module' => 'low_yearly_archives', 'module_name' => 'Low Yearly Archives'));
+    echo json_encode(array(
+        'before' => $before, 'after' => function_exists('ee'),
+        'facade_matches' => ee() === $GLOBALS['low_yearly_legacy_instance'],
+        'version' => APP_VER, 'bridge' => get_parent_class($bridge),
+        'config_calls' => ee()->config->calls,
+    ), JSON_THROW_ON_ERROR);
+    exit;
+}
+
 define('PATH_THIRD', $scenario === 'missing-archive' ? sys_get_temp_dir() . '/missing-low-yearly/' : $root . '/');
 define('BASEPATH', $root . '/');
 define('APP_VER', isset($argv[2]) ? $argv[2] : '7.5.17');

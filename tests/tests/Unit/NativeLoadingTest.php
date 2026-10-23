@@ -51,6 +51,24 @@ final class NativeLoadingTest extends LowYearlyTestCase
     }
 
     /**
+     * Load the source compatibility helper and configured version before EE bootstrap constants.
+     *
+     * @return void
+     */
+    public function testNativeLegacyBootstrapDefinesFacadeAndVersion(): void
+    {
+        list($status, $stdout, $stderr) = $this->process(array(__DIR__ . '/../../support/native.php', 'legacy-bootstrap', '2.11.9'));
+
+        self::assertSame(0, $status, $stdout . $stderr);
+        self::assertSame('', $stderr);
+        self::assertSame(array(
+            'before' => false, 'after' => true, 'facade_matches' => true,
+            'version' => '2.11.9', 'bridge' => 'Low\\YearlyArchives\\FluxCapacitor\\Bridge\\EE2',
+            'config_calls' => array('app_version'),
+        ), json_decode($stdout, true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Exercise direct access, foreign namespaces and explicit missing-file errors.
      *
      * @param string $scenario

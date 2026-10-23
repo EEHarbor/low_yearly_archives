@@ -83,7 +83,7 @@ final class LowYearlyBranchCoverage
     public static function write(): void
     {
         $scenario = basename($GLOBALS['argv'][0] ?? '') === 'native.php' ? ($GLOBALS['argv'][1] ?? null) : 'suite';
-        $report = array('php' => PHP_VERSION, 'xdebug' => phpversion('xdebug'), 'pid' => getmypid(), 'created' => microtime(true), 'ee' => APP_VER, 'request' => REQ, 'scenario' => $scenario, 'files' => array());
+        $report = array('php' => PHP_VERSION, 'xdebug' => phpversion('xdebug'), 'pid' => getmypid(), 'created' => microtime(true), 'ee' => defined('APP_VER') ? APP_VER : null, 'request' => REQ, 'scenario' => $scenario, 'files' => array());
         foreach (self::$coverage as $file => $coverage) {
             $report['files'][$file] = array('sha256' => hash_file('sha256', $file), 'coverage' => $coverage);
         }
