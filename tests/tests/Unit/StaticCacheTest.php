@@ -24,4 +24,29 @@ final class StaticCacheTest extends LowYearlyTestCase
         self::assertTrue(StaticCache::clear());
         self::assertSame(array(), StaticCache::all());
     }
+
+    /**
+     * Preserve a numeric zero component independently of another cache entry.
+     *
+     * @param int|string $zero
+     * @return void
+     * @dataProvider zeroKeyComponents
+     */
+    public function testZeroComponentPreservesCompositeKeyIdentity($zero): void
+    {
+        StaticCache::put('entry', 'original');
+        StaticCache::put(array('entry', $zero), 'zero');
+
+        self::assertSame(array('original', 'zero'), array(StaticCache::get('entry'), StaticCache::get(array('entry', $zero))));
+    }
+
+    /**
+     * Include integer and database-style numeric-string key components.
+     *
+     * @return array
+     */
+    public static function zeroKeyComponents(): array
+    {
+        return array('integer zero' => array(0), 'numeric string zero' => array('0'));
+    }
 }
