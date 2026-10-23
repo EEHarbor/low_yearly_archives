@@ -68,6 +68,8 @@ Self-review: test support guards `setAccessible()` to PHP < 8.1, restores error 
 
 Next work: independent review and resolve test findings, publish reviewed tests on `origin/unit-tests-2026`, then continue the remaining archived APIs and raw conditional-outcome coverage. This is a useful failing-regression checkpoint, not a completed add-on.
 
+Publication: `git push -u origin unit-tests-2026` succeeded after an authorized retry of a sandbox DNS failure. First published checkpoint `0cc47db765fb2abfdbaf91fb23c8aa142782044c` matched `origin/unit-tests-2026` exactly (`git rev-list --left-right --count HEAD...origin/unit-tests-2026` = `0 0`); the checkout was clean and production-source diff against the pinned baseline was empty. This publication-evidence documentation commit follows that checkpoint and is pushed to the same branch. No PR or production-source commit was created.
+
 ## Reviewed scoped commits
 
 - `b99a8fa` tests(low_yearly_archives): add pinned PHPUnit coverage harness
