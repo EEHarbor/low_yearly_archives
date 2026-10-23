@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import time
 import xml.etree.ElementTree as ET
+from support.process import run_process
 
 root = Path(__file__).resolve().parent.parent
 reports = root / "tests" / "reports"
@@ -28,7 +29,7 @@ for version in ("74", "80", "81", "82", "83", "84", "85"):
     environment.pop("LOW_YEARLY_MEASURE_ARCHIVE", None)
     command = [str(root / "tests/.phpunit/run-phpunit.sh"), "-c", str(root / "phpunit.xml"), "--log-junit", str(junit)]
     started = time.time()
-    process = subprocess.run(command, cwd=str(root), env=environment, capture_output=True, text=True, timeout=300)
+    process = run_process(command, str(root), environment, 300)
     (report_dir / ("php" + version + ".log")).write_text(process.stdout + process.stderr)
     counts = {}
     if junit.is_file() and junit.stat().st_size and junit.stat().st_mtime >= started:

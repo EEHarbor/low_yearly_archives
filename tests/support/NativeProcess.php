@@ -13,7 +13,8 @@ final class LowYearlyNativeProcess
      */
     public static function run(array $arguments, $sourceBytes = null, array $environmentOverrides = array()): array
     {
-        $temporary = sys_get_temp_dir() . '/low-yearly-native-' . bin2hex(random_bytes(8));
+        $temporaryRoot = getenv('LOW_YEARLY_SUITE_TEMP') ?: sys_get_temp_dir();
+        $temporary = $temporaryRoot . '/low-yearly-native-' . bin2hex(random_bytes(8));
         mkdir($temporary, 0700);
         $streams = array();
         $process = null;
