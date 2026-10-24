@@ -185,36 +185,38 @@ class PersistentCache
     }
 
     /**
-     * Check one configured cache alias while retaining the original native mkdir path.
+     * Create the configured native path and handle only its known filesystem failures.
      *
-     * @param string $path Configured cache directory path.
-     * @return bool Whether the directory was created.
+     * @param string $path Original configured directory path, including alias spelling.
+     * @return bool Whether native directory creation succeeded.
+     * @throws \Throwable When an unexpected diagnostic or stream callback fails.
      */
     private static function createDirectory($path)
     {
-        $separators = DIRECTORY_SEPARATOR === '\\' ? '/\\' : '/';
-        $directory = rtrim($path, $separators);
-
-        if (is_link($directory)) {
-            $target = readlink($directory);
-            if ($target === false || $target === '') {
-                return false;
+        $create_line = 0;
+        $previous = null;
+        $previous = set_error_handler(static function ($severity, $message, $file, $line) use (&$create_line, &$previous) {
+            if ($severity === E_WARNING && $file === __FILE__ && $line === $create_line
+                && in_array($message, array(
+                    'mkdir(): Permission denied',
+                    'mkdir(): File exists',
+                    'mkdir(): Not a directory',
+                    'mkdir(): No such file or directory',
+                    'mkdir(): Too many levels of symbolic links',
+                    'mkdir(): Read-only file system',
+                ), true)) {
+                return true;
             }
-            $absolute = $target[0] === '/' || (DIRECTORY_SEPARATOR === '\\'
-                && ($target[0] === '\\' || preg_match('/^[a-z]:[\\\\\/]/i', $target)));
-            $directory = rtrim($absolute ? $target : dirname($directory) . '/' . $target, $separators);
-            if (is_link($directory)) {
-                return false;
-            }
-        }
 
-        $parent = dirname($directory);
-        if (file_exists($directory) || !is_dir($parent) || !is_writable($parent)
-            || (DIRECTORY_SEPARATOR === '/' && !is_executable($parent))) {
-            return false;
-        }
+            return $previous === null ? false : $previous(...func_get_args());
+        }, -1);
 
-        return mkdir($path, DIR_WRITE_MODE);
+        try {
+            $create_line = __LINE__ + 1;
+            return mkdir($path, DIR_WRITE_MODE);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**

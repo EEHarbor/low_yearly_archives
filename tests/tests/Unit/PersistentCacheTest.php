@@ -85,6 +85,116 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Supply native accepted trailing-target chains at each configured boundary.
+     *
+     * @return array
+     */
+    public static function trailingCacheAliases(): array
+    {
+        $cases = array();
+        foreach (array('cache', 'module') as $scope) {
+            foreach (array('first', 'both', 'three') as $shape) { $cases[] = array($scope, $shape); }
+        }
+        return $cases;
+    }
+
+    /**
+     * Preserve native alias spelling, stored bytes and disk reads after fixture setup.
+     *
+     * @dataProvider trailingCacheAliases
+     * @param string $scope Generic or module cache directory.
+     * @param string $shape Intermediate targets retaining their trailing separator.
+     * @return void
+     */
+    public function testTrailingCacheAliasTargetsRemainSupported($scope, $shape): void
+    {
+        mkdir($this->temporary . '/target', 0700);
+        $target = $this->temporary . '/target/cache';
+        $inner = $this->temporary . '/inner';
+        $next = $shape === 'three' ? $this->temporary . '/third/' : $target . ($shape === 'both' ? '/' : '');
+        symlink($next, $inner);
+        if ($shape === 'three') { symlink($target, $this->temporary . '/third'); }
+        $link = $this->linkCachePath($scope, $scope === 'cache' ? 'inner/' : '../inner/');
+        // Newly created link chains can leave PHP's realpath cache stale before the source runs.
+        clearstatcache(true);
+        $handler = static function () {};
+        $before = set_error_handler($handler);
+        restore_error_handler();
+        $value = array('zero' => 0, 'name' => 'saved');
+        self::assertTrue(PersistentCache::set('entry', $value));
+        $after = set_error_handler($handler);
+        restore_error_handler();
+        self::assertSame($before, $after);
+        $file = $target . ($scope === 'cache' ? '/low_yearly_archives' : '') . '/' . sha1('entry');
+        self::assertSame(serialize($value), file_get_contents($file));
+        StaticCache::clear();
+        self::assertSame($value, PersistentCache::get('entry'));
+        self::assertSame($value, PersistentCache::get('entry'));
+        self::assertTrue(PersistentCache::has('entry'));
+        self::assertTrue(is_link($link));
+        self::assertTrue(is_link($inner));
+        self::assertDirectoryExists($target);
+    }
+
+    /**
+     * Supply unavailable final parents and incomplete trailing-target chains.
+     *
+     * @return array
+     */
+    public static function blockedTrailingCacheAliases(): array
+    {
+        $cases = array();
+        foreach (array('cache', 'module') as $scope) {
+            foreach (array('readonly', 'nonsearchable', 'file', 'missing', 'cycle', 'third-without-separator') as $shape) {
+                $cases[] = array($scope, $shape);
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * Keep unavailable final targets on the quiet false and developer-log path.
+     *
+     * @dataProvider blockedTrailingCacheAliases
+     * @param string $scope Generic or module cache directory.
+     * @param string $shape Unavailable final parent or alias spelling.
+     * @return void
+     */
+    public function testBlockedTrailingCacheAliasesReturnFalse($scope, $shape): void
+    {
+        $parent = $this->temporary . '/target';
+        mkdir($parent, 0700);
+        $target = $parent . '/cache';
+        $inner = $this->temporary . '/inner';
+        $link = $this->linkCachePath($scope, $inner . '/');
+        $next = $shape === 'cycle' ? $link . '/' : $target;
+        if ($shape === 'third-without-separator') {
+            $next = $this->temporary . '/third';
+            symlink($target, $next);
+        }
+        symlink($next, $inner);
+        if ($shape === 'readonly') { chmod($parent, 0500); }
+        if ($shape === 'nonsearchable') { chmod($parent, 0200); }
+        if ($shape === 'missing') { rmdir($parent); }
+        if ($shape === 'file') { rmdir($parent); file_put_contents($parent, 'retained'); chmod($parent, 0700); }
+        clearstatcache();
+        $handler = static function () {};
+        $before = set_error_handler($handler);
+        restore_error_handler();
+        try {
+            self::assertFalse(PersistentCache::set('entry', 'value'));
+            $after = set_error_handler($handler);
+            restore_error_handler();
+            self::assertSame($before, $after);
+            self::assertCount(1, $this->ee->logger->calls);
+        } finally {
+            if (file_exists($parent)) { chmod($parent, 0700); }
+        }
+        self::assertTrue(is_link($link));
+        self::assertTrue(is_link($inner));
+    }
+
+    /**
      * Supply unavailable alias target shapes at both configured cache boundaries.
      *
      * @return array

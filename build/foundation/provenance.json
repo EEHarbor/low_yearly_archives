@@ -172,5 +172,18 @@
         "@@@LICENSE_CONSTANT@@@": "true",
         "@@@VALIDATION_JS@@@": "<exact shipped JS>"
     },
-    "permissions_source": "Pinned original raw manifest flags; independent binary reader, not readonly PharFileInfo projection."
+    "permissions_source": "Pinned original raw manifest flags; independent binary reader, not readonly PharFileInfo projection.",
+    "native_mkdir_failure_contract": {
+        "rationale": "Coordinator-authorized exact native mkdir false/log handling preserves original alias spelling and chain evaluation; earlier availability resolver rejected valid trailing-target chains. No resolver or new @ retained.",
+        "scope": "E_WARNING only at own file and adjacent mkdir call line, exact six expected filesystem errno messages; forward every unexpected argument and restore in finally.",
+        "messages": [
+            "Permission denied",
+            "File exists",
+            "Not a directory",
+            "No such file or directory",
+            "Too many levels of symbolic links",
+            "Read-only file system"
+        ],
+        "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim."
+    }
 }
