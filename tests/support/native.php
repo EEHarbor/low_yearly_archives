@@ -1,18 +1,29 @@
 <?php
 
-error_reporting(E_ALL);
+require __DIR__ . '/Diagnostics.php';
 date_default_timezone_set('UTC');
 $root = dirname(__DIR__, 2);
 $scenario = $argv[1];
-set_error_handler(function ($severity, $message, $file, $line) use ($root) {
-    $source = strpos($file, $root . '/low_yearly_archives/') !== false;
-    $deprecation = $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED;
-    if ($source || $deprecation || (error_reporting() & $severity)) {
-        throw new ErrorException(($source ? '' : 'Test support diagnostic: ') . $message, 0, $severity, $file, $line);
-    }
-
-    return false;
+register_shutdown_function(static function () {
+    if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
+
+if (strpos($scenario, 'extraction-link-') === 0) {
+    $mode = $scenario;
+    require __DIR__ . '/extraction-links.php';
+    exit;
+}
+
+if (in_array($scenario, array('caught-diagnostic', 'caught-diagnostic-timeout', 'caught-diagnostic-output'), true)) {
+    try {
+        @trigger_error('Low Yearly caught native sentinel', E_USER_DEPRECATED);
+    } catch (ErrorException $error) {
+    }
+    if ($scenario === 'caught-diagnostic-timeout') { sleep(20); }
+    if ($scenario === 'caught-diagnostic-output') { echo str_repeat('x', 131073); }
+    echo 'CAUGHT';
+    exit;
+}
 
 if ($scenario === 'guard') {
     include $root . '/low_yearly_archives/pi.low_yearly_archives.php';

@@ -1,6 +1,8 @@
 """Verify outer suite cleanup when a native descendant outlives its parent."""
 
 import importlib.util
+import json
+import xml.etree.ElementTree as ET
 import os
 from pathlib import Path
 import signal
@@ -13,6 +15,9 @@ import unittest
 spec = importlib.util.spec_from_file_location("low_yearly_process", Path(__file__).parent / "support/process.py")
 process_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(process_module)
+
+
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class ProcessOwnershipTest(unittest.TestCase):
@@ -69,6 +74,31 @@ if os.environ['REVIEW_PARENT_WAITS']=='1':time.sleep(4)
                         os.kill(int(pid_file.read_text()), signal.SIGKILL)
                     except ProcessLookupError:
                         pass
+
+    def test_caught_native_diagnostic_survives_caught_probe_owner_failures(self):
+        for suffix in ['74', '85']:
+            for mode in ['caught-diagnostic-timeout', 'caught-diagnostic-output']:
+                with self.subTest(runtime=suffix, mode=mode), tempfile.TemporaryDirectory(prefix='low-yearly-receipt-test-') as temporary:
+                    fixture = Path(temporary) / 'CaughtDiagnosticTest.php'
+                    report = Path(temporary) / 'result.xml'
+                    fixture.write_bytes((ROOT / 'tests/fixtures/CaughtDiagnosticTest.php').read_bytes())
+                    environment = os.environ.copy()
+                    environment['PHP_BIN'] = '/Users/tomjaeger/Library/Application Support/Herd/bin/php' + suffix
+                    environment['LOW_YEARLY_CAUGHT_CONTEXT'] = mode.replace('caught-diagnostic', 'native')
+                    environment.pop('LOW_YEARLY_RAW_COVERAGE', None)
+                    environment.pop('LOW_YEARLY_MEASURE_ARCHIVE', None)
+                    result = process_module.run_process([str(ROOT / 'tests/.phpunit/run-phpunit.sh'), '-c', str(ROOT / 'phpunit.xml'),
+                                        str(fixture), '--log-junit=' + str(report)], str(ROOT), environment, 30)
+                    self.assertNotEqual(0, result.returncode)
+                    self.assertTrue(report.is_file())
+                    counts = ET.parse(report).getroot().find('testsuite').attrib
+                    self.assertEqual('1', counts['tests'])
+                    receipts = [json.loads(line.split(':', 1)[1]) for line in result.stderr.splitlines()
+                                if line.startswith('LOW_YEARLY_DIAGNOSTIC:')]
+                    self.assertEqual(1, len(receipts))
+                    child = json.loads(receipts[0]['message'].split('LOW_YEARLY_DIAGNOSTIC:', 1)[1])
+                    self.assertEqual(16384, child['severity'])
+                    self.assertIn('Low Yearly caught native sentinel', child['message'])
 
     def test_timeout_stops_child_and_removes_output(self):
         """A suite deadline must stop descendants before deleting their owned files."""

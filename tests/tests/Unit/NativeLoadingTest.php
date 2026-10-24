@@ -22,7 +22,7 @@ final class NativeLoadingTest extends LowYearlyTestCase
                 $files[] = $entry->getPathname();
             }
         }
-        self::assertCount(27, $files);
+        self::assertCount(28, $files);
         foreach ($files as $file) {
             $archived = strpos($file, 'phar://') === 0;
             list($status, $stdout, $stderr) = $this->process(array('-l', $archived ? '{source}' : $file), $archived ? file_get_contents($file) : null);
@@ -97,6 +97,34 @@ final class NativeLoadingTest extends LowYearlyTestCase
         self::assertSame(0, $status, $stdout . $stderr);
         self::assertSame('', $stderr);
         self::assertSame('Low\\YearlyArchives\\FluxCapacitor\\Bridge\\EE6:7.5.17', $stdout);
+    }
+
+    /**
+     * Cover linked extraction roots/containers and stale nested/hidden trees through both entries.
+     *
+     * @return array
+     */
+    public static function extractionTrees(): array
+    {
+        return array(array('direct', 'root'), array('direct', 'container'), array('direct', 'stale'),
+            array('fallback', 'root'), array('fallback', 'container'), array('fallback', 'stale'));
+    }
+
+    /**
+     * Preserve separate targets and the expected working directory during actual extraction.
+     *
+     * @dataProvider extractionTrees
+     * @param string $entry Actual archive entry route.
+     * @param string $kind Link or stale extraction-tree shape.
+     * @return void
+     */
+    public function testExtractionPreservesSeparateTargets($entry, $kind): void
+    {
+        $result = $this->process(array(__DIR__ . '/../../support/native.php', 'extraction-link-' . $entry . '-' . $kind));
+        self::assertSame(0, $result[0], $result[1] . $result[2]);
+        self::assertSame(array('refused' => $kind !== 'stale', 'target_preserved' => true,
+            'link_preserved' => $kind !== 'stale', 'stale_removed' => true, 'cwd_valid' => true,
+            'temporary_removed' => true), json_decode($result[1], true, 512, JSON_THROW_ON_ERROR));
     }
 
     /**

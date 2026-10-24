@@ -14,7 +14,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->previousErrorReporting = error_reporting(E_ALL);
+        $this->previousErrorReporting = error_reporting(-1);
         $this->ee = (object) array(
             'TMPL' => new LowYearlyTemplate(),
             'db' => new LowYearlyDatabase(),
@@ -30,7 +30,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
             'service_calls' => array(),
         );
         $GLOBALS['low_yearly_ee'] = $this->ee;
-        set_error_handler(array(self::class, 'handleSourceDiagnostic'));
+        LowYearlyDiagnostics::install();
         LowYearlyBranchCoverage::start();
         StaticCache::clear();
     }
@@ -50,7 +50,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
     }
 
     /**
-     * Fail every source diagnostic, including diagnostics hidden by @.
+     * Throw the handler's exception format for manual generated severity vectors.
      *
      * @param int $severity
      * @param string $message
@@ -61,14 +61,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
      */
     public static function handleSourceDiagnostic($severity, $message, $file, $line)
     {
-        $source = strpos($file, PATH_THIRD . 'low_yearly_archives/') !== false
-            || strpos($file, PATH_THIRD . 'tests/.coverage-source/') !== false;
-        $deprecation = $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED;
-        if ($source || $deprecation || (error_reporting() & $severity)) {
-            throw new ErrorException(($source ? '' : 'Test support diagnostic: ') . $message, 0, $severity, $file, $line);
-        }
-
-        return false;
+        throw LowYearlyDiagnostics::exception($severity, $message, $file, $line);
     }
 
     /**

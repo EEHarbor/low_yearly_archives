@@ -50,7 +50,7 @@ final class ArchivedBaseTest extends LowYearlyTestCase
     public static function moduleParameters(): array
     {
         return array(
-            array(false, true, 'fallback'), array('', true, 'fallback'), array('0', true, 'fallback'),
+            array(false, true, 'fallback'), array('', true, 'fallback'), array('0', true, '0'),
             array(' &nbsp;&#32; ', true, 'fallback'), array(' &nbsp; value &#32; ', true, 'value'),
             array('  value  ', false, '  value  '), array('value', true, 'value'),
         );

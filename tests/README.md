@@ -1,6 +1,8 @@
+Current production compatibility work and validation: see [COMPATIBILITY.md](COMPATIBILITY.md). Historical source-red/coverage evidence below remains a record of the earlier tests-only campaign.
+
 # Low Yearly Archives PHPUnit tests
 
-These tests use PHP 7.4-compatible syntax and pinned PHPUnit 9.6.38 on every runtime. Tool PHARs are local and ignored; production dependencies and sources are unchanged.
+These tests use PHP 7.4-compatible syntax and pinned PHPUnit 9.6.38 on every runtime. Tool PHARs are local and ignored; production compatibility changes are documented in COMPATIBILITY.md.
 
 ```sh
 bash tests/.phpunit/install.sh
@@ -10,7 +12,11 @@ python3 tests/run-matrix.py
 
 Set `PHP_BIN` to an explicit PHP executable for the launcher. The matrix uses the Herd binaries under `~/Library/Application Support/Herd/bin` without changing global PHP or services; `HERD_PHP_DIRECTORY` can override that directory. Every matrix run creates a fresh directory under `tests/reports/`, executes the complete configured suite on PHP 7.4–8.5, and rejects missing/empty JUnit reports. A nonzero exit is expected while documented source regressions remain.
 
-The EE doubles mirror the contracts inspected in `ee_repo_2/system/ee/legacy`: template fetch normalization, Active Record chaining/results, fieldtype `content_id()`, localize-month language keys, helper file IO and the CP service boundaries. Parser rendering and actual SQL execution are outside these unit tests; their passed data and operations are asserted directly. Native subprocess checks execute the original PHAR, bridge dispatcher, direct-access guard, missing-file paths, legacy URLs and self-extracting fallback. Each child has a 15-second deadline, file-backed stdout/stderr capped at 128 KiB per stream, and its own temporary tree removed in `finally`. Linting archive entries uses verified byte-identical temporary copies because PHP CLI `-l` does not accept `phar://` input filenames.
+The EE doubles mirror the contracts inspected in `ee_repo_2/system/ee/legacy`: template fetch normalization, Active Record chaining/results, fieldtype `content_id()`, localize-month language keys, helper file IO and the CP service boundaries. Parser rendering and actual SQL execution are outside these unit tests; their passed data and operations are asserted directly. Native subprocess checks execute the distributed PHAR, bridge dispatcher, direct-access guard, missing-file paths, legacy URLs and self-extracting fallback. Each child has a 15-second deadline, file-backed stdout/stderr capped at 128 KiB per stream, and its own temporary tree removed in `finally`. Linting archive entries uses verified byte-identical temporary copies because PHP CLI `-l` does not accept `phar://` input filenames.
+
+Historical coverage workflow (not collected for this compatibility repair):
+all new validation uses the checked launcher. The old measurement commands below
+record the earlier campaign and do not establish current strict publication proof.
 
 Run method line reports with byte-identical archive measurement copies:
 
@@ -30,7 +36,7 @@ python3 /Users/tomjaeger/.codex/skills/ee-addon-phpunit-coverage-writer/scripts/
   --coverage-clover "$REPORT/clover.xml" --reuse-clover --json
 ```
 
-The copies are hashed against the archive and listed in `SOURCE_MANIFEST.json`; they are never a rebuilt PHAR. Native and measurement coverage are separate runs. The native PHAR stub remains in the coverage filter. All 27 source units remain visible, including unexecuted files. Always use absolute coverage output paths: the PHAR's `Phar::interceptFileFuncs()` affects relative file operations.
+The copies are hashed against the archive and listed in `SOURCE_MANIFEST.json`; they are byte-identical to the distributed PHAR. Native and measurement coverage are separate runs. The native PHAR stub remains in the coverage filter. All 27 source units remain visible, including unexecuted files. Always use absolute coverage output paths: the PHAR's `Phar::interceptFileFuncs()` affects relative file operations.
 
 The skill's Clover helper reports method executable lines; its `branch_percent: null` and `at_target` label do **not** establish actual branch coverage. Independently collect Xdebug's raw basic blocks and `out`/`out_hit` exits:
 
@@ -47,4 +53,4 @@ The strict error handler fails every source diagnostic, including warnings/notic
 
 The matrix owns a separate POSIX process group and temporary directory for each suite. A suite timeout or keyboard interruption stops the full inherited group before removing that directory; normal completion also stops leftover descendants. Native PHP trees use that owned directory when the matrix supplies it. Verify the outer lifecycle separately with `python3 -m unittest discover -s tests -p test_process.py -v`; its bounded timeout and normal-exit vectors check child activity and file cleanup.
 
-Native EE2 dynamic-view probes load AbstractBridge/EE2 directly from the original PHAR while using an owned temporary PATH_THIRD/views directory. They check written bytes, loader arguments, original member paths/hashes and cleanup without writing production views. Those child graphs retain the original source provenance and remain separate from the parent Clover report. The adapter assertions do not evaluate templates, exercise the ordinary autoloader or replace installed-EE integration.
+Native EE2 dynamic-view probes load AbstractBridge/EE2 directly from the distributed PHAR while using an owned temporary PATH_THIRD/views directory. They check written bytes, loader arguments, original member paths/hashes and cleanup without writing production views. Those child graphs retain the original source provenance and remain separate from the parent Clover report. The adapter assertions do not evaluate templates, exercise the ordinary autoloader or replace installed-EE integration.

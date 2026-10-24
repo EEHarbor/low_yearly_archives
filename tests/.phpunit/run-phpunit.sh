@@ -10,4 +10,5 @@ if [[ "${actual%% *}" != "$expected" ]]; then
   exit 1
 fi
 
-exec "$php_bin" -d error_reporting=-1 -d display_errors=1 "$script_dir/phpunit-9.phar" "$@"
+export PHP_BIN="$php_bin"
+exec "$php_bin" -d error_reporting=-1 -d display_errors=stderr -d display_startup_errors=1 "$script_dir/run-main.php" "$@"

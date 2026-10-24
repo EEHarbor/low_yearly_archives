@@ -81,10 +81,56 @@ final class PersistentCacheTest extends LowYearlyTestCase
      */
     public function testRequestCacheShortCircuit(): void
     {
-        StaticCache::put('raw-key', array('present'), true);
+        StaticCache::put(sha1('raw-key'), array('present'), true);
 
         self::assertSame(array('present'), PersistentCache::get('raw-key'));
         self::assertSame(array(), $this->ee->load->calls);
+    }
+
+    /**
+     * Keep logical hash-looking keys independent of another entry's request-cache key.
+     *
+     * @return void
+     */
+    public function testHashLookingLogicalKeyDoesNotAliasAnotherEntry(): void
+    {
+        self::assertTrue(PersistentCache::set('entry', 'plain'));
+        self::assertTrue(PersistentCache::set(sha1('entry'), 'hashed'));
+        self::assertSame('plain', PersistentCache::get('entry'));
+        self::assertSame('hashed', PersistentCache::get(sha1('entry')));
+    }
+
+    /**
+     * Preserve false-like disk values and decoded request-cache hits after a reset.
+     *
+     * @return void
+     */
+    public function testFalseLikeDiskAndWarmReadsRemainTyped(): void
+    {
+        foreach (array(null, false, 0, '0', '', array()) as $value) {
+            self::assertTrue(PersistentCache::set('entry', $value));
+            StaticCache::clear();
+            self::assertSame($value, PersistentCache::get('entry'));
+            self::assertSame($value, PersistentCache::get('entry'));
+        }
+    }
+
+    /**
+     * Read historical storage while retaining its exact disk bytes.
+     *
+     * @return void
+     */
+    public function testLegacyDiskStorageRemainsReadableWithoutRewriting(): void
+    {
+        foreach (array('a:1:{s:4:"name";S:1:"\\41";}', 'a:1:{s:4:"name";s:1:"A";}unused') as $bytes) {
+            self::assertTrue(PersistentCache::set('entry', array()));
+            $file = $this->temporary . '/cache/low_yearly_archives/' . sha1('entry');
+            file_put_contents($file, $bytes);
+            StaticCache::clear();
+            self::assertSame(array('name' => 'A'), PersistentCache::get('entry'));
+            self::assertSame(array('name' => 'A'), PersistentCache::get('entry'));
+            self::assertSame($bytes, file_get_contents($file));
+        }
     }
 
     /**

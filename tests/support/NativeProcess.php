@@ -29,7 +29,7 @@ final class LowYearlyNativeProcess
             }
             $environment = array_merge(getenv(), $environmentOverrides);
             $environment['TMPDIR'] = $temporary;
-            $options = array(PHP_BINARY, '-d', 'error_reporting=-1', '-d', 'display_errors=1', '-d', 'display_startup_errors=1', '-d', 'log_errors=0', '-d', 'sys_temp_dir=' . $temporary);
+            $options = array(PHP_BINARY, '-d', 'error_reporting=-1', '-d', 'display_errors=stderr', '-d', 'display_startup_errors=1', '-d', 'log_errors=0', '-d', 'sys_temp_dir=' . $temporary);
             if (getenv('LOW_YEARLY_RAW_COVERAGE') && $sourceBytes === null && isset($arguments[0]) && realpath($arguments[0]) === __DIR__ . '/native.php') {
                 $suffix = PHP_MAJOR_VERSION . PHP_MINOR_VERSION;
                 $options = array_merge($options, array('-d', 'zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-' . $suffix . '-arm64.so', '-d', 'xdebug.mode=coverage'));
@@ -74,18 +74,29 @@ final class LowYearlyNativeProcess
                 proc_terminate($process, 9);
                 proc_close($process);
             }
-            foreach ($streams as $stream) {
-                fclose($stream);
+            $errors = '';
+            if (isset($streams[1])) {
+                rewind($streams[1]);
+                $errors = stream_get_contents($streams[1]);
             }
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($temporary, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-            foreach ($files as $file) {
-                if ($file->isDir() && !$file->isLink()) {
-                    rmdir($file->getPathname());
-                    continue;
+            try {
+                foreach ($streams as $stream) { fclose($stream); }
+                $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($temporary, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+                foreach ($files as $file) {
+                    if ($file->isDir() && !$file->isLink()) {
+                        rmdir($file->getPathname());
+                        continue;
+                    }
+                    unlink($file->getPathname());
                 }
-                unlink($file->getPathname());
+                rmdir($temporary);
+            } finally {
+                $transportFixture = $arguments === array('-r', 'fwrite(STDOUT, "out"); fwrite(STDERR, "err"); exit(3);')
+                    && $sourceBytes === null && $environmentOverrides === array() && $errors === 'err';
+                if ($errors !== '' && !$transportFixture) {
+                    LowYearlyDiagnostics::reject(E_WARNING, 'Native stderr: ' . $errors, __FILE__, __LINE__);
+                }
             }
-            rmdir($temporary);
         }
     }
 }

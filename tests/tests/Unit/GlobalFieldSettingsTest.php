@@ -5,6 +5,29 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Report failed settings persistence without replacing its serialized representation.
+     *
+     * @return void
+     */
+    public function testFailedSettingsWriteReturnsFalse(): void
+    {
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(array('old' => 'value')))));
+        $this->ee->db->writeResult = false;
+        self::assertFalse((new GlobalFieldSettings())->updateSetting('new', 0));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize(array('old' => 'value', 'new' => 0)))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Preserve historical escaped string settings through the actual archive reader.
+     *
+     * @return void
+     */
+    public function testLegacyEscapedSettingsRemainReadable(): void
+    {
+        $this->ee->db->rows = array(array('settings' => base64_encode('a:1:{s:4:"name";S:1:"\\41";}')));
+        self::assertSame(array('name' => 'A'), (new GlobalFieldSettings())->getSettings());
+    }
+    /**
      * Return null for an uninstalled fieldtype and avoid creating a settings row.
      *
      * @return void

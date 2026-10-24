@@ -351,12 +351,13 @@ class Low_yearly_archives extends Pi
     /**
      * Converts EE parameter to workable php vars
      *
-     * @access     private
-     * @param      string    String like 'not 1|2|3' or '40|15|34|234'
-     * @return     array     [0] = array of ids, [1] = boolean whether to include or exclude: TRUE means include, FALSE means exclude
+     * @param string|null $str Parameter such as 'not 1|2|3' or '40|15|34|234'.
+     * @return array Token values and whether matching values should be included.
      */
     private function _explode_param($str)
     {
+        if ($str === null) { $str = ''; }
+
         // --------------------------------------
         // Initiate $in var to TRUE
         // --------------------------------------

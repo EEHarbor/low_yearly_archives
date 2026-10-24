@@ -3,6 +3,21 @@
 final class SetupTest extends LowYearlyTestCase
 {
     /**
+     * Verify effective settings in the checked launcher and its actual native child.
+     *
+     * @return void
+     */
+    public function testProcessStartupSettingsAreStrict(): void
+    {
+        $expected = array(PHP_BINARY, -1, 'stderr', '1');
+        self::assertSame($expected, array(getenv('PHP_BIN'), error_reporting(), ini_get('display_errors'), ini_get('display_startup_errors')));
+        $result = LowYearlyNativeProcess::run(array('-r', 'echo json_encode(array(PHP_BINARY, error_reporting(), ini_get("display_errors"), ini_get("display_startup_errors")));'));
+        self::assertSame(0, $result[0], $result[1] . $result[2]);
+        self::assertSame('', $result[2]);
+        self::assertSame($expected, json_decode($result[1], true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Verify package metadata comes from the shipped JSON manifest.
      *
      * @return void
