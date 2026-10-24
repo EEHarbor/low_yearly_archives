@@ -8,6 +8,11 @@ register_shutdown_function(static function () {
     if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
 
+if (strpos($scenario, 'cleanup-root-') === 0) {
+    $mode = $scenario;
+    require __DIR__ . '/cleanup-roots.php';
+    exit;
+}
 if (strpos($scenario, 'mcp-api-') === 0) {
     $mode = $scenario;
     require __DIR__ . '/mcp-api.php';

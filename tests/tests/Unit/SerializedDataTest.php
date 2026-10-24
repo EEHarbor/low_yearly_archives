@@ -39,6 +39,9 @@ class SerializedDataTest extends LowYearlyTestCase
             array('i:-99999999999999999999999999999;', PHP_INT_MIN),
             array('a:2:{i:0;S:1:"\\41";i:1;i:99999999999999999999999999999;}', array('A', PHP_INT_MAX)),
             array('a:2:{i:0;S:1:"\\41";i:1;i:-99999999999999999999999999999;}', array('A', PHP_INT_MIN)),
+            array('S:000000000000000000000000000001:"\\41";', 'A'),
+            array('a:2:{i:0;s:000000000000000000000000000001:"A";i:1;S:1:"\\42";}', array('A', 'B')),
+            array('O:000000000000000000000000000008:"stdClass":1:{s:1:"x";S:1:"\\41";}', (object) array('x' => 'A')),
             array('O:8:"stdClass":+1:{s:1:"x";S:1:"\\41";}', (object) array('x' => 'A')),
             array('O:8:"stdClass":+01:{s:1:"x";S:1:"\\41";}', (object) array('x' => 'A')),
             array('a:2:{i:0;O:8:"stdClass":-0:{}i:1;S:1:"\\41";}', array(new \stdClass(), 'A')),
@@ -58,6 +61,13 @@ class SerializedDataTest extends LowYearlyTestCase
             array('s:20:"S:short";}'),
             array('X:S:1:"\41";}'),
             array('C:1:"X":-100:{S:1:"\41";}}'),
+            array('S:999999999999999999999999999999:"x";}'),
+            array('s:999999999999999999999999999999:"S:x";}'),
+            array('O:999999999999999999999999999999:"S:X":0:{}}'),
+            array('C:999999999999999999999999999999:"S:X":0:{}}'),
+            array('E:999999999999999999999999999999:"S:X";}'),
+            array('C:1:"X":+999999999999999999999999999999:{S:}}'),
+            array('C:1:"X":-999999999999999999999999999999:{S:}}'),
         );
     }
 
@@ -224,13 +234,29 @@ class SerializedDataTest extends LowYearlyTestCase
     }
 
     /**
+     * Preserve native signed zero custom lengths after an escaped value.
+     *
+     * @return void
+     */
+    public function testSignedZeroCustomPayloadLengthsRemainValid(): void
+    {
+        $class = SerializedCustomPayload::class;
+        foreach (array('0', '+0', '-0', '-000000000000000000000000000') as $length) {
+            $wire = 'a:2:{i:0;S:1:"\41";i:1;C:' . strlen($class) . ':"' . $class . '":' . $length . ':{}}';
+            $decoded = SerializedData::decode($wire);
+            self::assertSame('A', $decoded[0]);
+            self::assertSame('', $decoded[1]->payload);
+        }
+    }
+
+    /**
      * Supply native accepted lexical forms for custom payload lengths.
      *
      * @return array
      */
     public static function customPayloadCounts(): array
     {
-        return array(array(''), array('+'), array('+0'));
+        return array(array(''), array('+'), array('+0'), array('000000000000000000000000000'), array('+000000000000000000000000000'));
     }
 
     /**

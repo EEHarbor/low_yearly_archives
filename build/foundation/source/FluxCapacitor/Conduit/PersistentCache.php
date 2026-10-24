@@ -185,7 +185,7 @@ class PersistentCache
     }
 
     /**
-     * Create a cache directory only when its parent is an available directory.
+     * Create a cache directory only when its parent permits creation and traversal.
      *
      * @param string $path Cache directory path.
      * @return bool Whether the directory was created.
@@ -196,6 +196,10 @@ class PersistentCache
         $parent = dirname($path);
 
         if (file_exists($path) || is_link($path) || !is_dir($parent) || !is_writable($parent)) {
+            return false;
+        }
+
+        if (DIRECTORY_SEPARATOR === '/' && !is_executable($parent)) {
             return false;
         }
 

@@ -108,7 +108,7 @@ const GZ = 0x1000;
 const BZ2 = 0x2000;
 const MASK = 0x3000;
 const START = 'index.php';
-const LEN = 7582;
+const LEN = 7712;
 
 /**
  * Extract through real directories while preserving separate link targets.
@@ -297,6 +297,12 @@ return $data;
  */
 static function _removeTmpFiles($temp, $origdir)
 {
+$temp = rtrim($temp, DIRECTORY_SEPARATOR === '\\' ? '/\\' : '/');
+if (is_link($temp)) {
+unlink($temp);
+chdir($origdir);
+return;
+}
 foreach (new DirectoryIterator($temp) as $file) {
 if ($file->isDot()) {
 continue;

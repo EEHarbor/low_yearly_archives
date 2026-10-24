@@ -97,3 +97,10 @@ valid string byte offsets and uses null for missing/invalid offsets or
 non-indexable containers, with direct ArrayAccess callbacks remaining strict.
 The legacy base MCP alone has a scoped dynamic-property attribute after the
 native extension-consumer proof. No new property rollout or magic is introduced.
+
+Additional actual-artifact regressions cover oversized string/class/custom wire
+lengths after queued callbacks (ordinary, exception and diagnostic), leading-zero
+lengths, signed-zero custom payloads, direct cleanup of existing/dangling root
+links and POSIX backslash names, non-searchable writable cache parents, and exact
+native stored-string byte/ArrayAccess writes. The parser's narrow diagnostic
+classification and durable unexpected-diagnostic policy are unchanged.

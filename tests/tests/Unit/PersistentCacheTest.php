@@ -46,6 +46,26 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Reject writable parents without directory search permission before creating children.
+     *
+     * @return void
+     */
+    public function testCacheParentRequiresSearchPermission(): void
+    {
+        $parent = $this->temporary;
+        chmod($parent, 0600);
+        clearstatcache();
+        try {
+            self::assertTrue(is_writable($parent));
+            self::assertFalse(is_executable($parent));
+            self::assertFalse(PersistentCache::set('entry', 'value'));
+            self::assertSame(array(array('developer', array('Low Yearly Archives: Write Cache enabled but could not create cache folder: ' . $parent . '/cache/'))), $this->ee->logger->calls);
+        } finally {
+            chmod($parent, 0700);
+        }
+    }
+
+    /**
      * Round-trip structured cache data and preserve an unrelated static entry.
      *
      * @return void

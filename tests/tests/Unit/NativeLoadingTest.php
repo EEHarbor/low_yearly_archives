@@ -132,6 +132,31 @@ final class NativeLoadingTest extends LowYearlyTestCase
     }
 
     /**
+     * Supply root links and POSIX names that must not be traversed or shortened.
+     *
+     * @return array
+     */
+    public static function cleanupRoots(): array
+    {
+        return array(array('existing'), array('existing-slash'), array('dangling'),
+            array('dangling-slash'), array('backslash-link'), array('backslash-directory'));
+    }
+
+    /**
+     * Remove only the requested root while preserving targets and the caller directory.
+     *
+     * @dataProvider cleanupRoots
+     * @param string $kind Owned root shape.
+     * @return void
+     */
+    public function testDirectCleanupPreservesSeparateTargets($kind): void
+    {
+        $result = $this->process(array(__DIR__ . '/../../support/native.php', 'cleanup-root-' . $kind));
+        self::assertSame(0, $result[0], $result[1] . $result[2]);
+        self::assertSame(array('target_preserved' => true, 'root_removed' => true, 'cwd_preserved' => true), json_decode($result[1], true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Cover linked extraction roots/containers and stale nested/hidden trees through both entries.
      *
      * @return array

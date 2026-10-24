@@ -99,8 +99,11 @@ class SerializedData
                 return $result . substr($value, $start);
             }
 
-            $size = (int) $match[2];
             $position += strlen($match[0]);
+            $size = self::boundedLength($match[2], $length - $position);
+            if ($size === null) {
+                return $result . substr($value, $start);
+            }
             $contents = '';
 
             if ($type === 'S') {
@@ -132,8 +135,8 @@ class SerializedData
                 }
                 $position += strlen($tail[0]);
                 if ($type === 'C') {
-                    $payload_length = (int) $tail[1];
-                    if ($payload_length < 0 || $payload_length >= $length - $position || $value[$position + $payload_length] !== '}') {
+                    $payload_length = self::boundedLength($tail[1], $length - $position - 1);
+                    if ($payload_length === null || $value[$position + $payload_length] !== '}') {
                         return $result . substr($value, $start);
                     }
                     $position += $payload_length + 1;
@@ -159,5 +162,34 @@ class SerializedData
         }
 
         return $result;
+    }
+
+    /**
+     * Convert a nonnegative wire length only when it fits the remaining input.
+     *
+     * @param string $value Decimal length with an optional sign.
+     * @param int $maximum Available input bytes.
+     * @return int|null Bounded length, or null for an invalid length.
+     */
+    private static function boundedLength($value, $maximum)
+    {
+        if ($maximum < 0) {
+            return null;
+        }
+
+        if ($value[0] === '-') {
+            if (trim(substr($value, 1), '0') !== '') {
+                return null;
+            }
+            return 0;
+        }
+
+        $digits = ltrim($value, '+0');
+        $bound = (string) $maximum;
+        if (strlen($digits) > strlen($bound) || (strlen($digits) === strlen($bound) && strcmp($digits, $bound) > 0)) {
+            return null;
+        }
+
+        return (int) $digits;
     }
 }

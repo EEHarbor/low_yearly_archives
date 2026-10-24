@@ -61,3 +61,11 @@ Modern navigation canonicalizes an active-map root alias to the same index key
 used when constructing its header. An unset active title uses null, so valid
 textual zero remains the heading and breadcrumb trigger. Actual archived
 root/child/zero-label regressions cover EE3–5 and inherited EE6.
+
+Wire lengths are compared as decimal text with the available input before integer
+conversion. Oversized and negative custom lengths retain the untouched malformed
+remainder for native parser cleanup; signed zero and leading zeroes remain valid.
+Direct extraction cleanup removes root links themselves, including dangling links
+and roots with native trailing separators, without traversing their targets.
+POSIX backslashes remain literal path characters. Cache creation rejects parents
+without directory search permission before calling `mkdir`.

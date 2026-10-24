@@ -5,6 +5,37 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Preserve direct ArrayAccess writes and the existing object serialization.
+     *
+     * @return void
+     */
+    public function testGlobalSettingsRetainNativeArrayAccessWrites(): void
+    {
+        $wire = base64_encode(serialize(new StoredSettingsArrayAccess()));
+        $this->ee->db->rows = array(array('settings' => $wire));
+        StoredSettingsArrayAccess::$calls = array();
+        self::assertTrue((new GlobalFieldSettings())->updateSetting('missing', 'Z'));
+        self::assertSame(array('set:missing'), StoredSettingsArrayAccess::$calls);
+        self::assertSame(array('update', array('fieldtypes', array('settings' => $wire))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Preserve valid native string byte writes and the exact stored serialized shape.
+     *
+     * @return void
+     */
+    public function testGlobalSettingsRetainNativeStringByteWrites(): void
+    {
+        foreach (array(0, '0', 1, -1) as $key) {
+            $value = 'stored scalar';
+            $value[$key] = 'Z';
+            $this->ee->db->rows = array(array('settings' => base64_encode(serialize('stored scalar'))));
+            self::assertTrue((new GlobalFieldSettings())->updateSetting($key, 'Z'));
+            self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize($value))))), end($this->ee->db->calls));
+        }
+    }
+
+    /**
      * Preserve direct ArrayAccess reads even when offsetExists returns false.
      *
      * @return void
