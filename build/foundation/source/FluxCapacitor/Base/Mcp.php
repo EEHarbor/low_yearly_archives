@@ -68,7 +68,7 @@ class Mcp
     }
 
     /**
-     * Validate native scalar or Stringable license input before writing its row.
+     * Sanitize native license subjects before applying the ignored-site override.
      *
      * @return void
      * @throws \Throwable When input string conversion fails.
@@ -81,19 +81,33 @@ class Mcp
         $data['addon'] = 'Low\YearlyArchives';
         $data['license_key'] = ee()->input->post('license_key', true);
 
-        if (!is_scalar($data['license_key'])
-            && !(is_object($data['license_key']) && method_exists($data['license_key'], '__toString'))) {
+        $subjects = is_array($data['license_key']) ? $data['license_key'] : array($data['license_key']);
+
+        foreach ($subjects as $subject) {
+            if (is_scalar($subject) || (is_object($subject) && method_exists($subject, '__toString'))) {
+                continue;
+            }
+
             $this->flux->flashData('message_error', 'Invalid License Key');
             ee()->functions->redirect($this->flux->moduleURL('license'));
 
             return;
         }
 
+        unset($subject, $subjects);
+
         $data['license_key'] = preg_replace('/[^a-z0-9-]/i', '', $data['license_key']);
         $data['ignore_site'] = intval(ee()->input->post('ignore_site', true));
 
         if ($data['ignore_site'] === 1) {
             $data['license_key'] = str_replace('_', '-', 'low_yearly_archives-ignore-site-') . $data['site_id'];
+        }
+
+        if (!is_string($data['license_key'])) {
+            $this->flux->flashData('message_error', 'Invalid License Key');
+            ee()->functions->redirect($this->flux->moduleURL('license'));
+
+            return;
         }
 
         if (strlen($data['license_key']) > 50) {

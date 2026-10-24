@@ -83,6 +83,13 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         $cases['native absent license ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
         $native['post']['license_key'] = null;
         $cases['native null POST ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
+        foreach (array('empty' => array(), 'strings' => array(' clean_1 ', 'key-2'), 'scalars' => array(123, 12.5, true, false)) as $shape => $values) {
+            $native['post']['license_key'] = $values;
+            $cases['native ' . $shape . ' array ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
+        }
+        $native['stringable_license'] = 'key-1';
+        $native['array_license'] = true;
+        $cases['native Stringable array ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
         $input['licenses'] = array($same);
         $input['check_key_rows'] = array();
         $input['count'] = 1;

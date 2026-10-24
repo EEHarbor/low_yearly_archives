@@ -272,6 +272,9 @@ if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
                 return $this->value;
             }
         };
+        if (!empty($input['array_license'])) {
+            $_POST['license_key'] = array($_POST['license_key']);
+        }
     }
     ee()->db->tableExists = true;
     ee()->db->queryRows = array(array('Column_name' => 'license_key', 'Non_unique' => '0'));
