@@ -69,3 +69,11 @@ Direct extraction cleanup removes root links themselves, including dangling link
 and roots with native trailing separators, without traversing their targets.
 POSIX backslashes remain literal path characters. Cache creation rejects parents
 without directory search permission before calling `mkdir`.
+
+Configured cache paths retain native absolute/relative one-hop aliases to missing
+or existing directories. Availability checks resolve one final alias target;
+`mkdir` receives the original configured path and trailing separator. A second
+missing final alias, cycle, unavailable target parent or target file stays on the
+false/developer-log path. Both existing generic and module directories require
+POSIX search permission before any public operation traverses them. Extraction
+root links have a separate safety boundary and remain guarded.

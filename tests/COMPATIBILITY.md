@@ -104,3 +104,10 @@ lengths, signed-zero custom payloads, direct cleanup of existing/dangling root
 links and POSIX backslash names, non-searchable writable cache parents, and exact
 native stored-string byte/ArrayAccess writes. The parser's narrow diagnostic
 classification and durable unexpected-diagnostic policy are unchanged.
+
+Trusted cache alias regressions cover absolute/relative targets at both generic
+and module boundaries, targets that already exist, two-hop/cyclic aliases,
+missing/read-only/non-searchable target parents and target files. Existing mode0200
+cache/module directories return false/log through get/set/delete/clear without
+warnings. Actual original/candidate external probes use the unchanged EE75 file
+helper and complete per-process file-mode constants.

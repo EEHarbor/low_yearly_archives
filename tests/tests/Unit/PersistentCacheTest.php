@@ -34,6 +34,7 @@ final class PersistentCacheTest extends LowYearlyTestCase
         $this->setPaths($this->originalPaths[0], $this->originalPaths[1]);
         $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->temporary, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($files as $file) {
+            if ($file->isLink()) { unlink($file->getPathname()); continue; }
             if ($file->isDir()) {
                 chmod($file->getPathname(), 0700);
                 rmdir($file->getPathname());
@@ -43,6 +44,153 @@ final class PersistentCacheTest extends LowYearlyTestCase
         }
         rmdir($this->temporary);
         parent::tearDown();
+    }
+
+    /**
+     * Supply absolute/relative missing aliases and aliases to existing directories.
+     *
+     * @return array
+     */
+    public static function writableCacheAliases(): array
+    {
+        return array(array('cache', false, false), array('cache', true, false),
+            array('module', false, false), array('module', true, false),
+            array('cache', false, true), array('module', false, true));
+    }
+
+    /**
+     * Preserve native configured alias creation, exact bytes and disk reads after reset.
+     *
+     * @dataProvider writableCacheAliases
+     * @param string $scope Generic or module cache path.
+     * @param bool $relative Whether the alias target is relative.
+     * @param bool $existing Whether the target directory already exists.
+     * @return void
+     */
+    public function testWritableCacheAliasesRemainSupported($scope, $relative, $existing): void
+    {
+        mkdir($this->temporary . '/target', 0700);
+        $target = $this->temporary . '/target/cache';
+        if ($existing) { mkdir($target, 0700); }
+        $alias = $relative ? ($scope === 'cache' ? 'target/cache' : '../target/cache') : $target;
+        $link = $this->linkCachePath($scope, $alias);
+        $value = array('zero' => 0, 'name' => 'saved');
+        self::assertTrue(PersistentCache::set('entry', $value));
+        $file = $target . ($scope === 'cache' ? '/low_yearly_archives' : '') . '/' . sha1('entry');
+        self::assertSame(serialize($value), file_get_contents($file));
+        StaticCache::clear();
+        self::assertSame($value, PersistentCache::get('entry'));
+        self::assertTrue(is_link($link));
+        self::assertDirectoryExists($target);
+    }
+
+    /**
+     * Supply unavailable alias target shapes at both configured cache boundaries.
+     *
+     * @return array
+     */
+    public static function blockedCacheAliases(): array
+    {
+        $cases = array();
+        foreach (array('cache', 'module') as $scope) {
+            foreach (array('two-hop', 'cycle', 'missing-parent', 'readonly-parent', 'nonsearchable-parent', 'file') as $kind) {
+                $cases[] = array($scope, $kind);
+            }
+        }
+        return $cases;
+    }
+
+    /**
+     * Keep unavailable cache aliases on the quiet false and developer-log path.
+     *
+     * @dataProvider blockedCacheAliases
+     * @param string $scope Generic or module cache path.
+     * @param string $kind Unavailable target shape.
+     * @return void
+     */
+    public function testBlockedCacheAliasesReturnFalse($scope, $kind): void
+    {
+        $parent = $this->temporary . '/target';
+        mkdir($parent, 0700);
+        $target = $parent . '/cache';
+        $alias = $target;
+        if ($kind === 'two-hop' || $kind === 'cycle') { $alias = $this->temporary . '/second'; }
+        if ($kind === 'missing-parent') { $alias = $this->temporary . '/absent/cache'; }
+        if ($kind === 'file') { file_put_contents($target, 'retained'); }
+        $link = $this->linkCachePath($scope, $alias);
+        if ($kind === 'two-hop' || $kind === 'cycle') { symlink($kind === 'cycle' ? $link : $target, $alias); }
+        if ($kind === 'readonly-parent') { chmod($parent, 0500); }
+        if ($kind === 'nonsearchable-parent') { chmod($parent, 0200); }
+        clearstatcache();
+        $message = 'Low Yearly Archives: Write Cache enabled but could not create '
+            . ($scope === 'cache' ? 'cache folder: ' : 'module cache folder: ')
+            . $this->temporary . '/cache/' . ($scope === 'cache' ? '' : 'low_yearly_archives/');
+        try {
+            self::assertFalse(PersistentCache::set('entry', 'value'));
+            self::assertSame(array(array('developer', array($message))), $this->ee->logger->calls);
+        } finally {
+            chmod($parent, 0700);
+        }
+        self::assertTrue(is_link($link));
+        self::assertDirectoryDoesNotExist($target);
+    }
+
+    /**
+     * Supply every guarded public operation for existing non-searchable directories.
+     *
+     * @return array
+     */
+    public static function nonsearchableCachePaths(): array
+    {
+        $cases = array();
+        foreach (array('cache', 'module') as $scope) {
+            foreach (array('get', 'set', 'delete', 'clear') as $method) { $cases[] = array($scope, $method); }
+        }
+        return $cases;
+    }
+
+    /**
+     * Reject existing writable cache directories before traversing or writing through them.
+     *
+     * @dataProvider nonsearchableCachePaths
+     * @param string $scope Generic or module cache path.
+     * @param string $method Guarded public operation.
+     * @return void
+     */
+    public function testExistingCacheDirectoriesRequireSearchPermission($scope, $method): void
+    {
+        mkdir($this->temporary . '/cache/low_yearly_archives', 0700, true);
+        $path = $this->temporary . '/cache' . ($scope === 'cache' ? '' : '/low_yearly_archives');
+        chmod($path, 0200);
+        clearstatcache();
+        $message = 'Low Yearly Archives: Write Cache enabled but '
+            . ($scope === 'cache' ? 'cache path not writable: ' : 'module cache path not writable: ') . $path . '/';
+        $arguments = array('entry');
+        if ($method === 'set') { $arguments[] = 'value'; }
+        if ($method === 'clear') { $arguments = array(); }
+        try {
+            self::assertTrue(is_writable($path));
+            self::assertFalse(is_executable($path));
+            self::assertFalse(call_user_func_array(array(PersistentCache::class, $method), $arguments));
+            self::assertSame(array(array('developer', array($message))), $this->ee->logger->calls);
+        } finally {
+            chmod($path, 0700);
+        }
+    }
+
+    /**
+     * Link only this test's configured generic or module directory to its owned target.
+     *
+     * @param string $scope Generic or module cache path.
+     * @param string $target Absolute or relative native target.
+     * @return string Configured alias path.
+     */
+    private function linkCachePath($scope, $target): string
+    {
+        if ($scope === 'module') { mkdir($this->temporary . '/cache', 0700); }
+        $link = $this->temporary . '/cache' . ($scope === 'cache' ? '' : '/low_yearly_archives');
+        symlink($target, $link);
+        return $link;
     }
 
     /**

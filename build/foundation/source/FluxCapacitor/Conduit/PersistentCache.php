@@ -185,21 +185,32 @@ class PersistentCache
     }
 
     /**
-     * Create a cache directory only when its parent permits creation and traversal.
+     * Check one configured cache alias while retaining the original native mkdir path.
      *
-     * @param string $path Cache directory path.
+     * @param string $path Configured cache directory path.
      * @return bool Whether the directory was created.
      */
     private static function createDirectory($path)
     {
-        $path = rtrim($path, '/');
-        $parent = dirname($path);
+        $separators = DIRECTORY_SEPARATOR === '\\' ? '/\\' : '/';
+        $directory = rtrim($path, $separators);
 
-        if (file_exists($path) || is_link($path) || !is_dir($parent) || !is_writable($parent)) {
-            return false;
+        if (is_link($directory)) {
+            $target = readlink($directory);
+            if ($target === false || $target === '') {
+                return false;
+            }
+            $absolute = $target[0] === '/' || (DIRECTORY_SEPARATOR === '\\'
+                && ($target[0] === '\\' || preg_match('/^[a-z]:[\\\\\/]/i', $target)));
+            $directory = rtrim($absolute ? $target : dirname($directory) . '/' . $target, $separators);
+            if (is_link($directory)) {
+                return false;
+            }
         }
 
-        if (DIRECTORY_SEPARATOR === '/' && !is_executable($parent)) {
+        $parent = dirname($directory);
+        if (file_exists($directory) || !is_dir($parent) || !is_writable($parent)
+            || (DIRECTORY_SEPARATOR === '/' && !is_executable($parent))) {
             return false;
         }
 
@@ -207,7 +218,7 @@ class PersistentCache
     }
 
     /**
-     * Ensure the global and add-on cache directories exist and are writable.
+     * Ensure the global and add-on cache directories permit writes and traversal.
      *
      * @return bool Whether both cache directories are available.
      */
@@ -229,7 +240,7 @@ class PersistentCache
         }
 
         // Make sure the generic cache folder is writable.
-        if (!is_writable(self::$cache_path)) {
+        if (!is_writable(self::$cache_path) || (DIRECTORY_SEPARATOR === '/' && !is_executable(self::$cache_path))) {
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but cache path not writable: ' . self::$cache_path);
             return false;
@@ -248,7 +259,7 @@ class PersistentCache
         }
 
         // Make sure the module-specific cache folder is writable.
-        if (!is_writable(self::$module_cache_path)) {
+        if (!is_writable(self::$module_cache_path) || (DIRECTORY_SEPARATOR === '/' && !is_executable(self::$module_cache_path))) {
             // If the path is wrong we'll turn off caching
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but module cache path not writable: ' . self::$module_cache_path);
