@@ -84,6 +84,10 @@ class Mcp
         $subjects = is_array($data['license_key']) ? $data['license_key'] : array($data['license_key']);
 
         foreach ($subjects as $subject) {
+            if (is_array($data['license_key']) && !is_array($subject) && !is_object($subject)) {
+                continue;
+            }
+
             if (is_scalar($subject) || (is_object($subject) && method_exists($subject, '__toString'))) {
                 continue;
             }

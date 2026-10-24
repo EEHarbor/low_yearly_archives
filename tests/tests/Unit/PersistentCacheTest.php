@@ -25,6 +25,21 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Keep valid native integer boundaries readable without changing stored bytes.
+     *
+     * @return void
+     */
+    public function testNativeIntegerBoundariesRemainReadable(): void
+    {
+        foreach (array(PHP_INT_MAX, PHP_INT_MIN) as $value) {
+            self::assertTrue(PersistentCache::set('integer-boundary', $value));
+            StaticCache::clear();
+            self::assertSame($value, PersistentCache::get('integer-boundary'));
+            self::assertSame(serialize($value), file_get_contents($this->temporary . '/cache/low_yearly_archives/' . sha1('integer-boundary')));
+        }
+    }
+
+    /**
      * Restore class statics and remove only this test's private cache tree.
      *
      * @return void

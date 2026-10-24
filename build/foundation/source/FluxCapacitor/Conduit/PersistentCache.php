@@ -174,14 +174,15 @@ class PersistentCache
     }
 
     /**
-     * Decode a persistent cache payload using the native serialization contract.
+     * Decode cached bytes while retaining originally visible integer-range warnings.
      *
      * @param mixed $value Serialized stored bytes.
      * @return mixed Decoded value or false when invalid.
+     * @throws \Throwable When native decoding or the prior diagnostic handler fails.
      */
     private static function serveCacheData($value)
     {
-        return SerializedData::decode($value);
+        return SerializedData::decode($value, false);
     }
 
     /**

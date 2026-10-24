@@ -8,10 +8,11 @@ class SerializedData
      * Decode stored PHP values with historical escaped strings and prefix tolerance.
      *
      * @param mixed $value Stored serialized bytes.
+     * @param bool $quietRange Whether this caller historically suppressed native integer-range warnings.
      * @return mixed Decoded value, or false when the payload is invalid.
      * @throws \Throwable When hydrated object code or another diagnostic fails.
      */
-    public static function decode($value)
+    public static function decode($value, $quietRange = true)
     {
         if (!is_string($value) || $value === '') {
             return false;
@@ -24,7 +25,7 @@ class SerializedData
         $invalid = false;
         $parserLine = 0;
         $previous = null;
-        $previous = set_error_handler(static function ($severity, $message, $file, $line) use (&$invalid, &$parserLine, &$previous) {
+        $previous = set_error_handler(static function ($severity, $message, $file, $line) use (&$invalid, &$parserLine, &$previous, $quietRange) {
             // Native parse failures return false; callback diagnostics keep their original handler.
             if (($severity === E_NOTICE || $severity === E_WARNING) && $file === __FILE__ && $line === $parserLine
                 && preg_match('/^(?:unserialize\(\): (?:Error at offset [0-9]+ of [0-9]+ bytes|Unexpected end of serialized data|Maximum depth of [0-9]+ exceeded.*)|Insufficient data for unserializing - -?[0-9]+ required, [0-9]+ present)$/D', $message)) {
@@ -34,8 +35,9 @@ class SerializedData
             }
 
             if (($severity === E_NOTICE || $severity === E_WARNING) && $file === __FILE__ && $line === $parserLine
-                && preg_match('/^unserialize\(\): (?:Extra data starting at offset [0-9]+ of [0-9]+ bytes|Numerical result out of range)$/D', $message)) {
-                // Retain native complete-prefix and clamped integer results from older parsers.
+                && preg_match('/^unserialize\(\): (?:Extra data starting at offset [0-9]+ of [0-9]+ bytes|Numerical result out of range)$/D', $message)
+                && ($quietRange || $message !== 'unserialize(): Numerical result out of range')) {
+                // Preserve native prefixes and only historically quiet integer-range results.
                 return true;
             }
 
