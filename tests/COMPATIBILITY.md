@@ -87,3 +87,13 @@ runtime. All 28 distributed PHP/stub units receive native compilation checks.
 CLI fixtures do not establish installed EE/SQL/template rendering, real licensing
 or browser/transport behavior, complete coverage, other-user permissions, other
 filesystems/platforms or PHP below 7.4. No global PHP, INI or services change.
+
+Native API probes cover actual original and candidate archive consumers before
+and after the bounded native correction. New regressions preserve controller
+visibility/magic hooks, native signed O/C counts, positive/negative integer
+clamps, malformed-tail callbacks/exceptions/context, ArrayAccess and non-strict
+base64 carriers. Public getSettings retains truthy values; getSetting admits
+valid string byte offsets and uses null for missing/invalid offsets or
+non-indexable containers, with direct ArrayAccess callbacks remaining strict.
+The legacy base MCP alone has a scoped dynamic-property attribute after the
+native extension-consumer proof. No new property rollout or magic is introduced.

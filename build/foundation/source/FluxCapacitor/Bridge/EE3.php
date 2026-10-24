@@ -506,7 +506,7 @@ class EE3 extends AbstractBridge
 
         if ((bool) $ftSettingsQuery->num_rows()) {
             $stored = $ftSettingsQuery->row('settings');
-            $ftSettings = is_string($stored) ? \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode(base64_decode($stored, true)) : false;
+            $ftSettings = is_string($stored) ? \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode(base64_decode($stored)) : false;
             $ftSettings = is_array($ftSettings) ? $ftSettings : array();
         } else {
             $ftSettings = array();

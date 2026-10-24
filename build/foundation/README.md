@@ -45,3 +45,14 @@ It handles only the native parser's exact malformed-input messages
 at its own unserialize file/line, returning false on that documented failure
 contract. Unexpected diagnostics reach the previous handler and it is restored
 in finally. Error reporting stays enabled; no suppression operator is added.
+
+Native controller/storage corrections are independently retargeted from this
+author's Geotagger source after exact original-member parity. Only the new base
+MCP data declaration is removed; the scoped dynamic-property attribute preserves
+bare/public/protected/private/magic/ArrayObject consumers. Original declarations
+remain. The serializer accepts signed counts, preserves normalized prefixes and
+native malformed-tail callbacks, native integer clamps and PHP74 context.
+Global settings retain truthy native values/direct ArrayAccess and non-strict
+carriers; valid array/string offsets stay readable while invalid/non-indexable
+getSetting inputs take the quiet null fallback. No known-bad warning/TypeError
+is restored as a supported input contract and no diagnostic allowance is added.

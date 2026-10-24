@@ -18,21 +18,27 @@ class GlobalFieldSettings
      * Read an existing global fieldtype setting without missing-key diagnostics.
      *
      * @param string $name Setting key.
-     * @return mixed Setting value or null when absent.
+     * @return mixed Setting value or null for an absent offset or non-indexable container.
+     * @throws \Throwable When an ArrayAccess callback fails.
      */
     public function getSetting($name)
     {
         $ftSettings = $this->getSettings();
         if ($ftSettings) {
-            return isset($ftSettings[$name]) ? $ftSettings[$name] : null;
+            if ($ftSettings instanceof \ArrayAccess) {
+                return $ftSettings[$name];
+            }
+            if (is_array($ftSettings) || is_string($ftSettings)) {
+                return isset($ftSettings[$name]) ? $ftSettings[$name] : null;
+            }
         }
         return null;
     }
 
     /**
-     * Load global fieldtype settings and normalize invalid legacy payloads.
+     * Load native global fieldtype values and retain the legacy false-like fallback.
      *
-     * @return array|null Stored setting array, or null when the fieldtype row is absent.
+     * @return mixed Native stored value, an empty array for false-like values, or null when absent.
      */
     public function getSettings()
     {
@@ -42,8 +48,8 @@ class GlobalFieldSettings
 
         if ((bool) $ftSettingsQuery->num_rows()) {
             $stored = $ftSettingsQuery->row('settings');
-            $ftSettings = is_string($stored) ? SerializedData::decode(base64_decode($stored, true)) : false;
-            $ftSettings = is_array($ftSettings) ? $ftSettings : array();
+            $ftSettings = is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
+            $ftSettings = $ftSettings ?: array();
         } else {
             return null;
         }

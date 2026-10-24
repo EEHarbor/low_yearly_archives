@@ -35,7 +35,106 @@ class SerializedDataTest extends LowYearlyTestCase
             array('a:1:{s:4:"name";S:1:"\\41";}unused', array('name' => 'A')),
             array('a:1:{s:4:"name";s:1:"A";}unused', array('name' => 'A')),
             array(serialize('text S: is literal'), 'text S: is literal'),
+            array('i:99999999999999999999999999999;', PHP_INT_MAX),
+            array('i:-99999999999999999999999999999;', PHP_INT_MIN),
+            array('a:2:{i:0;S:1:"\\41";i:1;i:99999999999999999999999999999;}', array('A', PHP_INT_MAX)),
+            array('a:2:{i:0;S:1:"\\41";i:1;i:-99999999999999999999999999999;}', array('A', PHP_INT_MIN)),
+            array('O:8:"stdClass":+1:{s:1:"x";S:1:"\\41";}', (object) array('x' => 'A')),
+            array('O:8:"stdClass":+01:{s:1:"x";S:1:"\\41";}', (object) array('x' => 'A')),
+            array('a:2:{i:0;O:8:"stdClass":-0:{}i:1;S:1:"\\41";}', array(new \stdClass(), 'A')),
         );
+    }
+
+    /**
+     * Supply malformed tails after an already hydrated callback and normalized value.
+     *
+     * @return array
+     */
+    public static function malformedTails(): array
+    {
+        return array(
+            array('S:2:"\41";}'),
+            array('S:1:"\4g";}'),
+            array('s:20:"S:short";}'),
+            array('X:S:1:"\41";}'),
+            array('C:1:"X":-100:{S:1:"\41";}}'),
+        );
+    }
+
+    /**
+     * Preserve native cleanup callbacks when a later token makes the payload invalid.
+     *
+     * @dataProvider malformedTails
+     * @param string $tail Malformed later token.
+     * @return void
+     */
+    public function testMalformedTailRetainsQueuedCallback($tail): void
+    {
+        SerializedQueuedCallback::$calls = array();
+        $wire = 'a:3:{i:0;S:1:"\41";i:1;' . serialize(new SerializedQueuedCallback('ordinary')) . 'i:2;' . $tail;
+        self::assertFalse(SerializedData::decode($wire));
+        self::assertSame(array('ordinary'), SerializedQueuedCallback::$calls);
+    }
+
+    /**
+     * Preserve native callback exceptions and restore the handler after malformed data.
+     *
+     * @dataProvider malformedTails
+     * @param string $tail Malformed later token.
+     * @return void
+     */
+    public function testMalformedTailRetainsCallbackException($tail): void
+    {
+        SerializedQueuedCallback::$calls = array();
+        $wire = 'a:3:{i:0;S:1:"\41";i:1;' . serialize(new SerializedQueuedCallback('exception')) . 'i:2;' . $tail;
+        $handler = static function () { throw new \RuntimeException('Unexpected diagnostic'); };
+        set_error_handler($handler);
+        try {
+            try {
+                SerializedData::decode($wire);
+                self::fail('The queued callback exception must propagate.');
+            } catch (\RuntimeException $exception) {
+                self::assertSame('Queued callback exception', $exception->getMessage());
+            }
+            self::assertSame(array('exception'), SerializedQueuedCallback::$calls);
+            $restored = set_error_handler($handler);
+            restore_error_handler();
+            self::assertSame($handler, $restored);
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /**
+     * Forward callback diagnostics with the native PHP 7.4 context when available.
+     *
+     * @dataProvider malformedTails
+     * @param string $tail Malformed later token.
+     * @return void
+     */
+    public function testMalformedTailForwardsCallbackDiagnosticAndContext($tail): void
+    {
+        $events = array();
+        $handler = static function ($severity, $message, $file, $line, $context = null) use (&$events) {
+            $events[] = array($severity, $message, $file, is_array($context) && ($context['native_context_marker'] ?? null) === 'retained');
+            throw new \RuntimeException('Queued callback diagnostic forwarded');
+        };
+        set_error_handler($handler);
+        try {
+            $wire = 'a:3:{i:0;S:1:"\41";i:1;' . serialize(new SerializedQueuedCallback('diagnostic')) . 'i:2;' . $tail;
+            try {
+                SerializedData::decode($wire);
+                self::fail('The queued diagnostic must propagate.');
+            } catch (\RuntimeException $exception) {
+                self::assertSame('Queued callback diagnostic forwarded', $exception->getMessage());
+            }
+            self::assertSame(array(array(E_USER_WARNING, 'Queued callback diagnostic', __FILE__, PHP_VERSION_ID < 80000)), $events);
+            $restored = set_error_handler($handler);
+            restore_error_handler();
+            self::assertSame($handler, $restored);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**
@@ -110,16 +209,28 @@ class SerializedDataTest extends LowYearlyTestCase
     /**
      * Leave custom serialized payload bytes to their original native callback.
      *
+     * @dataProvider customPayloadCounts
+     * @param string $prefix Native payload-length sign and leading zeroes.
      * @return void
      */
-    public function testCustomPayloadWithLiteralEscapedTokenIsNotRewritten(): void
+    public function testCustomPayloadWithLiteralEscapedTokenIsNotRewritten($prefix): void
     {
         $class = SerializedCustomPayload::class;
         $contents = 'literal S:1:"\\41"; stays unchanged';
-        $wire = 'C:' . strlen($class) . ':"' . $class . '":' . strlen($contents) . ':{' . $contents . '}';
+        $wire = 'C:' . strlen($class) . ':"' . $class . '":' . $prefix . strlen($contents) . ':{' . $contents . '}';
         $decoded = SerializedData::decode($wire);
         self::assertInstanceOf($class, $decoded);
         self::assertSame($contents, $decoded->payload);
+    }
+
+    /**
+     * Supply native accepted lexical forms for custom payload lengths.
+     *
+     * @return array
+     */
+    public static function customPayloadCounts(): array
+    {
+        return array(array(''), array('+'), array('+0'));
     }
 
     /**
@@ -289,4 +400,39 @@ class SerializedCustomPayload implements \Serializable
      * @return void
      */
     public function __unserialize(array $data): void { $this->payload = $data['payload']; }
+}
+
+class SerializedQueuedCallback
+{
+    public static $calls = array();
+    public $behavior;
+
+    /**
+     * Select the callback side effect for native cleanup parity.
+     *
+     * @param string $behavior Callback behavior.
+     * @return void
+     */
+    public function __construct($behavior)
+    {
+        $this->behavior = $behavior;
+    }
+
+    /**
+     * Observe native wakeup ordering, exceptions and diagnostic context.
+     *
+     * @return void
+     * @throws \RuntimeException When the callback requests an exception.
+     */
+    public function __wakeup(): void
+    {
+        self::$calls[] = $this->behavior;
+        $native_context_marker = 'retained';
+        if ($this->behavior === 'exception') {
+            throw new \RuntimeException('Queued callback exception');
+        }
+        if ($this->behavior === 'diagnostic') {
+            trigger_error('Queued callback diagnostic', E_USER_WARNING);
+        }
+    }
 }

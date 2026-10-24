@@ -110,6 +110,19 @@ final class BridgeTest extends LowYearlyTestCase
     }
 
     /**
+     * Preserve native non-strict base64 carriers while merging field settings.
+     *
+     * @dataProvider allBridges
+     * @param string $class Distributed settings bridge.
+     * @return void
+     */
+    public function testSettingsRetainNonStrictBase64Carrier($class): void
+    {
+        $this->ee->db->rows = $this->ee->settings_db->rows = array(array('settings' => '!' . base64_encode(serialize(array('field' => 'kept')))));
+        self::assertSame('kept', $this->bridge($class)->getSettings(true)['field']);
+    }
+
+    /**
      * Persist setting updates with the current site and keep the request cache fresh.
      *
      * @param string $class

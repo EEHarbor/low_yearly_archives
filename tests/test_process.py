@@ -79,9 +79,8 @@ if os.environ['REVIEW_PARENT_WAITS']=='1':time.sleep(4)
         for suffix in ['74', '85']:
             for mode in ['caught-diagnostic-timeout', 'caught-diagnostic-output']:
                 with self.subTest(runtime=suffix, mode=mode), tempfile.TemporaryDirectory(prefix='low-yearly-receipt-test-') as temporary:
-                    fixture = Path(temporary) / 'CaughtDiagnosticTest.php'
+                    fixture = ROOT / 'tests/fixtures/CaughtDiagnosticTest.php'
                     report = Path(temporary) / 'result.xml'
-                    fixture.write_bytes((ROOT / 'tests/fixtures/CaughtDiagnosticTest.php').read_bytes())
                     environment = os.environ.copy()
                     environment['PHP_BIN'] = '/Users/tomjaeger/Library/Application Support/Herd/bin/php' + suffix
                     environment['LOW_YEARLY_CAUGHT_CONTEXT'] = mode.replace('caught-diagnostic', 'native')

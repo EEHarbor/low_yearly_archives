@@ -5,6 +5,65 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Preserve direct ArrayAccess reads even when offsetExists returns false.
+     *
+     * @return void
+     */
+    public function testGlobalSettingsRetainNativeArrayAccessValues(): void
+    {
+        $wire = base64_encode(serialize(new StoredSettingsArrayAccess()));
+        $this->ee->db->rows = array(array('settings' => $wire));
+        self::assertInstanceOf(StoredSettingsArrayAccess::class, (new GlobalFieldSettings())->getSettings());
+        StoredSettingsArrayAccess::$calls = array();
+        $this->ee->db->rows = array(array('settings' => $wire));
+        self::assertSame('computed:missing', (new GlobalFieldSettings())->getSetting('missing'));
+        self::assertSame(array('get:missing'), StoredSettingsArrayAccess::$calls);
+    }
+
+    /**
+     * Preserve native string offsets instead of treating all non-arrays as absent keys.
+     *
+     * @return void
+     */
+    public function testGlobalSettingsRetainNativeStringOffsets(): void
+    {
+        foreach (array('0' => 's', '-1' => 'r') as $name => $expected) {
+            $this->ee->db->rows = array(array('settings' => base64_encode(serialize('stored scalar'))));
+            self::assertSame($expected, (new GlobalFieldSettings())->getSetting($name));
+        }
+    }
+
+    /**
+     * Keep unusable offsets on the quiet missing-setting fallback without changing stored values.
+     *
+     * @return void
+     */
+    public function testInvalidOffsetContainersRetainMissingSettingFallback(): void
+    {
+        foreach (array('stored scalar', 42, 1.5, true, (object) array('name' => 'A')) as $value) {
+            $wire = base64_encode(serialize($value));
+            $this->ee->db->rows = array(array('settings' => $wire));
+            self::assertSame(serialize($value), serialize((new GlobalFieldSettings())->getSettings()));
+            $this->ee->db->rows = array(array('settings' => $wire));
+            self::assertNull((new GlobalFieldSettings())->getSetting('missing'));
+        }
+    }
+
+    /**
+     * Preserve truthy native stored values and non-strict base64 carrier decoding.
+     *
+     * @return void
+     */
+    public function testGlobalSettingsRetainTruthyNativeValues(): void
+    {
+        foreach (array((object) array('name' => 'A'), 'stored scalar', 42) as $value) {
+            $wire = '!' . base64_encode(serialize($value));
+            $this->ee->db->rows = array(array('settings' => $wire));
+            self::assertSame(serialize($value), serialize((new GlobalFieldSettings())->getSettings()));
+        }
+    }
+
+    /**
      * Report failed settings persistence without replacing its serialized representation.
      *
      * @return void
@@ -27,6 +86,7 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
         $this->ee->db->rows = array(array('settings' => base64_encode('a:1:{s:4:"name";S:1:"\\41";}')));
         self::assertSame(array('name' => 'A'), (new GlobalFieldSettings())->getSettings());
     }
+
     /**
      * Return null for an uninstalled fieldtype and avoid creating a settings row.
      *
@@ -124,4 +184,46 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
             'serialized empty array' => array(base64_encode(serialize(array()))),
         );
     }
+}
+
+class StoredSettingsArrayAccess implements \ArrayAccess
+{
+    public static $calls = array();
+
+    /**
+     * Model a computed offset without material storage.
+     *
+     * @param mixed $name Offset name.
+     * @return bool
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetExists($name) { self::$calls[] = 'exists:' . $name; return false; }
+
+    /**
+     * Return the native computed setting value.
+     *
+     * @param mixed $name Offset name.
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($name) { self::$calls[] = 'get:' . $name; return 'computed:' . $name; }
+
+    /**
+     * Observe a native offset write.
+     *
+     * @param mixed $name Offset name.
+     * @param mixed $value Setting value.
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetSet($name, $value) { self::$calls[] = 'set:' . $name; }
+
+    /**
+     * Observe a native offset removal.
+     *
+     * @param mixed $name Offset name.
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($name) { self::$calls[] = 'unset:' . $name; }
 }

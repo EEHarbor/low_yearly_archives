@@ -3,6 +3,38 @@
 final class NativeLoadingTest extends LowYearlyTestCase
 {
     /**
+     * Cover native legacy property declarations and inherited magic hooks.
+     *
+     * @return array
+     */
+    public static function mcpConsumers(): array
+    {
+        return array(array('bare'), array('public'), array('protected'), array('private'), array('magic'), array('array_access'));
+    }
+
+    /**
+     * Preserve the original MCP extension contract through actual archived pagination.
+     *
+     * @dataProvider mcpConsumers
+     * @param string $kind Native extension property shape.
+     * @return void
+     */
+    public function testLegacyMcpConsumerPropertiesRemainCompatible($kind): void
+    {
+        $result = $this->process(array(__DIR__ . '/../../support/native.php', 'mcp-api-' . $kind));
+        $this->assertSame(0, $result[0], $result[1] . $result[2]);
+        $this->assertSame('', $result[2]);
+        $data = $kind === 'bare' ? array() : array('seed' => true);
+        if ($kind !== 'private') { $data['pagination'] = 'links'; }
+        $this->assertSame(array(
+            'error' => $kind === 'private' ? array('Error', 'Cannot access private property LowYearlyNativePrivateMcp::$data') : null,
+            'data_type' => $kind === 'array_access' ? 'ArrayObject' : 'array', 'data' => $data,
+            'calls' => $kind === 'private' ? array() : array(array('limit', 10), array('offset', 10)),
+            'magic' => $kind === 'magic' ? array('get:data') : array(),
+        ), json_decode($result[1], true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Compile every loose and archived source in fresh processes with E_ALL.
      *
      * @return void

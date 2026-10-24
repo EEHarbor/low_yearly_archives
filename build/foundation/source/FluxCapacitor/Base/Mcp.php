@@ -18,12 +18,13 @@ use Low\YearlyArchives\FluxCapacitor\FluxCapacitor;
  * @copyright       Copyright (c) 2018, Tom Jaeger/EEHarbor
  */
 
+#[\AllowDynamicProperties]
 class Mcp
 {
+    // Legacy controllers own property visibility and magic hooks; bare instances also expose data.
     public $flux;
     public $version;
     public $nav;
-    public $data = array();
 
     public function __construct()
     {

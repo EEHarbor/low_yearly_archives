@@ -8,6 +8,12 @@ register_shutdown_function(static function () {
     if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
 
+if (strpos($scenario, 'mcp-api-') === 0) {
+    $mode = $scenario;
+    require __DIR__ . '/mcp-api.php';
+    exit;
+}
+
 if (strpos($scenario, 'extraction-link-') === 0) {
     $mode = $scenario;
     require __DIR__ . '/extraction-links.php';
@@ -110,6 +116,13 @@ if ($scenario === 'legacy-view') {
     require $archive . 'EE2.php';
 } else {
     require $root . '/low_yearly_archives/autoload.php';
+}
+
+if ($scenario === 'malformed-callback') {
+    require __DIR__ . '/malformed-callback.php';
+    MalformedStoredCallback::run();
+    echo 'CAUGHT';
+    exit;
 }
 
 if ($scenario === 'legacy-view') {
