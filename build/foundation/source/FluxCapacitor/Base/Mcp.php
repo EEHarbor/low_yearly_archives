@@ -68,9 +68,10 @@ class Mcp
     }
 
     /**
-     * Validate a submitted scalar license before checking or writing its row.
+     * Validate native scalar or Stringable license input before writing its row.
      *
      * @return void
+     * @throws \Throwable When input string conversion fails.
      */
     public function save_license()
     {
@@ -80,7 +81,8 @@ class Mcp
         $data['addon'] = 'Low\YearlyArchives';
         $data['license_key'] = ee()->input->post('license_key', true);
 
-        if (!is_string($data['license_key'])) {
+        if (!is_scalar($data['license_key'])
+            && !(is_object($data['license_key']) && method_exists($data['license_key'], '__toString'))) {
             $this->flux->flashData('message_error', 'Invalid License Key');
             ee()->functions->redirect($this->flux->moduleURL('license'));
 

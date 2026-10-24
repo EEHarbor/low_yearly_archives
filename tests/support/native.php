@@ -236,6 +236,43 @@ if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
     );
     ee()->config->values['site_id'] = $input['site_id'];
     ee()->input->values = $input['post'];
+    if (!empty($input['native_input'])) {
+        require __DIR__ . '/../fixtures/ee/Input.php';
+        $_POST = $input['post'];
+        ee()->input = (new ReflectionClass('EE_Input'))->newInstanceWithoutConstructor();
+        ee()->services['Security/XSS'] = new class {
+            /**
+             * Keep the native input accessor independent of XSS filtering.
+             *
+             * @param mixed $value
+             * @return mixed
+             */
+            public function clean($value) { return $value; }
+        };
+    }
+    $GLOBALS['low_yearly_license_conversions'] = 0;
+    if (isset($input['stringable_license'])) {
+        $_POST['license_key'] = new class($input['stringable_license']) {
+            private $value;
+            /**
+             * Retain the value supplied by a native Stringable input collaborator.
+             *
+             * @param string $value
+             * @return void
+             */
+            public function __construct($value) { $this->value = $value; }
+            /**
+             * Observe the action's native string conversion count.
+             *
+             * @return string
+             */
+            public function __toString()
+            {
+                $GLOBALS['low_yearly_license_conversions']++;
+                return $this->value;
+            }
+        };
+    }
     ee()->db->tableExists = true;
     ee()->db->queryRows = array(array('Column_name' => 'license_key', 'Non_unique' => '0'));
     ee()->db->count = $input['count'];
@@ -250,7 +287,9 @@ if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
          */
         public function redirect($url)
         {
-            echo json_encode(array('redirect' => $url->path, 'database' => ee()->db->calls, 'alerts' => ee()->alert->calls), JSON_THROW_ON_ERROR);
+            echo json_encode(array('redirect' => $url->path, 'database' => ee()->db->calls, 'alerts' => ee()->alert->calls,
+                'input_class' => get_class(ee()->input), 'missing_license' => ee()->input->post('license_key', true) === false,
+                'stringable_conversions' => $GLOBALS['low_yearly_license_conversions']), JSON_THROW_ON_ERROR);
             exit;
         }
     };
