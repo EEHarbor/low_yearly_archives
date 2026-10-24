@@ -97,12 +97,16 @@ class EE3 extends AbstractBridge
             }
         }
 
-        if (!empty($active_map[$last_segment]) && !empty($nav_items[$active_map[$last_segment]])) {
-            $activeTitle = $titles[$active_map[$last_segment]];
-            $nav_items[$active_map[$last_segment]]->isActive();
+        $activeMethod = isset($active_map[$last_segment]) ? $active_map[$last_segment] : null;
+        if ($activeMethod === '/') {
+            $activeMethod = 'index';
+        }
+        if ($activeMethod !== null && isset($titles[$activeMethod])) {
+            $activeTitle = $titles[$activeMethod];
+            $nav_items[$activeMethod]->isActive();
         }
 
-        if ($activeTitle) {
+        if ($activeTitle !== null) {
             ee()->view->cp_page_title = $activeTitle;
             ee()->cp->set_breadcrumb($this->moduleURL('index'), 'Low\YearlyArchives');
         }

@@ -324,6 +324,48 @@ final class ModernBridgeAdaptersTest extends LowYearlyTestCase
     }
 
     /**
+     * Resolve root aliases consistently when a child route maps to the root header.
+     *
+     * @dataProvider bridges
+     * @param string $class Actual archived bridge.
+     * @return void
+     */
+    public function testMappedRootNavigationPreservesCanonicalHeaderAndTitle($class): void
+    {
+        foreach (array('Home', '0') as $title) {
+            $sidebar = new LowYearlySidebar();
+            $this->ee->services['CP/Sidebar'] = $sidebar;
+            $this->ee->uri->path = 'cp/addons/settings/low_yearly_archives/detail';
+            $this->ee->view = (object) array('cp_page_title' => 'Unchanged');
+            $this->ee->cp = new LowYearlySpy(array('set_breadcrumb' => null));
+            $this->bridge($class)->getNav(array('/' => $title), array(), array('detail' => '/'));
+            self::assertSame($title, $this->ee->view->cp_page_title);
+            self::assertTrue($sidebar->headers[0]->active);
+            self::assertCount(1, $this->ee->cp->calls);
+        }
+    }
+
+    /**
+     * Keep the valid zero label when the root header is selected directly.
+     *
+     * @dataProvider bridges
+     * @param string $class Actual archived bridge.
+     * @return void
+     */
+    public function testDirectRootNavigationRetainsZeroTitle($class): void
+    {
+        $sidebar = new LowYearlySidebar();
+        $this->ee->services['CP/Sidebar'] = $sidebar;
+        $this->ee->uri->path = 'cp/addons/settings/low_yearly_archives';
+        $this->ee->view = (object) array('cp_page_title' => 'Unchanged');
+        $this->ee->cp = new LowYearlySpy(array('set_breadcrumb' => null));
+        $this->bridge($class)->getNav(array('/' => '0'));
+        self::assertSame('0', $this->ee->view->cp_page_title);
+        self::assertTrue($sidebar->headers[0]->active);
+        self::assertCount(1, $this->ee->cp->calls);
+    }
+
+    /**
      * Supply modern bridge implementations and the inherited EE6 adapter.
      *
      * @return array

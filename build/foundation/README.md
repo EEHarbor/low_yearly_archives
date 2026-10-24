@@ -56,3 +56,8 @@ Global settings retain truthy native values/direct ArrayAccess and non-strict
 carriers; valid array/string offsets stay readable while invalid/non-indexable
 getSetting inputs take the quiet null fallback. No known-bad warning/TypeError
 is restored as a supported input contract and no diagnostic allowance is added.
+
+Modern navigation canonicalizes an active-map root alias to the same index key
+used when constructing its header. An unset active title uses null, so valid
+textual zero remains the heading and breadcrumb trigger. Actual archived
+root/child/zero-label regressions cover EE3–5 and inherited EE6.
