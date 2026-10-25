@@ -78,6 +78,7 @@ class NativeMkdirStream
 function write_file($path, $data)
 {
     $GLOBALS['nativeMkdirWrites'][] = $data;
+    $GLOBALS['nativeMkdirWritePaths'][] = $path;
 
     return file_put_contents(NativeMkdirStream::target($path), $data) !== false;
 }
@@ -126,18 +127,23 @@ NativeMkdirStream::$root = $root;
 $GLOBALS['nativeMkdirHooks'] = array();
 $GLOBALS['nativeMkdirModes'] = array();
 $GLOBALS['nativeMkdirWrites'] = array();
+$GLOBALS['nativeMkdirWritePaths'] = array();
 $GLOBALS['nativeMkdirLogs'] = array();
 $GLOBALS['nativeMkdirEE'] = (object) array('load' => new NativeMkdirLoader(), 'logger' => new NativeMkdirLogger());
 stream_wrapper_register('nativemkdir', NativeMkdirStream::class);
 define('PATH_CACHE', 'nativemkdir://root/cache/');
 define('DIR_WRITE_MODE', 0700);
 define('FILE_WRITE_MODE', 0600);
+if (($argv[2] ?? '') === 'reference') {
+    mkdir($root . '/root/cache', 0700);
+    eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function mkdir(&$path, $mode) { $GLOBALS["nativeMkdirHooks"][] = $path; $GLOBALS["nativeMkdirModes"][] = $mode; \mkdir(\NativeMkdirStream::target($path), $mode); $path = "nativemkdir://root/cache/relocated/"; return \mkdir(\NativeMkdirStream::target($path), $mode); }');
+}
 try {
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/StaticCache.php';
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/PersistentCache.php';
     $value = Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::set('entry', 'stored');
     echo json_encode(array('value' => $value, 'native' => NativeMkdirStream::$calls,
-        'hooks' => $GLOBALS['nativeMkdirHooks'], 'writes' => $GLOBALS['nativeMkdirWrites'],
+        'hooks' => $GLOBALS['nativeMkdirHooks'], 'write_paths' => $GLOBALS['nativeMkdirWritePaths'], 'writes' => $GLOBALS['nativeMkdirWrites'],
         'modes' => $GLOBALS['nativeMkdirModes'], 'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'))), "\n";
 } finally {
     stream_wrapper_unregister('nativemkdir');

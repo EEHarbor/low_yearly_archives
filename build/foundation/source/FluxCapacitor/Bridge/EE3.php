@@ -514,6 +514,9 @@ class EE3 extends AbstractBridge
                 'parser' => \function_exists(__NAMESPACE__ . '\\unserialize'),
                 'carrier' => \function_exists(__NAMESPACE__ . '\\base64_decode'),
             );
+            if (!\class_exists(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::class, false)) {
+                require_once \dirname(__DIR__) . '/Conduit/SerializedData.php';
+            }
             $hooks = \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::storageHooks(__METHOD__, $available);
             if ($hooks['parser']) {
                 $ftSettings = $hooks['carrier']

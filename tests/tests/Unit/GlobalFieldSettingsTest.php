@@ -5,6 +5,36 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Leave different original callsites unaffected by an inserted helper dependency.
+     *
+     * @return void
+     */
+    public function testNativeCalleeHelperDoesNotAutoloadHooks(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'cross-autoload', 'autoload-register'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('first' => 7, 'second' => 9, 'hooks' => array()), json_decode($result[1], true));
+    }
+
+    /**
+     * Preserve the original module-path property reference through a native hook.
+     *
+     * @return void
+     */
+    public function testNativeMkdirPathReferenceRemainsNative(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-mkdir-callees.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', 'reference'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => true, 'native' => array(),
+            'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'),
+            'write_paths' => array('nativemkdir://root/cache/relocated/' . sha1('entry')),
+            'writes' => array('s:6:"stored";'), 'modes' => array(0700), 'logged' => 0,
+            'module_exists' => true), json_decode($result[1], true));
+    }
+
+    /**
      * Release raw ArrayAccess temporary key/value arguments in their native order.
      *
      * @return void
@@ -56,7 +86,7 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
         self::assertSame(0, $result[0]);
         self::assertSame('', $result[2]);
         self::assertSame(array('value' => false, 'native' => array('nativemkdir://root/cache/'),
-            'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'), 'writes' => array(),
+            'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'), 'write_paths' => array(), 'writes' => array(),
             'modes' => array(0777), 'logged' => 1, 'module_exists' => false), json_decode($result[1], true));
     }
 

@@ -131,3 +131,9 @@ Only primitive normalized array offsets create a local key value. Raw ArrayAcces
 object keys keep the original parameter ownership and key/value destruction order.
 The two native mkdir expressions also keep independent original write-mode
 constant lookups, so a first callback can define the unused site's mode.
+
+Consumers load the pinned helper file directly only when its original expression
+executes; loading this internal dependency does not invoke an added autoload
+callback that could register hooks for later, different original callsites.
+The mkdir closure retains the original path property by reference, preserving
+namespace hooks that relocate the cache before chmod and disk writes.

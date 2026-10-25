@@ -69,6 +69,9 @@ class GlobalFieldSettings
                 'parser' => \function_exists(__NAMESPACE__ . '\\unserialize'),
                 'carrier' => \function_exists(__NAMESPACE__ . '\\base64_decode'),
             );
+            if (!\class_exists(SerializedData::class, false)) {
+                require_once __DIR__ . '/SerializedData.php';
+            }
             $hooks = SerializedData::storageHooks(__METHOD__, $available);
             if ($hooks['parser']) {
                 $ftSettings = $hooks['carrier']

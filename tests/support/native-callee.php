@@ -316,7 +316,9 @@ $GLOBALS['application'] = (object) array('db' => new NativeCalleeDatabase());
 
 define('BASEPATH', __DIR__);
 define('PATH_THIRD', $root . '/');
-define('PATH_CACHE', sys_get_temp_dir() . '/');
+$nativeCacheRoot = $family === 'cross-autoload' ? sys_get_temp_dir() . '/native-callee-cache-' . bin2hex(random_bytes(8)) : null;
+if ($nativeCacheRoot !== null) { mkdir($nativeCacheRoot, 0700); }
+define('PATH_CACHE', ($nativeCacheRoot === null ? sys_get_temp_dir() : $nativeCacheRoot) . '/');
 spl_autoload_register(static function ($class) use ($archive) {
     if ($GLOBALS['scenario'] === 'autoload-register' && $class === 'Low\\YearlyArchives\\FluxCapacitor\\Conduit\\SerializedData') {
         installNativeCalleeHooks();
@@ -340,6 +342,39 @@ $read = static function ($class) use ($caller) {
     \Low\YearlyArchives\FluxCapacitor\Conduit\StaticCache::clear();
     return (new $class(array('module' => 'low_yearly_archives', 'module_name' => 'owned')))->getSettings(true);
 };
+
+if ($family === 'cross-autoload') {
+    /**
+     * Read the owned cache through an explicit narrow file-helper collaborator.
+     *
+     * @param string $path Existing owned cache file.
+     * @return string Stored native bytes.
+     */
+    function read_file($path) { return file_get_contents($path); }
+    $GLOBALS['application']->load = new class {
+        /**
+         * Keep the original file-helper loading boundary in the actual public getter.
+         *
+         * @param string $name Helper name.
+         * @return void
+         */
+        public function helper($name) {}
+    };
+    define('DIR_WRITE_MODE', 0700);
+    mkdir(PATH_CACHE . 'low_yearly_archives', 0700);
+    $file = PATH_CACHE . 'low_yearly_archives/' . sha1('entry');
+    file_put_contents($file, serialize(array('keep' => 9)));
+    try {
+        $first = $read($parent);
+        $second = \Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::get('entry');
+        echo json_encode(array('first' => $first['keep'], 'second' => $second['keep'], 'hooks' => $hookCalls), JSON_THROW_ON_ERROR), "\n";
+    } finally {
+        unlink($file);
+        rmdir(PATH_CACHE . 'low_yearly_archives');
+        rmdir($nativeCacheRoot);
+    }
+    return;
+}
 
 if ($family === 'argument') {
     eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function serialize($value) { $key = \debug_backtrace(0, 2)[1]["args"][0]; return \serialize(array("argument_type" => \gettype($key), "argument" => $key, "value" => $value)); }');

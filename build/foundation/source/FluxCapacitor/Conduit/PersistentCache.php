@@ -183,6 +183,9 @@ class PersistentCache
     private static function serveCacheData($value)
     {
         $available = array('parser' => \function_exists(__NAMESPACE__ . '\\unserialize'), 'carrier' => false);
+        if (!\class_exists(SerializedData::class, false)) {
+            require_once __DIR__ . '/SerializedData.php';
+        }
         $hooks = SerializedData::storageHooks(__METHOD__, $available);
         if ($hooks['parser']) {
             return unserialize($value);
@@ -207,7 +210,7 @@ class PersistentCache
          * @return bool Whether native directory creation succeeded.
          * @throws \Throwable When an unrelated diagnostic or stream callback fails.
          */
-        $createDirectory = static function ($path, $module) {
+        $createDirectory = static function (&$path, $module) {
             $create_line = 0;
             $previous = null;
             $previous = \set_error_handler(static function ($severity, $message, $file, $line) use (&$create_line, &$previous) {
