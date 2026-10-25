@@ -223,5 +223,11 @@
         "protocol": "Root supplied confirmed native accepted-input finding only; no implementation copied",
         "implementation": "Only helper/native parser path converts a Stringable decoded carrier once before lexer. Original caller parser overrides still receive the untouched object.",
         "evidence": "stringable-carrier-before/results.json; testDecodedStringableCarrierConvertsOnce"
+    },
+    "native_setter_path_repair": {
+        "author": "slot03",
+        "protocol": "Root bounded Tag policy after actual original/current invalid-offset and real caller/pinned fixture audit; no implementation copied",
+        "implementation": "Only verified quiet native writable string offsets receive first-byte preconversion. Original non-null assignment/value/failure remains for all other containers/keys; absent-row/null and genuine DB-failure false contracts retained.",
+        "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only"
     }
 }

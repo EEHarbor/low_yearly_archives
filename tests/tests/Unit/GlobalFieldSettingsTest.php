@@ -232,6 +232,20 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
     }
 
     /**
+     * Convert one accepted native integer-string offset value before storing its byte.
+     *
+     * @return void
+     */
+    public function testNativeIntegerStringOffsetConvertsValueOnce(): void
+    {
+        $value = new NativeOffsetStringValue();
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abc'))));
+        self::assertTrue((new GlobalFieldSettings())->updateSetting('1', $value));
+        self::assertSame(1, $value->calls);
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize('alc'))))), end($this->ee->db->calls));
+    }
+
+    /**
      * Preserve a native Stringable exception before any database update.
      *
      * @return void

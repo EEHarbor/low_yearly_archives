@@ -100,7 +100,7 @@ class GlobalFieldSettings
             $stringOffset = (\is_int($key) || (\is_string($key) && \preg_match($pattern, $key)))
                 && $key >= -\strlen($ftSettings) && $key < \PHP_INT_MAX;
         }
-        if (!\is_array($ftSettings) && !$ftSettings instanceof \ArrayAccess && !$stringOffset) {
+        if ($ftSettings === null) {
             return false;
         }
         if (\is_array($ftSettings) && $key === null) {
@@ -121,7 +121,7 @@ class GlobalFieldSettings
                 $key = (int) $key;
             }
         }
-        if (\is_string($ftSettings)) {
+        if ($stringOffset) {
             $value = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
             if (\strlen($value) > 1) {
                 $value = $value[0];
