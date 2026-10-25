@@ -186,17 +186,24 @@
         ],
         "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim."
     },
-    "native_offset_helpers": {
+    "native_offset_adaptation": {
         "author": "slot04",
         "repository": "packettide/matrix",
         "source": "build/foundation/source/FluxCapacitor/Conduit/GlobalFieldSettings.php",
         "source_sha256": "51d2fec71f60bafba97f7d573baf6f5f5c04df94536e8ff813be7d8c49944f8c",
         "source_head_context": "4982e7a2fdb4cf33498c051748b9decc1d038650",
         "binding": "Owner04 read-only working source bytes are bound by source_sha256; HEAD is context only.",
-        "helpers": {
+        "integration": "Reference hashes describe04 source helper bodies only. Candidate math/offset validation is inlined03 into existing methods with global builtin arithmetic; no new legacy class methods. ArrayAccess/original carrier/DB-return behavior remains.",
+        "reference_helper_hashes": {
             "nativeArrayKey": "1e486c64685c05cf43259850297784c8d2cd9c2ca32fd35ace1299f5c8be1718",
             "canWriteStringOffset": "58d52c36e01ae12e94d396b02461b5eb0e16c4da36dedfc6c247bf239d4c3b96"
-        },
-        "integration": "slot03 independently integrated ordinary array/string dispatch, preserving actual DB write return and ArrayAccess arguments; no reviewer10 implementation copied."
+        }
+    },
+    "legacy_class_surface_repair": {
+        "author": "slot03",
+        "finding": "Native original74/85 legal child nonstatic declarations collide with three new private static parent methods on74",
+        "implementation": "Inline GFS math and string-offset guard; checkPath-local native mkdir closure. No new class/global callable names; same own-callsite failure whitelist and B1 handler contract retained.",
+        "evidence": "native-class-surface/before.json",
+        "native_offset_followups": "Normalize null ordinary array keys to the native empty string, retain NAN first-byte spelling without a PHP85 cast diagnostic, and qualify newly introduced native arithmetic/guard builtins and constants. Native namespace dispatch of original ee/base64/serialization and mkdir calls remains unchanged; positive ArrayAccess and once-only Stringable behavior retained."
     }
 }

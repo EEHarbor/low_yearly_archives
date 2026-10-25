@@ -186,53 +186,53 @@ class PersistentCache
     }
 
     /**
-     * Create the configured native path and handle only its known filesystem failures.
-     *
-     * @param string $path Original configured directory path, including alias spelling.
-     * @return bool Whether native directory creation succeeded.
-     * @throws \Throwable When an unexpected diagnostic or stream callback fails.
-     */
-    private static function createDirectory($path)
-    {
-        $create_line = 0;
-        $previous = null;
-        $previous = set_error_handler(static function ($severity, $message, $file, $line) use (&$create_line, &$previous) {
-            if ($severity === E_WARNING && $file === __FILE__ && $line === $create_line
-                && in_array($message, array(
-                    'mkdir(): Permission denied',
-                    'mkdir(): File exists',
-                    'mkdir(): Not a directory',
-                    'mkdir(): No such file or directory',
-                    'mkdir(): Too many levels of symbolic links',
-                    'mkdir(): Read-only file system',
-                ), true)) {
-                return true;
-            }
-
-            return $previous === null ? false : $previous(...func_get_args());
-        }, -1);
-
-        try {
-            $create_line = __LINE__ + 1;
-            return mkdir($path, DIR_WRITE_MODE);
-        } finally {
-            restore_error_handler();
-        }
-    }
-
-    /**
      * Ensure the global and add-on cache directories permit writes and traversal.
      *
      * @return bool Whether both cache directories are available.
+     * @throws \Throwable When an unrelated diagnostic or native callback fails.
      */
     private static function checkPath()
     {
+        /**
+         * Create native paths locally so legacy children retain their method names.
+         *
+         * @param string $path Original configured path spelling.
+         * @return bool Whether native directory creation succeeded.
+         * @throws \Throwable When an unrelated diagnostic or stream callback fails.
+         */
+        $createDirectory = static function ($path) {
+            $create_line = 0;
+            $previous = null;
+            $previous = \set_error_handler(static function ($severity, $message, $file, $line) use (&$create_line, &$previous) {
+                if ($severity === \E_WARNING && $file === __FILE__ && $line === $create_line
+                    && \in_array($message, array(
+                        'mkdir(): Permission denied',
+                        'mkdir(): File exists',
+                        'mkdir(): Not a directory',
+                        'mkdir(): No such file or directory',
+                        'mkdir(): Too many levels of symbolic links',
+                        'mkdir(): Read-only file system',
+                    ), true)) {
+                    return true;
+                }
+
+                return $previous === null ? false : $previous(...\func_get_args());
+            }, -1);
+
+            try {
+                $create_line = __LINE__ + 1;
+                return mkdir($path, DIR_WRITE_MODE);
+            } finally {
+                \restore_error_handler();
+            }
+        };
+
         // Add a trailing slash to the path if needed
         self::$cache_path = preg_replace("/(.+?)\/*$/", "\\1/", self::$cache_path);
 
         // If the generic cache folder doesn't exist, try to create it.
         if (! @is_dir(self::$cache_path)) {
-            if (!self::createDirectory(self::$cache_path)) {
+            if (!$createDirectory(self::$cache_path)) {
                 ee()->load->library('logger');
                 ee()->logger->developer('Low Yearly Archives: Write Cache enabled but could not create cache folder: ' . self::$cache_path);
                 return false;
@@ -243,7 +243,7 @@ class PersistentCache
         }
 
         // Make sure the generic cache folder is writable.
-        if (!is_writable(self::$cache_path) || (DIRECTORY_SEPARATOR === '/' && !is_executable(self::$cache_path))) {
+        if (!is_writable(self::$cache_path) || (\DIRECTORY_SEPARATOR === '/' && !\is_executable(self::$cache_path))) {
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but cache path not writable: ' . self::$cache_path);
             return false;
@@ -251,7 +251,7 @@ class PersistentCache
 
         // If the module-specific cache folder doesn't exist, try to create it.
         if (!@is_dir(self::$module_cache_path)) {
-            if (!self::createDirectory(self::$module_cache_path)) {
+            if (!$createDirectory(self::$module_cache_path)) {
                 ee()->load->library('logger');
                 ee()->logger->developer('Low Yearly Archives: Write Cache enabled but could not create module cache folder: ' . self::$module_cache_path);
                 return false;
@@ -262,7 +262,7 @@ class PersistentCache
         }
 
         // Make sure the module-specific cache folder is writable.
-        if (!is_writable(self::$module_cache_path) || (DIRECTORY_SEPARATOR === '/' && !is_executable(self::$module_cache_path))) {
+        if (!is_writable(self::$module_cache_path) || (\DIRECTORY_SEPARATOR === '/' && !\is_executable(self::$module_cache_path))) {
             // If the path is wrong we'll turn off caching
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but module cache path not writable: ' . self::$module_cache_path);

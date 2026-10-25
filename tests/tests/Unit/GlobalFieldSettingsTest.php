@@ -5,6 +5,113 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Preserve formerly legal consumer-owned nonstatic helper method names.
+     *
+     * @return void
+     */
+    public function testNativeConsumerMethodNamesRemainAvailable(): void
+    {
+        $settings = new class extends GlobalFieldSettings {
+            /**
+             * Keep unrelated EE construction outside this native child proof.
+             *
+             * @return void
+             */
+            public function __construct() {}
+            /**
+             * Preserve the consumer's own nonstatic key helper.
+             *
+             * @return string
+             */
+            public function nativeArrayKey() { return 'consumer-key'; }
+            /**
+             * Preserve the consumer's own nonstatic byte helper.
+             *
+             * @return string
+             */
+            public function canWriteStringOffset() { return 'consumer-offset'; }
+        };
+        $settings->fieldtype_name = 'low_yearly_archives';
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(array('entry' => 'kept')))));
+        self::assertSame('consumer-key', $settings->nativeArrayKey());
+        self::assertSame('consumer-offset', $settings->canWriteStringOffset());
+        self::assertSame('kept', $settings->getSetting('entry'));
+        self::assertTrue($settings->updateSetting('entry', 'updated'));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize(array('entry' => 'updated')))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Supply native nonfinite values without coercing them in the provider.
+     *
+     * @return array
+     */
+    public static function nativeNonfiniteValues(): array
+    {
+        return array(array('nan', 'aNc'), array('infinity', 'aIc'), array('negative-infinity', 'a-c'));
+    }
+
+    /**
+     * Preserve the original first-byte spelling of nonfinite numeric values.
+     *
+     * @dataProvider nativeNonfiniteValues
+     * @param string $shape Native value shape.
+     * @param string $expected Stored byte result.
+     * @return void
+     */
+    public function testNonfiniteStringOffsetValues($shape, $expected): void
+    {
+        $values = array('nan' => NAN, 'infinity' => INF, 'negative-infinity' => -INF);
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abc'))));
+        self::assertTrue((new GlobalFieldSettings())->updateSetting(1, $values[$shape]));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize($expected))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Keep native arithmetic and limits independent of legal consumer namespace symbols.
+     *
+     * @return void
+     */
+    public function testNativeOffsetSymbolsIgnoreNamespaceOverrides(): void
+    {
+        require_once dirname(__DIR__, 2) . '/fixtures/NativeOffsetFunctions.php';
+        NativeOffsetFunctionState::$calls = 0;
+        try {
+            $this->ee->db->rows = array(array('settings' => base64_encode(serialize(array(1000 => 'one', 0 => 'zero', -23 => 'shadowed')))));
+            $settings = new GlobalFieldSettings();
+            self::assertSame('one', $settings->getSetting(1000.5));
+            self::assertTrue($settings->updateSetting(1000.5, 'updated'));
+            self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize(array(1000 => 'updated', 0 => 'zero', -23 => 'shadowed')))))), end($this->ee->db->calls));
+            self::assertSame(0, NativeOffsetFunctionState::$calls);
+            $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abcde'))));
+            self::assertTrue($settings->updateSetting(3, 'X'));
+            self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize('abcXe'))))), end($this->ee->db->calls));
+        } finally {
+            NativeOffsetFunctionState::$calls = 0;
+        }
+    }
+
+    /**
+     * Normalize ordinary null keys while leaving ArrayAccess keys and values untouched.
+     *
+     * @return void
+     */
+    public function testNullArrayKeyAndArrayAccessArguments(): void
+    {
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(array('' => 'kept')))));
+        $settings = new GlobalFieldSettings();
+        self::assertSame('kept', $settings->getSetting(null));
+        self::assertTrue($settings->updateSetting(null, 'updated'));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize(array('' => 'updated')))))), end($this->ee->db->calls));
+        NativeOffsetDictionary::$calls = array();
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(new NativeOffsetDictionary()))));
+        $value = new NativeOffsetStringValue();
+        self::assertSame('computed', $settings->getSetting(null));
+        self::assertTrue($settings->updateSetting(null, $value));
+        self::assertSame(array(array('get', null), array('set', null, $value)), NativeOffsetDictionary::$calls);
+        self::assertSame(0, $value->calls);
+    }
+
+    /**
      * Supply clean native fractional and signed-word array key forms.
      *
      * @return array

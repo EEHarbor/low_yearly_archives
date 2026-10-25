@@ -25,6 +25,27 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Retain a consumer's nonstatic directory helper beside inherited cache writes.
+     *
+     * @return void
+     */
+    public function testNativeConsumerDirectoryMethodRemainsAvailable(): void
+    {
+        $cache = new class extends PersistentCache {
+            /**
+             * Preserve the consumer-owned directory method.
+             *
+             * @return string
+             */
+            public function createDirectory() { return 'consumer-directory'; }
+        };
+        self::assertSame('consumer-directory', $cache->createDirectory());
+        self::assertTrue($cache::set('native-child', array('retained')));
+        StaticCache::clear();
+        self::assertSame(array('retained'), $cache::get('native-child'));
+    }
+
+    /**
      * Keep valid native integer boundaries readable without changing stored bytes.
      *
      * @return void

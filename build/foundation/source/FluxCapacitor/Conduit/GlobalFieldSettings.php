@@ -27,10 +27,25 @@ class GlobalFieldSettings
         if ($ftSettings instanceof \ArrayAccess) {
             return $ftSettings[$name];
         }
-        if (is_array($ftSettings) && is_float($name)) {
-            $name = self::nativeArrayKey($name);
+        if (\is_array($ftSettings) && $name === null) {
+            $name = '';
         }
-        if (is_array($ftSettings) || is_string($ftSettings)) {
+        if (\is_array($ftSettings) && \is_float($name)) {
+            if (!\is_finite($name)) {
+                $name = 0;
+            } else {
+                $range = 2.0 ** (\PHP_INT_SIZE * 8);
+                $name = \fmod($name, $range);
+                if ($name >= $range / 2) {
+                    $name -= $range;
+                }
+                if ($name < -$range / 2) {
+                    $name += $range;
+                }
+                $name = (int) $name;
+            }
+        }
+        if (\is_array($ftSettings) || \is_string($ftSettings)) {
             return isset($ftSettings[$name]) ? $ftSettings[$name] : null;
         }
 
@@ -50,7 +65,7 @@ class GlobalFieldSettings
 
         if ((bool) $ftSettingsQuery->num_rows()) {
             $stored = $ftSettingsQuery->row('settings');
-            $ftSettings = is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
+            $ftSettings = \is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
             $ftSettings = $ftSettings ?: array();
         } else {
             return null;
@@ -71,16 +86,36 @@ class GlobalFieldSettings
     {
         $ftSettings = $this->getSettings();
 
-        if (!is_array($ftSettings) && !$ftSettings instanceof \ArrayAccess
-            && !self::canWriteStringOffset($ftSettings, $key)) {
+        $stringOffset = false;
+        if (\is_string($ftSettings)) {
+            $pattern = \PHP_VERSION_ID < 80000 ? '/^\s*[+-]?[0-9]+$/D' : '/^\s*[+-]?[0-9]+\s*$/D';
+            $stringOffset = (\is_int($key) || (\is_string($key) && \preg_match($pattern, $key)))
+                && $key >= -\strlen($ftSettings) && $key < \PHP_INT_MAX;
+        }
+        if (!\is_array($ftSettings) && !$ftSettings instanceof \ArrayAccess && !$stringOffset) {
             return false;
         }
-        if (is_array($ftSettings) && is_float($key)) {
-            $key = self::nativeArrayKey($key);
+        if (\is_array($ftSettings) && $key === null) {
+            $key = '';
         }
-        if (is_string($ftSettings)) {
-            $value = (string) $value;
-            if (strlen($value) > 1) {
+        if (\is_array($ftSettings) && \is_float($key)) {
+            if (!\is_finite($key)) {
+                $key = 0;
+            } else {
+                $range = 2.0 ** (\PHP_INT_SIZE * 8);
+                $key = \fmod($key, $range);
+                if ($key >= $range / 2) {
+                    $key -= $range;
+                }
+                if ($key < -$range / 2) {
+                    $key += $range;
+                }
+                $key = (int) $key;
+            }
+        }
+        if (\is_string($ftSettings)) {
+            $value = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
+            if (\strlen($value) > 1) {
                 $value = $value[0];
             }
         }
@@ -90,50 +125,5 @@ class GlobalFieldSettings
 
         return ee()->db->where('name', $this->fieldtype_name)
             ->update('fieldtypes', $settingsForDb);
-    }
-
-    /**
-     * Preserve native signed-word array keys without newer float-cast diagnostics.
-     *
-     * @param float $key
-     * @return int
-     */
-    private static function nativeArrayKey($key)
-    {
-        if (!is_finite($key)) {
-            return 0;
-        }
-
-        $range = 2.0 ** (PHP_INT_SIZE * 8);
-        $key = fmod($key, $range);
-        if ($key >= $range / 2) {
-            $key -= $range;
-        }
-        if ($key < -$range / 2) {
-            $key += $range;
-        }
-
-        return (int) $key;
-    }
-
-    /**
-     * Accept native integer string offsets without coercing invalid keys.
-     *
-     * @param mixed $settings
-     * @param mixed $key
-     * @return bool
-     */
-    private static function canWriteStringOffset($settings, $key)
-    {
-        if (!is_string($settings)) {
-            return false;
-        }
-
-        $pattern = PHP_VERSION_ID < 80000 ? '/^\s*[+-]?[0-9]+$/D' : '/^\s*[+-]?[0-9]+\s*$/D';
-        if (!is_int($key) && !(is_string($key) && preg_match($pattern, $key))) {
-            return false;
-        }
-
-        return $key >= -strlen($settings) && $key < PHP_INT_MAX;
     }
 }
