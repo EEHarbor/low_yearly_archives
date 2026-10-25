@@ -116,7 +116,8 @@ final class LowYearlyNativeProcess
                     && $failure === 'Native process exceeded its 128-KiB output limit.' && $errors === '';
                 if (!$transportFixture && !$limitFixture && ($errors !== '' || $failure !== null || $nativeExit !== 0 || $signal !== 0)) {
                     $receipt = array('exit' => $nativeExit, 'signal' => $signal, 'failure' => $failure, 'stderr' => $errors);
-                    LowYearlyDiagnostics::reject(E_WARNING, 'Unexpected native outcome: ' . json_encode($receipt, JSON_INVALID_UTF8_SUBSTITUTE), __FILE__, __LINE__);
+                    $message = $errors !== '' ? 'Native stderr: ' . $errors : 'Unexpected native outcome: ' . json_encode($receipt, JSON_INVALID_UTF8_SUBSTITUTE);
+                    LowYearlyDiagnostics::reject(E_WARNING, $message, __FILE__, __LINE__);
                 }
             }
         }
