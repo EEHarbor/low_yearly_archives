@@ -4,18 +4,89 @@ namespace Low\YearlyArchives\FluxCapacitor\Conduit;
 
 class SerializedData
 {
+    // Native callee selections outlive serializable application-state snapshots.
+    private static \Closure $storageBindings;
+
     /**
-     * Decode stored PHP values with historical escaped strings and prefix tolerance.
+     * Preserve each original lexical callsite's first namespace selection.
+     *
+     * @param string $caller Original declared method identity.
+     * @param string $namespace Original consumer namespace.
+     * @return array Native parser and carrier selections shared by inherited calls.
+     */
+    public static function storageHooks($caller, $namespace)
+    {
+        if (!isset(self::$storageBindings)) {
+            self::$storageBindings = static function ($caller, $namespace) {
+                static $bindings = array();
+
+                if (!\array_key_exists($caller, $bindings)) {
+                    $bindings[$caller] = array(
+                        'parser' => \function_exists($namespace . '\\unserialize'),
+                        'carrier' => \function_exists($namespace . '\\base64_decode'),
+                    );
+                }
+
+                return $bindings[$caller];
+            };
+        }
+
+        return (self::$storageBindings)($caller, $namespace);
+    }
+
+    /**
+     * Retain native carrier coercion while defaulting its historical nullable input.
+     *
+     * @param mixed $value Native SQL carrier.
+     * @return mixed Original native argument or its proven nullable/NAN spelling.
+     */
+    public static function nativeCarrier($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        return \is_float($value) && \is_nan($value) ? 'NAN' : $value;
+    }
+
+    /**
+     * Keep Stringable conversion inside the native parser.
+     *
+     * @param mixed $value Decoded native argument.
+     * @return mixed Original Stringable or native scalar bytes.
+     * @throws \Throwable When unsupported native argument coercion fails.
+     */
+    public static function nativeDecoded($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+        if (\is_object($value) && \method_exists($value, '__toString')) {
+            return $value;
+        }
+        if (\is_scalar($value)) {
+            return \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
+        }
+
+        return \unserialize($value);
+    }
+
+    /**
+     * Decode stored bytes while preserving opaque native Stringable arguments.
      *
      * @param mixed $value Stored bytes or a native Stringable parser input.
      * @param bool $quietRange Whether this caller historically suppressed native integer-range warnings.
      * @return mixed Decoded value, or false when the payload is invalid.
-     * @throws \Throwable When hydrated object code or another diagnostic fails.
+     * @throws \Throwable When native Stringable parsing, hydrated object code or another diagnostic fails.
      */
     public static function decode($value, $quietRange = true)
     {
         if (\is_object($value) && \method_exists($value, '__toString')) {
-            $value = (string) $value;
+            // Native conversion must own the temporary before hydration and failure cleanup.
+            $arguments = array($value);
+            unset($value);
+
+            return \unserialize(\array_pop($arguments));
         }
 
         if (!\is_string($value) || $value === '') {

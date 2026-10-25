@@ -65,14 +65,15 @@ class GlobalFieldSettings
             ->get('fieldtypes');
 
         if ((bool) $ftSettingsQuery->num_rows()) {
-            $stored = $ftSettingsQuery->row('settings');
-            $carrierHook = \function_exists(__NAMESPACE__ . '\\base64_decode');
-            $parserHook = \function_exists(__NAMESPACE__ . '\\unserialize');
-            if ($carrierHook || $parserHook) {
-                $decoded = base64_decode($carrierHook ? $stored : ($stored === null ? '' : $stored));
-                $ftSettings = $parserHook ? unserialize($decoded) : SerializedData::decode($decoded);
+            $hooks = SerializedData::storageHooks(__METHOD__, __NAMESPACE__);
+            if ($hooks['parser']) {
+                $ftSettings = $hooks['carrier']
+                    ? @unserialize(@base64_decode($ftSettingsQuery->row('settings')))
+                    : @unserialize(@base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings'))));
             } else {
-                $ftSettings = \is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
+                $ftSettings = @SerializedData::decode(SerializedData::nativeDecoded($hooks['carrier']
+                    ? @base64_decode($ftSettingsQuery->row('settings'))
+                    : @base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
             }
             $ftSettings = $ftSettings ?: array();
         } else {

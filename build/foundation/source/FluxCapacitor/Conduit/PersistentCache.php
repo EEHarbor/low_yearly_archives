@@ -182,7 +182,8 @@ class PersistentCache
      */
     private static function serveCacheData($value)
     {
-        if (\function_exists(__NAMESPACE__ . '\\unserialize')) {
+        $hooks = SerializedData::storageHooks(__METHOD__, __NAMESPACE__);
+        if ($hooks['parser']) {
             return unserialize($value);
         }
 
@@ -226,7 +227,7 @@ class PersistentCache
 
             try {
                 $create_line = __LINE__ + 1;
-                return mkdir($path, DIR_WRITE_MODE);
+                return @mkdir($path, DIR_WRITE_MODE);
             } finally {
                 \restore_error_handler();
             }

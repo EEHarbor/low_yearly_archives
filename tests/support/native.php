@@ -123,6 +123,13 @@ if ($scenario === 'legacy-view') {
     require $root . '/low_yearly_archives/autoload.php';
 }
 
+if ($scenario === 'original-scope-callback') {
+    require __DIR__ . '/original-scope-callback.php';
+    OriginalScopeStoredCallback::run();
+    echo 'CAUGHT';
+    exit;
+}
+
 if ($scenario === 'malformed-callback') {
     require __DIR__ . '/malformed-callback.php';
     MalformedStoredCallback::run();

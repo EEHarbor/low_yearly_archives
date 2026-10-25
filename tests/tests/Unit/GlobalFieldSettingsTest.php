@@ -15,6 +15,112 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
     }
 
     /**
+     * Retain the first original namespace selection after row-time and later hooks.
+     *
+     * @dataProvider nativeCallerScopes
+     * @param string $caller Original settings caller.
+     * @return void
+     */
+    public function testNativeCalleeSelectionRemainsBound($caller): void
+    {
+        foreach (array('between', 'row-register') as $scenario) {
+            $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, 'lifetime', $scenario));
+            self::assertSame(0, $result[0]);
+            self::assertSame('', $result[2]);
+            self::assertSame(array('values' => array(7, 7, 7), 'hooks' => array()), json_decode($result[1], true));
+        }
+    }
+
+    /**
+     * Supply native resolution timing and inheritance boundaries.
+     *
+     * @return array
+     */
+    public static function nativeCalleeTimingCases(): array
+    {
+        $both = array('carrier', 'parser', 'carrier', 'parser', 'carrier', 'parser');
+
+        return array(
+            array('initial', array('parser', 'parser', 'parser'), $both),
+            array('inherited', array(7, 7, 7), array()),
+            array('child-first', array(7, 7, 7), array()),
+            array('no-row', array(null, 'parser', 'parser'), array('carrier', 'parser', 'carrier', 'parser')),
+            array('row-throws', array('row-error', 7, 7), array()),
+            array('numrows-register', array('parser', 'parser', 'parser'), $both),
+            array('inner-registers-outer', array('carrier', 'carrier', 'carrier'), array('carrier', 'carrier', 'carrier')),
+        );
+    }
+
+    /**
+     * Bind only when the original expression executes, before its argument callbacks.
+     *
+     * @dataProvider nativeCalleeTimingCases
+     * @param string $scenario Owned registration boundary.
+     * @param array $values Original native results.
+     * @param array $hooks Original native hook sequence.
+     * @return void
+     */
+    public function testNativeCalleeTimingAndInheritance($scenario, $values, $hooks): void
+    {
+        $caller = 'GFS';
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, 'lifetime', $scenario));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('values' => $values, 'hooks' => $hooks), json_decode($result[1], true));
+    }
+
+    /**
+     * Supply real static restoration before and after native binding.
+     *
+     * @return array
+     */
+    public static function nativeCalleeSnapshotCases(): array
+    {
+        return array(array('unloaded'), array('loaded'), array('after'));
+    }
+
+    /**
+     * Preserve process-lifetime callee selection across the pinned PHPUnit restorer.
+     *
+     * @dataProvider nativeCalleeSnapshotCases
+     * @param string $scenario Real static snapshot boundary.
+     * @return void
+     */
+    public function testNativeCalleeSelectionSurvivesStaticRestoration($scenario): void
+    {
+        $caller = 'GFS';
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, 'snapshot', $scenario));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('values' => array_fill(0, $scenario === 'after' ? 4 : 3, 7), 'hooks' => array()), json_decode($result[1], true));
+    }
+
+    /**
+     * Release raw and decoded temporaries before hydration and query cleanup.
+     *
+     * @dataProvider nativeCallerScopes
+     * @param string $caller Original settings caller.
+     * @return void
+     */
+    public function testNativeTemporaryCleanupAndFailureIdentity($caller): void
+    {
+        foreach (array('raw', 'decoded') as $route) {
+            foreach (array('none', 'conversion', 'destructor', 'both') as $failure) {
+                $scenario = $route . '-' . $failure;
+                $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, 'temporary', $scenario));
+                self::assertSame(0, $result[0]);
+                self::assertSame('', $result[2]);
+                $outcome = $failure === 'none' ? array('ready' => true, 'shared' => true) : array('exception' => $failure === 'conversion' ? 'conversion' : 'destructor');
+                $events = $failure === 'none' ? array('convert', 'destroy', 'hydrate', 'query-destroy') : array('convert', 'destroy', 'query-destroy');
+                $nativeMask = PHP_VERSION_ID < 80000 ? 0 : E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+                $masks = array_fill(0, $failure === 'none' ? 3 : 2, $nativeMask);
+                $masks[] = -1;
+                self::assertSame(array('outcome' => $outcome, 'events' => $events, 'masks' => $masks), json_decode($result[1], true));
+            }
+        }
+    }
+
+    /**
      * Preserve raw carrier and decoded values at each original caller hook.
      *
      * @dataProvider nativeCallerScopes

@@ -221,7 +221,7 @@
     "decoded_stringable_repair": {
         "author": "slot03",
         "protocol": "Root supplied confirmed native accepted-input finding only; no implementation copied",
-        "implementation": "Only helper/native parser path converts a Stringable decoded carrier once before lexer. Original caller parser overrides still receive the untouched object.",
+        "implementation": "Superseded pre-cast by opaque Stringable passthrough: native unserialize owns an ephemeral argument and performs conversion/destruction before hydration. No new handler or normalization applies to opaque arguments; modern hidden-S/prefix native diagnostics remain an explicit positive failing B2 boundary.",
         "evidence": "stringable-carrier-before/results.json; testDecodedStringableCarrierConvertsOnce"
     },
     "native_setter_path_repair": {
@@ -229,5 +229,12 @@
         "protocol": "Root bounded Tag policy after actual original/current invalid-offset and real caller/pinned fixture audit; no implementation copied",
         "implementation": "Only verified quiet native writable string offsets receive first-byte preconversion. Original non-null assignment/value/failure remains for all other containers/keys; absent-row/null and genuine DB-failure false contracts retained.",
         "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only"
+    },
+    "native_callee_lifetime_repair": {
+        "author": "slot03 independently authored source and permanent regression fixtures",
+        "protocol": "Root requested original native callsite lifetime, temporary failure cleanup and operator-scope preservation. Observations only from slots06/07/05/10; no implementation or permanent fixture code copied.",
+        "implementation": "First lexical method binding on the new SerializedData class, with uninitialized typed Closure state that matches original native cache lifetime across inherited calls and real pinned PHPUnit static restoration. Bind after positive row count and before row callback; no-row does not bind. Original nested @unserialize/@base64 and @mkdir callback-reporting scopes retained. Raw/decoded temporaries, conversion/destructor failure identity and shared hydrated references preserved. No additions to original22 named method/property surfaces.",
+        "evidence": "native-caller-prototype-1 and -2; native-frame-observation; own configured native-callee fixture; OriginalScopeDiagnosticTest negative checked controls",
+        "limits": "B1 prior-handler severity-mask/installed-state contract remains for temporary handlers; B2 hidden native Stringable S/prefix diagnostics remain failing, without a new diagnostic whitelist."
     }
 }
