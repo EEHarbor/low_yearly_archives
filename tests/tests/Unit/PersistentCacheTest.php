@@ -25,6 +25,31 @@ final class PersistentCacheTest extends LowYearlyTestCase
     }
 
     /**
+     * Preserve the native false/log result for overlong generic and module paths.
+     *
+     * @return void
+     */
+    public function testLongDirectoryNamesReturnFalseAndLog(): void
+    {
+        foreach (array(false, true) as $module) {
+            $cache = $this->temporary . '/cache';
+            if ($module && !is_dir($cache)) { mkdir($cache, 0700); }
+            $path = $this->temporary . '/' . str_repeat('x', 300);
+            $this->setPaths($module ? $cache : $path, $module ? $cache . '/' . str_repeat('x', 300) : $path . '/low_yearly_archives/');
+            $this->ee->logger->calls = array();
+            $handler = static function () {};
+            $before = set_error_handler($handler);
+            restore_error_handler();
+            self::assertFalse(PersistentCache::set('entry', 'value'));
+            $after = set_error_handler($handler);
+            restore_error_handler();
+            self::assertSame($before, $after);
+            self::assertCount(1, $this->ee->logger->calls);
+            self::assertStringContainsString('could not create', $this->ee->logger->calls[0][1][0]);
+        }
+    }
+
+    /**
      * Retain a consumer's nonstatic directory helper beside inherited cache writes.
      *
      * @return void

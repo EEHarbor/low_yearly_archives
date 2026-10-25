@@ -205,5 +205,11 @@
         "implementation": "Inline GFS math and string-offset guard; checkPath-local native mkdir closure. No new class/global callable names; same own-callsite failure whitelist and B1 handler contract retained.",
         "evidence": "native-class-surface/before.json",
         "native_offset_followups": "Normalize null ordinary array keys to the native empty string, retain NAN first-byte spelling without a PHP85 cast diagnostic, and qualify newly introduced native arithmetic/guard builtins and constants. Native namespace dispatch of original ee/base64/serialization and mkdir calls remains unchanged; positive ArrayAccess and once-only Stringable behavior retained."
+    },
+    "native_parser_binding_repair": {
+        "author": "slot03",
+        "finding": "Root independent actual strlen namespace collision changed valid legacy-S value; original long-name mkdir failure returnedfalse/log",
+        "implementation": "Qualify only campaign-new lexer/handler native builtins/constants; preserve original unqualified unserialize/base64/mkdir dispatch. Add exact own-callsite File name too long outcome. B1 remains unresolved.",
+        "evidence": "review-low_yearly_archives-root-class-v6 and own native-bindings-v12"
     }
 }

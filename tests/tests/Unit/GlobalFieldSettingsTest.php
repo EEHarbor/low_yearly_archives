@@ -5,6 +5,19 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Keep new lexer builtins native while preserving original namespace parser hooks.
+     *
+     * @return void
+     */
+    public function testNativeParserFunctionsRetainTheirOriginalBindings(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-parser-bindings.php'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => 'abc', 'lexer_calls' => 0, 'carrier_calls' => 1, 'parser_calls' => 1), json_decode($result[1], true));
+    }
+
+    /**
      * Preserve formerly legal consumer-owned nonstatic helper method names.
      *
      * @return void

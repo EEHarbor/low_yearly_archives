@@ -212,6 +212,7 @@ class PersistentCache
                         'mkdir(): No such file or directory',
                         'mkdir(): Too many levels of symbolic links',
                         'mkdir(): Read-only file system',
+                        'mkdir(): File name too long',
                     ), true)) {
                     return true;
                 }
