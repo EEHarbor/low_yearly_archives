@@ -155,13 +155,27 @@ class NativeSetterDictionary implements ArrayAccess
     public function offsetExists($offset): bool { return false; }
 
     /**
-     * Supply the owned missing-key value.
+     * Observe the original getter reporting scope without changing the raw key.
      *
      * @param mixed $offset Original key.
      * @return mixed
      */
     #[\ReturnTypeWillChange]
-    public function offsetGet($offset) { return null; }
+    public function offsetGet($offset)
+    {
+        if ($GLOBALS['family'] === 'getter') {
+            $GLOBALS['observations'][] = $offset;
+            if ($GLOBALS['scenario'] === 'diagnostic') {
+                try {
+                    @trigger_error('Owned ArrayAccess getter diagnostic', E_USER_DEPRECATED);
+                } catch (Throwable $error) {
+                }
+            }
+            return error_reporting();
+        }
+
+        return null;
+    }
 
     /**
      * Observe assignment without retaining either temporary argument.
@@ -224,7 +238,7 @@ class NativeCalleeQuery
         }
         if ($GLOBALS['family'] === 'nan') { return base64_encode('d:NAN;'); }
         if ($GLOBALS['family'] === 'argument') { return base64_encode(serialize(array(1 => 'old', '' => 'empty'))); }
-        if ($GLOBALS['family'] === 'key-temporary') { return base64_encode(serialize(new NativeSetterDictionary())); }
+        if ($GLOBALS['family'] === 'key-temporary' || $GLOBALS['family'] === 'getter') { return base64_encode(serialize(new NativeSetterDictionary())); }
         if ($GLOBALS['family'] === 'setter') { return base64_encode(serialize('abc')); }
         if ($GLOBALS['family'] === 'temporary') {
             return $GLOBALS['route'] === 'raw' ? new NativeCalleeTemporary() : 'decoded-by-hook';
@@ -374,6 +388,14 @@ if ($family === 'cross-autoload') {
         rmdir(PATH_CACHE . 'low_yearly_archives');
         rmdir($nativeCacheRoot);
     }
+    return;
+}
+
+if ($family === 'getter') {
+    $settings = (new ReflectionClass($parent))->newInstanceWithoutConstructor();
+    $settings->fieldtype_name = 'owned';
+    $value = $settings->getSetting('raw-key');
+    echo json_encode(array('value' => $value, 'keys' => $observations), JSON_THROW_ON_ERROR), "\n";
     return;
 }
 

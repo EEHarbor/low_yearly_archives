@@ -1,245 +1,251 @@
 {
-    "tools_origin": "git@github.com:packettide/tools.git",
-    "tools_commit": "cc1d34bd8db0119bbe2b9e38ebb337add61c7fbb",
-    "foundation_version": "4.10.0",
-    "tests_baseline": "1cbdc3dac0cf51dff4976deff5341ac68f49a6f8",
-    "original_archive_sha256": "3959e83638da756c85860d736bb13b52d735526ec817f0bfad4f7d7383ed5356",
-    "original_stub_sha256": "0be23232d45b4b1374c6bebcb1b42bc1acc9e78e0308f9f67eacb8e8c09875b4",
-    "alias": "low_yearly_archives.phar",
-    "signature_algorithm": "SHA-256",
-    "metadata": null,
-    "members": {
-        "FluxCapacitor/Base/Ext.php": {
-            "sha256": "210c9a68226b1f680411c478c68cbce380e6ac7b343f89c83669792feb5268ae",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "e25d08e695bdea56c0635168d13ae85b1442e824311b1876958084b7863855e7"
-        },
-        "FluxCapacitor/Base/Ft.php": {
-            "sha256": "232af5e891db95bd15c3a5c6ccc457f6a593d370bed725df716743962f12d93e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "e146d62fee26d4e50403175efdcc746a5cee68d648878d2e7fa5d9d23e1baf0a"
-        },
-        "FluxCapacitor/Base/Mcp.php": {
-            "sha256": "7a52e77512cf5930fade5c0518de880344c82e405dc73afd186327a505c1ba50",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "6326fa17991195348f8b6c22703b559e8c6b5ed75568095798f2db2170aaf0f7"
-        },
-        "FluxCapacitor/Base/Mod.php": {
-            "sha256": "4ecb6ae9c36ad8a459d370a8c579b4ac54265cadcd99488b9dd09c1bd609f651",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "85ea5c9550930c15dcf9079bda6d93637d31a02c3b19f5e005bea389e126281b"
-        },
-        "FluxCapacitor/Base/Pi.php": {
-            "sha256": "1bcdcb11e66602780cb41de7c8e53e61c0ff8a143d7875b57cea3a41d9c59964",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "8a8f036723100671de00525b549e7ec80fd294328659837425e134987b643669"
-        },
-        "FluxCapacitor/Base/Tab.php": {
-            "sha256": "b8582b1ae7a974b5d205889b893a067e3e01fe320d0a0eb1eb7a8f5e0d3f065e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "067c621a801ff21fd715726884cc0bc4d775a619e149b4e7eb015e4d544328c7"
-        },
-        "FluxCapacitor/Base/Upd.php": {
-            "sha256": "4b1b15d4eefb06812002fe81b89201f4b17251249a2fe0bc5ab69f739c08063e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "d36c9850911622e1464ecd94da6e62e13b79a9327d6f08a7facb84bfe669a6e5"
-        },
-        "FluxCapacitor/Bridge/AbstractBridge.php": {
-            "sha256": "b744061c22d6e0af9fcbccbdfbd0c5ed0af4d619a2dbc8177d6a07640153499e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "5382ceea3f915192a78429fdd90f4bc0cb9ef56b1b3cec9aa6f5f4157a466953"
-        },
-        "FluxCapacitor/Bridge/EE.php": {
-            "sha256": "a4e58820c2cb0567f586a3fea455db9838a9d4f0cf8ff34c191b5708cf9b9777",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "ae1483244b9006f5460a725778d74ed3ea8398186093231010e44511b17db37a"
-        },
-        "FluxCapacitor/Bridge/EE2.php": {
-            "sha256": "4d48600020d38058ae0cf413c5cdfabf4c3f0e50573f954fa26f9ca998ae9c7e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "1b4604555687773c1ea1e634e58166cabea677088a2da0cc1b901b5b8e214e39"
-        },
-        "FluxCapacitor/Bridge/EE3.php": {
-            "sha256": "6d306348fdb3bb82a89185f8deeb0623d0d8eae63d8fbf0c9bda6cbf6d32120c",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "8d4bc321e79df90aba93149ee2bd400ec73b421f768c912162474b5e7d2b04b7"
-        },
-        "FluxCapacitor/Bridge/EE4.php": {
-            "sha256": "bdd1d2b07f0f01da1372225d9f4f43caf2ff74d0ae716d6d9c887addd0fcd7d9",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "1ddd230da958288da275a03a9db31024af18246f2b03c2e1fcefc06a9c0b5408"
-        },
-        "FluxCapacitor/Bridge/EE5.php": {
-            "sha256": "26dace9fc292881669fee1b09ef9929f0a4f7e58f0b00407fe7c8c2174db1815",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "b959b12a6f31bb9e78864dd084bc4d5377f2bcce4053417255d4734aa3726928"
-        },
-        "FluxCapacitor/Bridge/EE6.php": {
-            "sha256": "68918fa4a16c6c6024b5e518eef52d5e52a2f4004fab8ad09af9d5a20725752b",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "5239e2b3746f0ea5221a40244a3c9b754f77c3cc2120688ebf9d22c14b4147b3"
-        },
-        "FluxCapacitor/Conduit/GlobalFieldSettings.php": {
-            "sha256": "05bc0b157aa07bbe5f860e6fa88ca48260ba1385e5e9cf7bf23a1279fb260d44",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "d9f180cb74673efaef4b6804f12e506e4bc3a6f3cba692355015e6775665fed3"
-        },
-        "FluxCapacitor/Conduit/McpNav.php": {
-            "sha256": "a506c3fc7088ef7ea6bb34feadce824df5386fa490f8f1ddc7a99c37da1ea746",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "e399fd79e12122697e5c5181c3a6c8d3666fb9669bc45c1a075e40082b9db6ae"
-        },
-        "FluxCapacitor/Conduit/PersistentCache.php": {
-            "sha256": "90558b934a17f4494310bc25de1182d51e9b74807427b702faef07a5769b64d7",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "e0f533adf2d356f2cecc120d2c0047396651fba98c38d4d3923608e71d27dbd6"
-        },
-        "FluxCapacitor/Conduit/StaticCache.php": {
-            "sha256": "2f22f898cc12acb1ad4f88376fa9b74ac43612c7becbe71afa2e6bc0916d222b",
-            "permissions": 420,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "be77a885ffc840b18d85cf95c12056cded0f550b55bdf2f84497d45ab2e2e065"
-        },
-        "FluxCapacitor/Conduit/Version.php": {
-            "sha256": "95d395a820966bc4aff5a25439890c3c94b60654863f748102715f3fab51a0c4",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "4c654ba66a4e6ae8d5669d2cdda6e71dc047bebb6f7bb7a10eb21dd904d1ea57"
-        },
-        "FluxCapacitor/FluxCapacitor.php": {
-            "sha256": "e10542fc9f3ecd88a3557f37205aa73d434649689acd962bccfa114c4daed98e",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "102212af2526871d0e3666c2e8200bf5cf31d92fc68271ec67acef15ecd6ede4"
-        },
-        "Views/license.php": {
-            "sha256": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46"
-        },
-        "index.php": {
-            "sha256": "a1f14dd768f8033574b1b84eae3c2b8ef2383cc5f46b6fedb016b2ce5141d888",
-            "permissions": 493,
-            "compressed": false,
-            "metadata": null,
-            "tools_template_sha256": "ffde79119f96f664d3b0a573324d8f270a8a0018647ba90cc21ffa96991dba2f"
-        }
+  "tools_origin": "git@github.com:packettide/tools.git",
+  "tools_commit": "cc1d34bd8db0119bbe2b9e38ebb337add61c7fbb",
+  "foundation_version": "4.10.0",
+  "tests_baseline": "1cbdc3dac0cf51dff4976deff5341ac68f49a6f8",
+  "original_archive_sha256": "3959e83638da756c85860d736bb13b52d735526ec817f0bfad4f7d7383ed5356",
+  "original_stub_sha256": "0be23232d45b4b1374c6bebcb1b42bc1acc9e78e0308f9f67eacb8e8c09875b4",
+  "alias": "low_yearly_archives.phar",
+  "signature_algorithm": "SHA-256",
+  "metadata": null,
+  "members": {
+    "FluxCapacitor/Base/Ext.php": {
+      "sha256": "210c9a68226b1f680411c478c68cbce380e6ac7b343f89c83669792feb5268ae",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "e25d08e695bdea56c0635168d13ae85b1442e824311b1876958084b7863855e7"
     },
-    "substitutions": {
-        "@@@ADDON_NAMESPACE@@@": "Low\\YearlyArchives",
-        "@@@MODULE@@@": "low_yearly_archives",
-        "@@@MODULE_NAME@@@": "Low Yearly Archives",
-        "@@@FOUNDATION_VERSION@@@": "4.10.0",
-        "@@@LICENSE_CONSTANT@@@": "true",
-        "@@@VALIDATION_JS@@@": "<exact shipped JS>"
+    "FluxCapacitor/Base/Ft.php": {
+      "sha256": "232af5e891db95bd15c3a5c6ccc457f6a593d370bed725df716743962f12d93e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "e146d62fee26d4e50403175efdcc746a5cee68d648878d2e7fa5d9d23e1baf0a"
     },
-    "permissions_source": "Pinned original raw manifest flags; independent binary reader, not readonly PharFileInfo projection.",
-    "native_mkdir_failure_contract": {
-        "rationale": "Exact native mkdir false/log handling preserves original argument and alias spelling. Original @ reporting scopes are restored while the durable strict kernel retains unexpected diagnostics.",
-        "scope": "E_WARNING only at own file and adjacent active mkdir call line, exact seven expected filesystem errno messages; forward every unexpected argument and restore in finally.",
-        "messages": [
-            "Permission denied",
-            "File exists",
-            "Not a directory",
-            "No such file or directory",
-            "Too many levels of symbolic links",
-            "Read-only file system",
-            "File name too long"
-        ],
-        "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim.",
-        "callee_lifetime_followup": "The local closure contains two distinct native mkdir expressions selected by original generic/module position. Native lookup caches remain independent, including initially unused sites, late callback registration and real pinned PHPUnit static restoration. No manual resolver or new legacy method/property. Own actual original/current all7 real EE file-helper proofs; own permanent native-mkdir-callees fixture uses an explicit narrow file-helper collaborator. Each native expression also retains its own original unqualified DIR_WRITE_MODE fetch; first callback registration of a namespaced mode is seen by the unused module site. The local closure receives the original static path property by reference; a legal namespace mkdir(&$path, $mode) hook updates subsequent native chmod/write paths exactly as original.01 supplied behavioral finding only; own real EE original/current proof/permanent fixture authored03."
+    "FluxCapacitor/Base/Mcp.php": {
+      "sha256": "7a52e77512cf5930fade5c0518de880344c82e405dc73afd186327a505c1ba50",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "6326fa17991195348f8b6c22703b559e8c6b5ed75568095798f2db2170aaf0f7"
     },
-    "native_offset_adaptation": {
-        "author": "slot04",
-        "repository": "packettide/matrix",
-        "source": "build/foundation/source/FluxCapacitor/Conduit/GlobalFieldSettings.php",
-        "source_sha256": "51d2fec71f60bafba97f7d573baf6f5f5c04df94536e8ff813be7d8c49944f8c",
-        "source_head_context": "4982e7a2fdb4cf33498c051748b9decc1d038650",
-        "binding": "Owner04 read-only working source bytes are bound by source_sha256; HEAD is context only.",
-        "integration": "Reference hashes describe04 source helper bodies only. Candidate math/offset validation is inlined03 into existing methods with global builtin arithmetic; no new legacy class methods. ArrayAccess/original carrier/DB-return behavior remains.",
-        "reference_helper_hashes": {
-            "nativeArrayKey": "1e486c64685c05cf43259850297784c8d2cd9c2ca32fd35ace1299f5c8be1718",
-            "canWriteStringOffset": "58d52c36e01ae12e94d396b02461b5eb0e16c4da36dedfc6c247bf239d4c3b96"
-        },
-        "public_argument_followup": "Retain original updateSetting $key parameter and normalize only a local assignment offset. Own actual original74/current hook-derived persisted values retain fractional/null public argument types; ArrayAccess raw arguments unchanged.02 supplied finding/protocol only; no implementation/probe copied. Only primitive null/float ordinary-array offsets get a local; raw ArrayAccess object keys are never copied to another local owner. Own original/current destructor-effect proof and positive regression preserve assign/DB/key-release/value-release."
+    "FluxCapacitor/Base/Mod.php": {
+      "sha256": "4ecb6ae9c36ad8a459d370a8c579b4ac54265cadcd99488b9dd09c1bd609f651",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "85ea5c9550930c15dcf9079bda6d93637d31a02c3b19f5e005bea389e126281b"
     },
-    "legacy_class_surface_repair": {
-        "author": "slot03",
-        "finding": "Native original74/85 legal child nonstatic declarations collide with three new private static parent methods on74",
-        "implementation": "Inline GFS math and string-offset guard; checkPath-local native mkdir closure. No new class/global callable names; same own-callsite failure whitelist and B1 handler contract retained.",
-        "evidence": "native-class-surface/before.json",
-        "native_offset_followups": "Normalize null ordinary array keys to the native empty string, retain NAN first-byte spelling without a PHP85 cast diagnostic, and qualify newly introduced native arithmetic/guard builtins and constants. Native namespace dispatch of original ee/base64/serialization and mkdir calls remains unchanged; positive ArrayAccess and once-only Stringable behavior retained."
+    "FluxCapacitor/Base/Pi.php": {
+      "sha256": "1bcdcb11e66602780cb41de7c8e53e61c0ff8a143d7875b57cea3a41d9c59964",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "8a8f036723100671de00525b549e7ec80fd294328659837425e134987b643669"
     },
-    "native_parser_binding_repair": {
-        "author": "slot03",
-        "finding": "Root independent actual strlen namespace collision changed valid legacy-S value; original long-name mkdir failure returnedfalse/log",
-        "implementation": "Qualify only campaign-new lexer/handler native builtins/constants; preserve original unqualified unserialize/base64/mkdir dispatch. Add exact own-callsite File name too long outcome. B1 remains unresolved.",
-        "evidence": "review-low_yearly_archives-root-class-v6 and own native-bindings-v12"
+    "FluxCapacitor/Base/Tab.php": {
+      "sha256": "b8582b1ae7a974b5d205889b893a067e3e01fe320d0a0eb1eb7a8f5e0d3f065e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "067c621a801ff21fd715726884cc0bc4d775a619e149b4e7eb015e4d544328c7"
     },
-    "original_namespace_hook_repair": {
-        "author": "slot03",
-        "protocol": "Root original-caller hook decision, independently reproduced45 actual contexts/repo; no root implementation copied",
-        "implementation": "Call each original caller namespace carrier hook with raw stored value and parser hook with untouched decoded value before no-hook native helper. Native helper unserialize is global; PC preserves original Conduit raw unserialize hook directly. Original serialize/mkdir dispatch unchanged. Default native null carrier uses its original empty-byte result only when no carrier override is present. B1 mask/state limits retained.",
-        "evidence": "caller-hooks-before/results.json; own permanent native caller positives and external after proof"
+    "FluxCapacitor/Base/Upd.php": {
+      "sha256": "4b1b15d4eefb06812002fe81b89201f4b17251249a2fe0bc5ab69f739c08063e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "d36c9850911622e1464ecd94da6e62e13b79a9327d6f08a7facb84bfe669a6e5"
     },
-    "decoded_stringable_repair": {
-        "author": "slot03",
-        "protocol": "Root supplied confirmed native accepted-input finding only; no implementation copied",
-        "implementation": "Superseded pre-cast by opaque Stringable passthrough: native unserialize owns an ephemeral argument and performs conversion/destruction before hydration. No new handler or normalization applies to opaque arguments; modern hidden-S/prefix native diagnostics remain an explicit positive failing B2 boundary.",
-        "evidence": "stringable-carrier-before/results.json; testDecodedStringableCarrierConvertsOnce"
+    "FluxCapacitor/Bridge/AbstractBridge.php": {
+      "sha256": "b744061c22d6e0af9fcbccbdfbd0c5ed0af4d619a2dbc8177d6a07640153499e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "5382ceea3f915192a78429fdd90f4bc0cb9ef56b1b3cec9aa6f5f4157a466953"
     },
-    "native_setter_path_repair": {
-        "author": "slot03",
-        "protocol": "Root bounded Tag policy after actual original/current invalid-offset and real caller/pinned fixture audit; no implementation copied",
-        "implementation": "Only verified quiet native writable string offsets receive first-byte preconversion. Original non-null assignment/value/failure remains for all other containers/keys; absent-row/null and genuine DB-failure false contracts retained.",
-        "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only",
-        "temporary_followup": "Retain original replacement parameter and convert only a separate byte local. Own actual original/current happy/DBthrow/destructor/both proof preserves convert\u2192DB\u2192destroy, DB payload, persistence and exception identity/previous chain; no root/10 implementation or probe copied into permanent fixture."
+    "FluxCapacitor/Bridge/EE.php": {
+      "sha256": "a4e58820c2cb0567f586a3fea455db9838a9d4f0cf8ff34c191b5708cf9b9777",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "ae1483244b9006f5460a725778d74ed3ea8398186093231010e44511b17db37a"
     },
-    "native_callee_lifetime_repair": {
-        "author": "slot03 independently authored source and permanent regression fixtures",
-        "protocol": "Root requested original native callsite lifetime, temporary failure cleanup and operator-scope preservation. Observations only from slots06/07/05/10; no implementation or permanent fixture code copied.",
-        "implementation": "First lexical method binding on the new SerializedData class, with uninitialized typed Closure state that matches original native cache lifetime across inherited calls and real pinned PHPUnit static restoration. Bind after positive row count and before row callback; no-row does not bind. Original nested @unserialize/@base64 and @mkdir callback-reporting scopes retained. Raw/decoded temporaries, conversion/destructor failure identity and shared hydrated references preserved. No additions to original22 named method/property surfaces.",
-        "evidence": "native-caller-prototype-1 and -2; native-frame-observation; own configured native-callee fixture; OriginalScopeDiagnosticTest negative checked controls; native-followup-after and mkdir-callee-additional/results.json",
-        "limits": "B1 prior-handler severity-mask/installed-state contract remains for temporary handlers; B2 hidden native Stringable S/prefix diagnostics remain failing, without a new diagnostic whitelist.",
-        "autoload_followup": "Capture original namespace availability in pure caller locals before the new helper can autoload; explicitly select the global carrier only when the original selection was native. Original hooks remain untouched when present. Actual original/current loader callback data witness and one configured positive prevent inserted autoload from changing first selection. Later actual public cache access proved inserted helper autoload can still install hooks for a different unused callsite. All original consumers now require the pinned local helper explicitly only when needed, without invoking autoload; no new hook side effect is introduced. Own GFS\u2192public cache configured positive and real EE original/current proof preserve both values."
+    "FluxCapacitor/Bridge/EE2.php": {
+      "sha256": "4d48600020d38058ae0cf413c5cdfabf4c3f0e50573f954fa26f9ca998ae9c7e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "1b4604555687773c1ea1e634e58166cabea677088a2da0cc1b901b5b8e214e39"
+    },
+    "FluxCapacitor/Bridge/EE3.php": {
+      "sha256": "6d306348fdb3bb82a89185f8deeb0623d0d8eae63d8fbf0c9bda6cbf6d32120c",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "8d4bc321e79df90aba93149ee2bd400ec73b421f768c912162474b5e7d2b04b7"
+    },
+    "FluxCapacitor/Bridge/EE4.php": {
+      "sha256": "bdd1d2b07f0f01da1372225d9f4f43caf2ff74d0ae716d6d9c887addd0fcd7d9",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "1ddd230da958288da275a03a9db31024af18246f2b03c2e1fcefc06a9c0b5408"
+    },
+    "FluxCapacitor/Bridge/EE5.php": {
+      "sha256": "26dace9fc292881669fee1b09ef9929f0a4f7e58f0b00407fe7c8c2174db1815",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "b959b12a6f31bb9e78864dd084bc4d5377f2bcce4053417255d4734aa3726928"
+    },
+    "FluxCapacitor/Bridge/EE6.php": {
+      "sha256": "68918fa4a16c6c6024b5e518eef52d5e52a2f4004fab8ad09af9d5a20725752b",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "5239e2b3746f0ea5221a40244a3c9b754f77c3cc2120688ebf9d22c14b4147b3"
+    },
+    "FluxCapacitor/Conduit/GlobalFieldSettings.php": {
+      "sha256": "05bc0b157aa07bbe5f860e6fa88ca48260ba1385e5e9cf7bf23a1279fb260d44",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "d9f180cb74673efaef4b6804f12e506e4bc3a6f3cba692355015e6775665fed3"
+    },
+    "FluxCapacitor/Conduit/McpNav.php": {
+      "sha256": "a506c3fc7088ef7ea6bb34feadce824df5386fa490f8f1ddc7a99c37da1ea746",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "e399fd79e12122697e5c5181c3a6c8d3666fb9669bc45c1a075e40082b9db6ae"
+    },
+    "FluxCapacitor/Conduit/PersistentCache.php": {
+      "sha256": "90558b934a17f4494310bc25de1182d51e9b74807427b702faef07a5769b64d7",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "e0f533adf2d356f2cecc120d2c0047396651fba98c38d4d3923608e71d27dbd6"
+    },
+    "FluxCapacitor/Conduit/StaticCache.php": {
+      "sha256": "2f22f898cc12acb1ad4f88376fa9b74ac43612c7becbe71afa2e6bc0916d222b",
+      "permissions": 420,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "be77a885ffc840b18d85cf95c12056cded0f550b55bdf2f84497d45ab2e2e065"
+    },
+    "FluxCapacitor/Conduit/Version.php": {
+      "sha256": "95d395a820966bc4aff5a25439890c3c94b60654863f748102715f3fab51a0c4",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "4c654ba66a4e6ae8d5669d2cdda6e71dc047bebb6f7bb7a10eb21dd904d1ea57"
+    },
+    "FluxCapacitor/FluxCapacitor.php": {
+      "sha256": "e10542fc9f3ecd88a3557f37205aa73d434649689acd962bccfa114c4daed98e",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "102212af2526871d0e3666c2e8200bf5cf31d92fc68271ec67acef15ecd6ede4"
+    },
+    "Views/license.php": {
+      "sha256": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46"
+    },
+    "index.php": {
+      "sha256": "a1f14dd768f8033574b1b84eae3c2b8ef2383cc5f46b6fedb016b2ce5141d888",
+      "permissions": 493,
+      "compressed": false,
+      "metadata": null,
+      "tools_template_sha256": "ffde79119f96f664d3b0a573324d8f270a8a0018647ba90cc21ffa96991dba2f"
     }
+  },
+  "substitutions": {
+    "@@@ADDON_NAMESPACE@@@": "Low\\YearlyArchives",
+    "@@@MODULE@@@": "low_yearly_archives",
+    "@@@MODULE_NAME@@@": "Low Yearly Archives",
+    "@@@FOUNDATION_VERSION@@@": "4.10.0",
+    "@@@LICENSE_CONSTANT@@@": "true",
+    "@@@VALIDATION_JS@@@": "<exact shipped JS>"
+  },
+  "permissions_source": "Pinned original raw manifest flags; independent binary reader, not readonly PharFileInfo projection.",
+  "native_mkdir_failure_contract": {
+    "rationale": "Exact native mkdir false/log handling preserves original argument and alias spelling. Original @ reporting scopes are restored while the durable strict kernel retains unexpected diagnostics.",
+    "scope": "E_WARNING only at own file and adjacent active mkdir call line, exact seven expected filesystem errno messages; forward every unexpected argument and restore in finally.",
+    "messages": [
+      "Permission denied",
+      "File exists",
+      "Not a directory",
+      "No such file or directory",
+      "Too many levels of symbolic links",
+      "Read-only file system",
+      "File name too long"
+    ],
+    "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim.",
+    "callee_lifetime_followup": "The local closure contains two distinct native mkdir expressions selected by original generic/module position. Native lookup caches remain independent, including initially unused sites, late callback registration and real pinned PHPUnit static restoration. No manual resolver or new legacy method/property. Own actual original/current all7 real EE file-helper proofs; own permanent native-mkdir-callees fixture uses an explicit narrow file-helper collaborator. Each native expression also retains its own original unqualified DIR_WRITE_MODE fetch; first callback registration of a namespaced mode is seen by the unused module site. The local closure receives the original static path property by reference; a legal namespace mkdir(&$path, $mode) hook updates subsequent native chmod/write paths exactly as original.01 supplied behavioral finding only; own real EE original/current proof/permanent fixture authored03."
+  },
+  "native_offset_adaptation": {
+    "author": "slot04",
+    "repository": "packettide/matrix",
+    "source": "build/foundation/source/FluxCapacitor/Conduit/GlobalFieldSettings.php",
+    "source_sha256": "51d2fec71f60bafba97f7d573baf6f5f5c04df94536e8ff813be7d8c49944f8c",
+    "source_head_context": "4982e7a2fdb4cf33498c051748b9decc1d038650",
+    "binding": "Owner04 read-only working source bytes are bound by source_sha256; HEAD is context only.",
+    "integration": "Reference hashes describe04 source helper bodies only. Candidate math/offset validation is inlined03 into existing methods with global builtin arithmetic; no new legacy class methods. ArrayAccess/original carrier/DB-return behavior remains.",
+    "reference_helper_hashes": {
+      "nativeArrayKey": "1e486c64685c05cf43259850297784c8d2cd9c2ca32fd35ace1299f5c8be1718",
+      "canWriteStringOffset": "58d52c36e01ae12e94d396b02461b5eb0e16c4da36dedfc6c247bf239d4c3b96"
+    },
+    "public_argument_followup": "Retain original updateSetting $key parameter and normalize only a local assignment offset. Own actual original74/current hook-derived persisted values retain fractional/null public argument types; ArrayAccess raw arguments unchanged.02 supplied finding/protocol only; no implementation/probe copied. Only primitive null/float ordinary-array offsets get a local; raw ArrayAccess object keys are never copied to another local owner. Own original/current destructor-effect proof and positive regression preserve assign/DB/key-release/value-release."
+  },
+  "legacy_class_surface_repair": {
+    "author": "slot03",
+    "finding": "Native original74/85 legal child nonstatic declarations collide with three new private static parent methods on74",
+    "implementation": "Inline GFS math and string-offset guard; checkPath-local native mkdir closure. No new class/global callable names; same own-callsite failure whitelist and B1 handler contract retained.",
+    "evidence": "native-class-surface/before.json",
+    "native_offset_followups": "Normalize null ordinary array keys to the native empty string, retain NAN first-byte spelling without a PHP85 cast diagnostic, and qualify newly introduced native arithmetic/guard builtins and constants. Native namespace dispatch of original ee/base64/serialization and mkdir calls remains unchanged; positive ArrayAccess and once-only Stringable behavior retained."
+  },
+  "native_parser_binding_repair": {
+    "author": "slot03",
+    "finding": "Root independent actual strlen namespace collision changed valid legacy-S value; original long-name mkdir failure returnedfalse/log",
+    "implementation": "Qualify only campaign-new lexer/handler native builtins/constants; preserve original unqualified unserialize/base64/mkdir dispatch. Add exact own-callsite File name too long outcome. B1 remains unresolved.",
+    "evidence": "review-low_yearly_archives-root-class-v6 and own native-bindings-v12"
+  },
+  "original_namespace_hook_repair": {
+    "author": "slot03",
+    "protocol": "Root original-caller hook decision, independently reproduced45 actual contexts/repo; no root implementation copied",
+    "implementation": "Call each original caller namespace carrier hook with raw stored value and parser hook with untouched decoded value before no-hook native helper. Native helper unserialize is global; PC preserves original Conduit raw unserialize hook directly. Original serialize/mkdir dispatch unchanged. Default native null carrier uses its original empty-byte result only when no carrier override is present. B1 mask/state limits retained.",
+    "evidence": "caller-hooks-before/results.json; own permanent native caller positives and external after proof"
+  },
+  "decoded_stringable_repair": {
+    "author": "slot03",
+    "protocol": "Root supplied confirmed native accepted-input finding only; no implementation copied",
+    "implementation": "Superseded pre-cast by opaque Stringable passthrough: native unserialize owns an ephemeral argument and performs conversion/destruction before hydration. No new handler or normalization applies to opaque arguments; modern hidden-S/prefix native diagnostics remain an explicit positive failing B2 boundary.",
+    "evidence": "stringable-carrier-before/results.json; testDecodedStringableCarrierConvertsOnce"
+  },
+  "native_setter_path_repair": {
+    "author": "slot03",
+    "protocol": "Root bounded Tag policy after actual original/current invalid-offset and real caller/pinned fixture audit; no implementation copied",
+    "implementation": "Only verified quiet native writable string offsets receive first-byte preconversion. Original non-null assignment/value/failure remains for all other containers/keys; absent-row/null and genuine DB-failure false contracts retained.",
+    "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only",
+    "temporary_followup": "Retain original replacement parameter and convert only a separate byte local. Own actual original/current happy/DBthrow/destructor/both proof preserves convert\u2192DB\u2192destroy, DB payload, persistence and exception identity/previous chain; no root/10 implementation or probe copied into permanent fixture."
+  },
+  "native_callee_lifetime_repair": {
+    "author": "slot03 independently authored source and permanent regression fixtures",
+    "protocol": "Root requested original native callsite lifetime, temporary failure cleanup and operator-scope preservation. Observations only from slots06/07/05/10; no implementation or permanent fixture code copied.",
+    "implementation": "First lexical method binding on the new SerializedData class, with uninitialized typed Closure state that matches original native cache lifetime across inherited calls and real pinned PHPUnit static restoration. Bind after positive row count and before row callback; no-row does not bind. Original nested @unserialize/@base64 and @mkdir callback-reporting scopes retained. Raw/decoded temporaries, conversion/destructor failure identity and shared hydrated references preserved. No additions to original22 named method/property surfaces.",
+    "evidence": "native-caller-prototype-1 and -2; native-frame-observation; own configured native-callee fixture; OriginalScopeDiagnosticTest negative checked controls; native-followup-after and mkdir-callee-additional/results.json",
+    "limits": "B1 prior-handler severity-mask/installed-state contract remains for temporary handlers; B2 hidden native Stringable S/prefix diagnostics remain failing, without a new diagnostic whitelist.",
+    "autoload_followup": "Capture original namespace availability in pure caller locals before the new helper can autoload; explicitly select the global carrier only when the original selection was native. Original hooks remain untouched when present. Actual original/current loader callback data witness and one configured positive prevent inserted autoload from changing first selection. Later actual public cache access proved inserted helper autoload can still install hooks for a different unused callsite. All original consumers now require the pinned local helper explicitly only when needed, without invoking autoload; no new hook side effect is introduced. Own GFS\u2192public cache configured positive and real EE original/current proof preserve both values."
+  },
+  "native_getter_reporting_repair": {
+    "author": "slot03 independently authored source and permanent native fixture",
+    "contract": "Restore only the original ArrayAccess offset @ expression. Actual pinned74/85 offsetGet returns reporting masks0/4437 as ordinary data, raw key unchanged; new strict owner controls still reject caught diagnostics.",
+    "evidence": "getter-mask-before/results.json; native-callee GFS getter configured positive; original22 other member bytes retained",
+    "review_protocol": "Independent09 Geo /10 Yearly findings supplied behavioral observations only; no reviewer implementation or permanent fixture copied."
+  }
 }

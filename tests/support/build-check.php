@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/Diagnostics.php';
+require_once __DIR__ . '/Diagnostics.php';
 $root = dirname(__DIR__, 2);
 $target = sys_get_temp_dir() . '/build-check';
 mkdir($target, 0700);

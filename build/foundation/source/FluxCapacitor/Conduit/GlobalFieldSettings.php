@@ -25,7 +25,7 @@ class GlobalFieldSettings
     {
         $ftSettings = $this->getSettings();
         if ($ftSettings instanceof \ArrayAccess) {
-            return $ftSettings[$name];
+            return @$ftSettings[$name];
         }
         if (\is_array($ftSettings) && $name === null) {
             $name = '';

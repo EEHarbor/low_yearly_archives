@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/Diagnostics.php';
+require_once __DIR__ . '/Diagnostics.php';
 date_default_timezone_set('UTC');
 $root = dirname(__DIR__, 2);
 $scenario = $argv[1];

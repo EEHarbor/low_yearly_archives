@@ -122,7 +122,7 @@ namespace {
     $GLOBALS['caller_hooks']=array();
     $GLOBALS['hook_carrier']=$argv[4]==='null-carrier'?null:($argv[4]==='empty-carrier'?'':'carrier');
     $GLOBALS['hook_decoded']=$argv[4]==='stringable-decoded' ? new NativeHookDecodedValue() : ($argv[4]==='empty-carrier'?null:'S:3:"abc";');
-    require __DIR__ . '/Diagnostics.php';
+    require_once __DIR__ . '/Diagnostics.php';
     register_shutdown_function(static function () { if (LowYearlyDiagnostics::events() !== array()) { exit(1); } });
     define('BASEPATH',__DIR__);define('PATH_THIRD',$argv[2].'/');define('PATH_CACHE',sys_get_temp_dir().'/');
     $base='phar://'.$argv[1].'/FluxCapacitor/';

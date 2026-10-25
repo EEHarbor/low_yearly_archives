@@ -2,8 +2,6 @@
 
 final class LowYearlyDiagnostics
 {
-    private static $events = array();
-
     /**
      * Retain every PHP diagnostic before a caller can catch its exception.
      *
@@ -49,7 +47,7 @@ final class LowYearlyDiagnostics
     {
         $error = self::exception($severity, $message, $file, $line);
         $event = array('severity' => $severity, 'message' => $error->getMessage(), 'file' => $file, 'line' => $line);
-        self::$events[] = $event;
+        self::events($event);
         fwrite(STDERR, 'LOW_YEARLY_DIAGNOSTIC:' . json_encode($event, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE) . "\n");
         throw $error;
     }
@@ -57,11 +55,18 @@ final class LowYearlyDiagnostics
     /**
      * Return retained diagnostics for the checked process owner.
      *
+     * @param array|null $event Diagnostic retained before caller control resumes.
      * @return array
      */
-    public static function events(): array
+    public static function events(?array $event = null): array
     {
-        return self::$events;
+        // PHPUnit restores class properties, but this process-owned ledger must survive.
+        static $events = array();
+        if ($event !== null) {
+            $events[] = $event;
+        }
+
+        return $events;
     }
 }
 

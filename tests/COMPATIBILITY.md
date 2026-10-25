@@ -71,9 +71,9 @@ The checked launcher exports its selected `PHP_BIN` and explicitly sets
 loading pinned PHPUnit 9.6.38. The earliest handler verifies those settings,
 records diagnostics before throwing and rejects caught events at checked process
 completion. Native stderr is propagated into the parent ledger on every cleanup
-path, including caught deadlines/output failures. The only native transport
-exception is the exact existing generated `out`/`err`/exit3 command and literal
-stderr `err`; other stderr remains strict. Manual severity tests exercise the
+path, including caught deadlines/output failures. Finite native transport/output-limit fixtures are admitted only for their exact
+owning test methods, arguments and complete observed outcome; arbitrary calls
+cannot use those tooling controls. Other outcomes remain strict. Manual severity tests exercise the
 same exception formatter; external checked main/provider/native controls prove
 the installed handler's durable behavior. No source diagnostic is expected away.
 
@@ -111,3 +111,27 @@ missing/read-only/non-searchable target parents and target files. Existing mode0
 cache/module directories return false/log through get/set/delete/clear without
 warnings. Actual original/candidate external probes use the unchanged EE75 file
 helper and complete per-process file-mode constants.
+
+The bounded getter correction restores the original ArrayAccess offset `@`
+expression: callback-returned reporting masks remain native0/4437 with the raw
+key unchanged. This does not waive diagnostics. The ledger now uses process-local
+function-static storage, surviving pinned PHPUnit class-static restoration.
+Owned native abnormal exits, signals and captured owner failures remain rejecting
+even when an ordinary test ignores the result or catches its exception.
+`tests/fixtures/AuthorityDiagnosticTest.php` provides separate checked negative
+controls for backup rollback and quiet native exit; these are tooling failures,
+not configured tests expecting a product warning.
+
+B1 prior-handler registered-mask/installed-state preservation and B2 opaque
+Stringable hidden serialized wire remain blocked. The unchanged five positive
+native Stringable cases still report genuine modern diagnostics; no exclusions,
+expected product errors, warning whitelist or pre-cast workaround makes them green.
+
+The native adapter supports existing file and lint targets plus the exact
+`-d phar.readonly=0` flag needed by its owned build check. It prepends its checked diagnostic guard to executed files; unsupported
+inline/server forms and caller `auto_prepend_file` overrides fail explicitly.
+The former pure inline settings/transport/output-limit checks now execute the
+same operations in a small owned file fixture. No caller prelude is silently
+replaced. Generic caught file diagnostics and ignored inline commands have
+separate expected-failing owner controls. Native startup settings follow the accepted build flag; unsupported startup
+options cannot silently override the strict boundary.

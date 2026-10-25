@@ -9,7 +9,7 @@ final class NativeProcessTest extends LowYearlyTestCase
      */
     public function testCapturesNativeResult(): void
     {
-        $result = LowYearlyNativeProcess::run(array('-r', 'fwrite(STDOUT, "out"); fwrite(STDERR, "err"); exit(3);'));
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/fixtures/native-process.php', 'transport'));
 
         self::assertSame(array(3, 'out', 'err'), $result);
     }
@@ -24,6 +24,6 @@ final class NativeProcessTest extends LowYearlyTestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Native process exceeded its 128-KiB output limit.');
 
-        LowYearlyNativeProcess::run(array('-r', 'fwrite(STDOUT, str_repeat("x", 131073));'));
+        LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/fixtures/native-process.php', 'limit'));
     }
 }

@@ -105,7 +105,7 @@ namespace {
     $GLOBALS['decoded_conversions'] = 0;
     $GLOBALS['decoded_shape'] = $argv[4];
     $GLOBALS['hook_decoded'] = new NativeDecodedValue();
-    require __DIR__ . '/Diagnostics.php';
+    require_once __DIR__ . '/Diagnostics.php';
     register_shutdown_function(static function () { if (LowYearlyDiagnostics::events() !== array()) { exit(1); } });
     define('BASEPATH',__DIR__);define('PATH_THIRD',$argv[2].'/');define('PATH_CACHE',sys_get_temp_dir().'/');
     $base='phar://'.$argv[1].'/FluxCapacitor/';

@@ -19,7 +19,7 @@ namespace Low\YearlyArchives\FluxCapacitor\Conduit {
 }
 
 namespace {
-    require __DIR__ . '/Diagnostics.php';
+    require_once __DIR__ . '/Diagnostics.php';
     register_shutdown_function(static function () {
         if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
     });

@@ -4,6 +4,21 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
+
+    /**
+     * Keep the original ArrayAccess getter reporting context and raw key.
+     *
+     * @return void
+     */
+    public function testNativeArrayAccessGetterReportingScope(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'getter', 'native'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        $mask = PHP_VERSION_ID < 80000 ? 0 : E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+        self::assertSame(array('value' => $mask, 'keys' => array('raw-key')), json_decode($result[1], true));
+    }
+
     /**
      * Retain native and original namespace NAN settings without boolean coercion.
      *
