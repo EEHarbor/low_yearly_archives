@@ -177,4 +177,34 @@ final class ArchivedBaseTest extends LowYearlyTestCase
 
         self::assertTrue($updater->update('4.0.0'));
     }
+    /**
+     * Include readable optional extensions while treating an unreadable file as absent.
+     *
+     * @dataProvider optionalExtensionModes
+     * @param string $mode Actual owned extension state.
+     * @param array $calls Expected native extension update calls.
+     * @return void
+     */
+    public function testOptionalExtensionAvailability($mode, array $calls): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native.php', $mode));
+
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('result' => true, 'calls' => $calls), json_decode($result[1], true, 512, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Supply the existing optional-extension availability boundary.
+     *
+     * @return array
+     */
+    public static function optionalExtensionModes(): array
+    {
+        return array(
+            'readable' => array('optional-extension-readable', array('4.0.0')),
+            'unreadable' => array('optional-extension-unreadable', array()),
+            'missing' => array('optional-extension-missing', array()),
+        );
+    }
 }

@@ -148,3 +148,21 @@ operands left by by-reference mkdir hooks retain their original native consumers
 conversion effects and ownership. An actual-artifact positive case checks the
 original seven conversions through set, disk persistence and a cold read; real EE
 file-helper original/current observations verify the same behavior.
+
+The reviewed native-startup follow-up preserves the interpreter's effective default
+prelude. A bounded inline configuration query runs with the same native binary,
+environment and strict options; its original lookup occurs before composition.
+A private exclusive file in the physical child cwd installs diagnostics and then
+requires the selected prelude in global scope. The original main file and argv
+remain native. Configuration and execution share one 15-second deadline; held
+inode and complete-byte checks precede removal of only the owned composition.
+The public adapter still accepts only its existing file/lint/PHAR-build forms.
+
+A present unreadable optional extension follows the quiet missing-extension path;
+a readable extension retains its native update callback. Actual-artifact positives
+cover readable, unreadable and missing files. The configured native-startup
+regression records the fixed Herd profile's actual dump-loader/configuration
+startup effects, with direct prior/current native observations retained outside
+the candidate. Diagnostics.php is unchanged and retains the independent root
+whole-file approval. Native B1/B2 limitations remain blockers; no complete
+compatibility or publication claim is made.

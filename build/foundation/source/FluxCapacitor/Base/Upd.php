@@ -69,7 +69,7 @@ class Upd
         try{
             $extension = PATH_THIRD . 'low_yearly_archives/ext.low_yearly_archives.php';
 
-            if (is_file($extension)) {
+            if (\is_file($extension) && \is_readable($extension)) {
                 include_once $extension;
             }
 

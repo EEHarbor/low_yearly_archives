@@ -142,3 +142,9 @@ Public getSettings retains a native or namespace-parser NAN result before the
 legacy false-like fallback. PHP7.4 accepts that value; newer boolean coercion
 would diagnose it. This native value is distinct from unsupported scalar offset
 reads. The actual-artifact positive covers both producers without filtering.
+
+The optional updater extension is included only when it is a readable regular
+file. A missing or unreadable optional extension keeps the existing successful
+no-extension result; readable extension callbacks and their version argument
+remain unchanged. The bounded follow-up changes only this original archive
+member; all other current member bytes and the original raw envelope remain.

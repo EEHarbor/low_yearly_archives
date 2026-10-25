@@ -16,8 +16,8 @@ final class AuthorityDiagnosticTest extends LowYearlyTestCase
             if ($context === 'backup') {
                 @trigger_error('Owned static-backup diagnostic', E_USER_DEPRECATED);
             }
-            if ($context === 'native-exit' || $context === 'generic-caught' || $context === 'forged-transport') {
-                $mode = $context === 'native-exit' ? 'nonzero' : ($context === 'generic-caught' ? 'caught' : 'transport');
+            if ($context === 'native-exit' || $context === 'generic-caught' || $context === 'forged-transport' || $context === 'closed-child') {
+                $mode = $context === 'closed-child' ? 'closed-caught' : ($context === 'native-exit' ? 'nonzero' : ($context === 'generic-caught' ? 'caught' : 'transport'));
                 LowYearlyNativeProcess::run(array(__DIR__ . '/native-process.php', $mode));
             }
             if ($context === 'getter-callback') {

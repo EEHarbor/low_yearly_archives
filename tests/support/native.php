@@ -8,6 +8,31 @@ register_shutdown_function(static function () {
     if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
 
+if (strpos($scenario, 'optional-extension-') === 0) {
+    $fixture = sys_get_temp_dir() . '/low-yearly-optional-' . bin2hex(random_bytes(8));
+    mkdir($fixture, 0700);
+    mkdir($fixture . '/low_yearly_archives', 0700);
+    $extension = $fixture . '/low_yearly_archives/ext.low_yearly_archives.php';
+    $GLOBALS['extensionCalls'] = array();
+    if ($scenario !== 'optional-extension-missing') {
+        file_put_contents($extension, '<?php class Low_yearly_archives_ext { /** @param string $current @return void */ public function updateExtension($current) { $GLOBALS["extensionCalls"][] = $current; } }');
+        chmod($extension, $scenario === 'optional-extension-unreadable' ? 0000 : 0600);
+    }
+    define('PATH_THIRD', $fixture . '/');
+    try {
+        require 'phar://' . $root . '/low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Base/Upd.php';
+        $updater = (new ReflectionClass('Low\\YearlyArchives\\FluxCapacitor\\Base\\Upd'))->newInstanceWithoutConstructor();
+        $updater->version = '4.1.1';
+        $updater->module_name = 'Low_yearly_archives';
+        echo json_encode(array('result' => $updater->update('4.0.0'), 'calls' => $GLOBALS['extensionCalls']));
+    } finally {
+        if (is_file($extension)) { chmod($extension, 0600); unlink($extension); }
+        rmdir($fixture . '/low_yearly_archives');
+        rmdir($fixture);
+    }
+    exit;
+}
+
 if (strpos($scenario, 'cleanup-root-') === 0) {
     $mode = $scenario;
     require __DIR__ . '/cleanup-roots.php';
