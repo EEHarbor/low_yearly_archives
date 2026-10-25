@@ -137,3 +137,8 @@ executes; loading this internal dependency does not invoke an added autoload
 callback that could register hooks for later, different original callsites.
 The mkdir closure retains the original path property by reference, preserving
 namespace hooks that relocate the cache before chmod and disk writes.
+
+Public getSettings retains a native or namespace-parser NAN result before the
+legacy false-like fallback. PHP7.4 accepts that value; newer boolean coercion
+would diagnose it. This native value is distinct from unsupported scalar offset
+reads. The actual-artifact positive covers both producers without filtering.

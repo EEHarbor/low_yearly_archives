@@ -5,6 +5,21 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Retain native and original namespace NAN settings without boolean coercion.
+     *
+     * @return void
+     */
+    public function testNativeNanGlobalSettingsRemainsNative(): void
+    {
+        foreach (array('native', 'hook') as $mode) {
+            $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'nan', $mode));
+            self::assertSame(0, $result[0]);
+            self::assertSame('', $result[2]);
+            self::assertSame(array('is_nan' => true), json_decode($result[1], true));
+        }
+    }
+
+    /**
      * Leave different original callsites unaffected by an inserted helper dependency.
      *
      * @return void

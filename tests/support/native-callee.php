@@ -222,6 +222,7 @@ class NativeCalleeQuery
                 throw $GLOBALS['rowFailure'];
             }
         }
+        if ($GLOBALS['family'] === 'nan') { return base64_encode('d:NAN;'); }
         if ($GLOBALS['family'] === 'argument') { return base64_encode(serialize(array(1 => 'old', '' => 'empty'))); }
         if ($GLOBALS['family'] === 'key-temporary') { return base64_encode(serialize(new NativeSetterDictionary())); }
         if ($GLOBALS['family'] === 'setter') { return base64_encode(serialize('abc')); }
@@ -373,6 +374,15 @@ if ($family === 'cross-autoload') {
         rmdir(PATH_CACHE . 'low_yearly_archives');
         rmdir($nativeCacheRoot);
     }
+    return;
+}
+
+if ($family === 'nan') {
+    if ($scenario === 'hook') {
+        eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function unserialize($value) { return \NAN; }');
+    }
+    $value = $read($parent);
+    echo json_encode(array('is_nan' => is_float($value) && is_nan($value)), JSON_THROW_ON_ERROR), "\n";
     return;
 }
 

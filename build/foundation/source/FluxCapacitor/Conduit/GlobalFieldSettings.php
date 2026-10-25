@@ -82,6 +82,9 @@ class GlobalFieldSettings
                     ? @base64_decode($ftSettingsQuery->row('settings'))
                     : @\base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
             }
+            if (\is_float($ftSettings) && \is_nan($ftSettings)) {
+                return $ftSettings;
+            }
             $ftSettings = $ftSettings ?: array();
         } else {
             return null;
