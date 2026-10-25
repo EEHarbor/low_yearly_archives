@@ -182,6 +182,10 @@ class PersistentCache
      */
     private static function serveCacheData($value)
     {
+        if (\function_exists(__NAMESPACE__ . '\\unserialize')) {
+            return unserialize($value);
+        }
+
         return SerializedData::decode($value, false);
     }
 

@@ -459,6 +459,7 @@ class EE2 extends AbstractBridge
      * Merge valid stored fieldtype arrays with site and add-on settings.
      *
      * @return bool Whether initialization completed.
+     * @throws \Throwable When original namespace hooks or hydration callbacks fail.
      */
     private function initiateSettings()
     {
@@ -499,8 +500,15 @@ class EE2 extends AbstractBridge
 
         if ((bool) $ftSettingsQuery->num_rows()) {
             $stored = $ftSettingsQuery->row('settings');
-            $ftSettings = is_string($stored) ? \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode(base64_decode($stored)) : false;
-            $ftSettings = is_array($ftSettings) ? $ftSettings : array();
+            $carrierHook = \function_exists(__NAMESPACE__ . '\\base64_decode');
+            $parserHook = \function_exists(__NAMESPACE__ . '\\unserialize');
+            if ($carrierHook || $parserHook) {
+                $decoded = base64_decode($carrierHook ? $stored : ($stored === null ? '' : $stored));
+                $ftSettings = $parserHook ? unserialize($decoded) : \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode($decoded);
+            } else {
+                $ftSettings = \is_string($stored) ? \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode(base64_decode($stored)) : false;
+            }
+            $ftSettings = \is_array($ftSettings) ? $ftSettings : array();
         } else {
             $ftSettings = array();
         }

@@ -211,5 +211,11 @@
         "finding": "Root independent actual strlen namespace collision changed valid legacy-S value; original long-name mkdir failure returnedfalse/log",
         "implementation": "Qualify only campaign-new lexer/handler native builtins/constants; preserve original unqualified unserialize/base64/mkdir dispatch. Add exact own-callsite File name too long outcome. B1 remains unresolved.",
         "evidence": "review-low_yearly_archives-root-class-v6 and own native-bindings-v12"
+    },
+    "original_namespace_hook_repair": {
+        "author": "slot03",
+        "protocol": "Root original-caller hook decision, independently reproduced45 actual contexts/repo; no root implementation copied",
+        "implementation": "Call each original caller namespace carrier hook with raw stored value and parser hook with untouched decoded value before no-hook native helper. Native helper unserialize is global; PC preserves original Conduit raw unserialize hook directly. Original serialize/mkdir dispatch unchanged. Default native null carrier uses its original empty-byte result only when no carrier override is present. B1 mask/state limits retained.",
+        "evidence": "caller-hooks-before/results.json; own permanent native caller positives and external after proof"
     }
 }

@@ -56,6 +56,7 @@ class GlobalFieldSettings
      * Load native global fieldtype values and retain the legacy false-like fallback.
      *
      * @return mixed Native stored value, an empty array for false-like values, or null when absent.
+     * @throws \Throwable When original namespace hooks or hydration callbacks fail.
      */
     public function getSettings()
     {
@@ -65,7 +66,14 @@ class GlobalFieldSettings
 
         if ((bool) $ftSettingsQuery->num_rows()) {
             $stored = $ftSettingsQuery->row('settings');
-            $ftSettings = \is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
+            $carrierHook = \function_exists(__NAMESPACE__ . '\\base64_decode');
+            $parserHook = \function_exists(__NAMESPACE__ . '\\unserialize');
+            if ($carrierHook || $parserHook) {
+                $decoded = base64_decode($carrierHook ? $stored : ($stored === null ? '' : $stored));
+                $ftSettings = $parserHook ? unserialize($decoded) : SerializedData::decode($decoded);
+            } else {
+                $ftSettings = \is_string($stored) ? SerializedData::decode(base64_decode($stored)) : false;
+            }
             $ftSettings = $ftSettings ?: array();
         } else {
             return null;

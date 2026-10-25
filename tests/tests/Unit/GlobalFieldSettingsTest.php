@@ -5,6 +5,37 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Supply each original settings caller namespace.
+     *
+     * @return array
+     */
+    public static function nativeCallerScopes(): array
+    {
+        return array(array('GFS'), array('EE2'), array('EE3'), array('EE4'), array('EE5'));
+    }
+
+    /**
+     * Preserve raw carrier and decoded values at each original caller hook.
+     *
+     * @dataProvider nativeCallerScopes
+     * @param string $caller Original native settings caller.
+     * @return void
+     */
+    public function testOriginalCallerHooksReceiveUntouchedValues($caller): void
+    {
+        foreach (array('null-carrier', 'empty-carrier', 'legacy-bytes') as $shape) {
+            $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-caller-hooks.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, $shape));
+            self::assertSame(0, $result[0]);
+            self::assertSame('', $result[2]);
+            $segment = $caller === 'GFS' ? 'Conduit' : 'Bridge';
+            $carrier = $shape === 'null-carrier' ? null : ($shape === 'empty-carrier' ? '' : 'carrier');
+            $decoded = $shape === 'empty-carrier' ? null : 'S:3:"abc";';
+            self::assertSame(array('hooks' => array(array($segment . '-base64', $carrier), array($segment . '-unserialize', $decoded)),
+                'marker_present' => true, 'marker' => $decoded), json_decode($result[1], true));
+        }
+    }
+
+    /**
      * Keep new lexer builtins native while preserving original namespace parser hooks.
      *
      * @return void
@@ -14,7 +45,7 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
         $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-parser-bindings.php'));
         self::assertSame(0, $result[0]);
         self::assertSame('', $result[2]);
-        self::assertSame(array('value' => 'abc', 'lexer_calls' => 0, 'carrier_calls' => 1, 'parser_calls' => 1), json_decode($result[1], true));
+        self::assertSame(array('value' => 'abc', 'lexer_calls' => 0, 'carrier_calls' => 1), json_decode($result[1], true));
     }
 
     /**

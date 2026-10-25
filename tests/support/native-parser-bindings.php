@@ -16,14 +16,6 @@ namespace Low\YearlyArchives\FluxCapacitor\Conduit {
      * @return string
      */
     function base64_decode($value) { $GLOBALS['parser_carrier_calls']++; return \base64_decode($value); }
-
-    /**
-     * Observe the original public parser hook without changing hydration.
-     *
-     * @param string $value Serialized bytes.
-     * @return mixed
-     */
-    function unserialize($value) { $GLOBALS['parser_native_calls']++; return \unserialize($value); }
 }
 
 namespace {
@@ -77,11 +69,11 @@ namespace {
      */
     function ee() { static $app; if (!$app) { $app = (object) array('db' => new NativeParserDatabase()); } return $app; }
 
-    $GLOBALS['parser_lexical_calls'] = $GLOBALS['parser_carrier_calls'] = $GLOBALS['parser_native_calls'] = 0;
+    $GLOBALS['parser_lexical_calls'] = $GLOBALS['parser_carrier_calls'] = 0;
     require 'phar://' . dirname(__DIR__, 2) . '/low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Conduit/SerializedData.php';
     require 'phar://' . dirname(__DIR__, 2) . '/low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Conduit/GlobalFieldSettings.php';
     $settings = (new ReflectionClass('Low\\YearlyArchives\\FluxCapacitor\\Conduit\\GlobalFieldSettings'))->newInstanceWithoutConstructor();
     $settings->fieldtype_name = 'native';
     echo json_encode(array('value' => $settings->getSettings(), 'lexer_calls' => $GLOBALS['parser_lexical_calls'],
-        'carrier_calls' => $GLOBALS['parser_carrier_calls'], 'parser_calls' => $GLOBALS['parser_native_calls']), JSON_THROW_ON_ERROR);
+        'carrier_calls' => $GLOBALS['parser_carrier_calls']), JSON_THROW_ON_ERROR);
 }

@@ -50,7 +50,7 @@ class SerializedData
 
         try {
             $parserLine = __LINE__ + 1;
-            $decoded = unserialize($value);
+            $decoded = \unserialize($value);
 
             return $invalid ? false : $decoded;
         } finally {

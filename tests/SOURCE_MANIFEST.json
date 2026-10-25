@@ -1,5 +1,5 @@
 {
-    "archive_sha256": "a2cb5577b5c8fa24983f5c1869c7b613e056eaaa729a0898a71a5f733bd83d1f",
+    "archive_sha256": "fb603567e334e650ddea94d7d69ae46ae8dbbeed08fb7c72ed1e78cfda3a2cb4",
     "loose_files": {
         "addon.setup.php": "a5e5c659f6787506df47776250150362911dbd281376a38bf9a3a826366211ea",
         "autoload.php": "c0dbd735d3d469883a600c17ba51994a7b4dbbd140954777f38a786b41a9dd92",
@@ -44,40 +44,40 @@
             "sha256": "a4e58820c2cb0567f586a3fea455db9838a9d4f0cf8ff34c191b5708cf9b9777"
         },
         "FluxCapacitor/Bridge/EE2.php": {
-            "bytes": 17693,
-            "sha256": "1b3496185cd53708151755b4b7f01f5c610d93ecf1554b1eb63bf95ced5c102d"
+            "bytes": 18269,
+            "sha256": "db2b31e3265833486ef4f4722255510d6bff10a13de86b3de810f832836e2792"
         },
         "FluxCapacitor/Bridge/EE3.php": {
-            "bytes": 17520,
-            "sha256": "1edde85249a17f04ee7fb6f5ccc2ff1b884be1bacfb2b80c22789d206fd22df1"
+            "bytes": 18096,
+            "sha256": "96781b78b2e91bb8133bd32369ee7b758ea80b5dfc78af4f6fc903626f5bb78f"
         },
         "FluxCapacitor/Bridge/EE4.php": {
-            "bytes": 17604,
-            "sha256": "d79dd08447eeea8c7d5369c8e4eb3dc79edebc057a325206d54e5fc6d9b39852"
+            "bytes": 18180,
+            "sha256": "7e02e9347cfd32324b803fb06e6f24be6541cb1faba061ff08898e379a0baadd"
         },
         "FluxCapacitor/Bridge/EE5.php": {
-            "bytes": 17604,
-            "sha256": "42fa35642e58e9f19740d0afad46e286cddb90c5f23385a46ca27ed15a2ab463"
+            "bytes": 18180,
+            "sha256": "2856dd1cf73db9d38b96c0735bbb061258fb0de81fd976fdd8ecbd1bff76d021"
         },
         "FluxCapacitor/Bridge/EE6.php": {
             "bytes": 449,
             "sha256": "68918fa4a16c6c6024b5e518eef52d5e52a2f4004fab8ad09af9d5a20725752b"
         },
         "FluxCapacitor/Conduit/GlobalFieldSettings.php": {
-            "bytes": 4367,
-            "sha256": "707b766065d82895246bfdb5d67e7f50a2097b89717cec4de5d7d4d621a5d904"
+            "bytes": 4899,
+            "sha256": "7b4392583d3023db2543e2d7362d802c91dad7313b9c94d9aa79d6b6bb85ddc5"
         },
         "FluxCapacitor/Conduit/McpNav.php": {
             "bytes": 7842,
             "sha256": "668ab3317bca93bec93b34675e191642a948ca4bdcc3dec4097d894668102979"
         },
         "FluxCapacitor/Conduit/PersistentCache.php": {
-            "bytes": 10028,
-            "sha256": "54a5bed814eb3e6432357b87f8f45307dead51beab060dbbec82b4f4616392f7"
+            "bytes": 10144,
+            "sha256": "cf560a5e479ab69d4755221ee36038844afd8ed5ad4f7551894eceae4156a01f"
         },
         "FluxCapacitor/Conduit/SerializedData.php": {
-            "bytes": 7306,
-            "sha256": "705bd0a27235481e5f8361de64b2969ae07e218273520d1d5dc71992520606e2"
+            "bytes": 7307,
+            "sha256": "1c21b57b7fadfb940db5e0f53875614e3b2cdaaecbb5d12648d020ed50ada1ce"
         },
         "FluxCapacitor/Conduit/StaticCache.php": {
             "bytes": 3793,
