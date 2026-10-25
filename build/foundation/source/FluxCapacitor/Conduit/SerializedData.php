@@ -7,13 +7,17 @@ class SerializedData
     /**
      * Decode stored PHP values with historical escaped strings and prefix tolerance.
      *
-     * @param mixed $value Stored serialized bytes.
+     * @param mixed $value Stored bytes or a native Stringable parser input.
      * @param bool $quietRange Whether this caller historically suppressed native integer-range warnings.
      * @return mixed Decoded value, or false when the payload is invalid.
      * @throws \Throwable When hydrated object code or another diagnostic fails.
      */
     public static function decode($value, $quietRange = true)
     {
+        if (\is_object($value) && \method_exists($value, '__toString')) {
+            $value = (string) $value;
+        }
+
         if (!\is_string($value) || $value === '') {
             return false;
         }

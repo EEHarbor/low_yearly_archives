@@ -1,5 +1,5 @@
 {
-    "archive_sha256": "fb603567e334e650ddea94d7d69ae46ae8dbbeed08fb7c72ed1e78cfda3a2cb4",
+    "archive_sha256": "1247f74d789c506c5507d80a348a2ccce8f29ad4b45179e17a4e5ec6343b78fa",
     "loose_files": {
         "addon.setup.php": "a5e5c659f6787506df47776250150362911dbd281376a38bf9a3a826366211ea",
         "autoload.php": "c0dbd735d3d469883a600c17ba51994a7b4dbbd140954777f38a786b41a9dd92",
@@ -76,8 +76,8 @@
             "sha256": "cf560a5e479ab69d4755221ee36038844afd8ed5ad4f7551894eceae4156a01f"
         },
         "FluxCapacitor/Conduit/SerializedData.php": {
-            "bytes": 7307,
-            "sha256": "1c21b57b7fadfb940db5e0f53875614e3b2cdaaecbb5d12648d020ed50ada1ce"
+            "bytes": 7455,
+            "sha256": "479a2fa1883101536865ae9842eae8204ba0ce50e353f11c40abe239f27424d6"
         },
         "FluxCapacitor/Conduit/StaticCache.php": {
             "bytes": 3793,

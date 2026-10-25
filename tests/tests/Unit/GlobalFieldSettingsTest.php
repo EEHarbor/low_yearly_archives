@@ -23,15 +23,34 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
      */
     public function testOriginalCallerHooksReceiveUntouchedValues($caller): void
     {
-        foreach (array('null-carrier', 'empty-carrier', 'legacy-bytes') as $shape) {
+        foreach (array('null-carrier', 'empty-carrier', 'legacy-bytes', 'stringable-decoded') as $shape) {
             $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-caller-hooks.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, $shape));
             self::assertSame(0, $result[0]);
             self::assertSame('', $result[2]);
             $segment = $caller === 'GFS' ? 'Conduit' : 'Bridge';
             $carrier = $shape === 'null-carrier' ? null : ($shape === 'empty-carrier' ? '' : 'carrier');
-            $decoded = $shape === 'empty-carrier' ? null : 'S:3:"abc";';
+            $decoded = $shape === 'stringable-decoded' ? array('marker' => 'unconverted') : ($shape === 'empty-carrier' ? null : 'S:3:"abc";');
             self::assertSame(array('hooks' => array(array($segment . '-base64', $carrier), array($segment . '-unserialize', $decoded)),
                 'marker_present' => true, 'marker' => $decoded), json_decode($result[1], true));
+        }
+    }
+
+    /**
+     * Preserve the native parser conversion of a carrier hook's Stringable result.
+     *
+     * @dataProvider nativeCallerScopes
+     * @param string $caller Original native settings caller.
+     * @return void
+     */
+    public function testDecodedStringableCarrierConvertsOnce($caller): void
+    {
+        foreach (array('serialized-array', 'legacy-string', 'accepted-prefix') as $shape) {
+            $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-decoded-stringable.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), $caller, $shape));
+            self::assertSame(0, $result[0]);
+            self::assertSame('', $result[2]);
+            $segment = $caller === 'GFS' ? 'Conduit' : 'Bridge';
+            self::assertSame(array('hooks' => array(array($segment . '-base64', 'carrier')),
+                'value' => 'accepted', 'conversions' => 1), json_decode($result[1], true));
         }
     }
 

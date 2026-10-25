@@ -217,5 +217,11 @@
         "protocol": "Root original-caller hook decision, independently reproduced45 actual contexts/repo; no root implementation copied",
         "implementation": "Call each original caller namespace carrier hook with raw stored value and parser hook with untouched decoded value before no-hook native helper. Native helper unserialize is global; PC preserves original Conduit raw unserialize hook directly. Original serialize/mkdir dispatch unchanged. Default native null carrier uses its original empty-byte result only when no carrier override is present. B1 mask/state limits retained.",
         "evidence": "caller-hooks-before/results.json; own permanent native caller positives and external after proof"
+    },
+    "decoded_stringable_repair": {
+        "author": "slot03",
+        "protocol": "Root supplied confirmed native accepted-input finding only; no implementation copied",
+        "implementation": "Only helper/native parser path converts a Stringable decoded carrier once before lexer. Original caller parser overrides still receive the untouched object.",
+        "evidence": "stringable-carrier-before/results.json; testDecodedStringableCarrierConvertsOnce"
     }
 }

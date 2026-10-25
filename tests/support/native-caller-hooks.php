@@ -53,6 +53,20 @@ namespace Low\YearlyArchives\FluxCapacitor\Bridge {
 }
 
 namespace {
+    class NativeHookDecodedValue
+    {
+        public $marker = 'unconverted';
+        /**
+         * Reject a conversion the original parser override never requested.
+         *
+         * @return string
+         * @throws \RuntimeException
+         */
+        public function __toString()
+        {
+            throw new \RuntimeException('A custom parser must receive its original object.');
+        }
+    }
     class NativeHookDatabase {
         public $data_cache=array();
         /**
@@ -107,7 +121,7 @@ namespace {
     function ee($service=null){static $app;if(!$app){$app=(object)array('db'=>new NativeHookDatabase());}return $service==='db'?$app->db:$app;}
     $GLOBALS['caller_hooks']=array();
     $GLOBALS['hook_carrier']=$argv[4]==='null-carrier'?null:($argv[4]==='empty-carrier'?'':'carrier');
-    $GLOBALS['hook_decoded']=$argv[4]==='empty-carrier'?null:'S:3:"abc";';
+    $GLOBALS['hook_decoded']=$argv[4]==='stringable-decoded' ? new NativeHookDecodedValue() : ($argv[4]==='empty-carrier'?null:'S:3:"abc";');
     require __DIR__ . '/Diagnostics.php';
     register_shutdown_function(static function () { if (LowYearlyDiagnostics::events() !== array()) { exit(1); } });
     define('BASEPATH',__DIR__);define('PATH_THIRD',$argv[2].'/');define('PATH_CACHE',sys_get_temp_dir().'/');
