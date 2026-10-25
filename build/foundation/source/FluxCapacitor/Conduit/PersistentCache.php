@@ -260,7 +260,9 @@ class PersistentCache
         }
 
         // Make sure the generic cache folder is writable.
-        if (!is_writable(self::$cache_path) || (\DIRECTORY_SEPARATOR === '/' && !\is_executable(self::$cache_path))) {
+        if (!is_writable(self::$cache_path) || (\DIRECTORY_SEPARATOR === '/'
+            && (\preg_match('~^[a-z0-9+.-]{2,}://~i', self::$cache_path) !== 1 || \strncasecmp(self::$cache_path, 'file://', 7) === 0)
+            && !\is_executable(self::$cache_path))) {
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but cache path not writable: ' . self::$cache_path);
             return false;
@@ -279,7 +281,9 @@ class PersistentCache
         }
 
         // Make sure the module-specific cache folder is writable.
-        if (!is_writable(self::$module_cache_path) || (\DIRECTORY_SEPARATOR === '/' && !\is_executable(self::$module_cache_path))) {
+        if (!is_writable(self::$module_cache_path) || (\DIRECTORY_SEPARATOR === '/'
+            && (\preg_match('~^[a-z0-9+.-]{2,}://~i', self::$module_cache_path) !== 1 || \strncasecmp(self::$module_cache_path, 'file://', 7) === 0)
+            && !\is_executable(self::$module_cache_path))) {
             // If the path is wrong we'll turn off caching
             ee()->load->library('logger');
             ee()->logger->developer('Low Yearly Archives: Write Cache enabled but module cache path not writable: ' . self::$module_cache_path);

@@ -5,6 +5,8 @@ register_shutdown_function(static function () {
     if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
 
+$nativeMkdirScenario = $argv[2] ?? 'late';
+
 class NativeMkdirStream
 {
     public $context;
@@ -23,7 +25,7 @@ class NativeMkdirStream
     }
 
     /**
-     * Report native permissions without emitting missing-file diagnostics.
+     * Report owned backend metadata, including virtual non-POSIX permissions.
      *
      * @param string $path Stream path.
      * @param int $flags Native lookup flags.
@@ -33,11 +35,18 @@ class NativeMkdirStream
     {
         $target = self::target($path);
 
-        return file_exists($target) ? stat($target) : false;
+        if (!file_exists($target)) { return false; }
+        $value = stat($target);
+        if ($GLOBALS['nativeMkdirScenario'] === 'virtual') {
+            $value['mode'] = ($value['mode'] & ~0777) | 0666;
+            $value[2] = $value['mode'];
+        }
+
+        return $value;
     }
 
     /**
-     * Register the module hook during the first original native mkdir callback.
+     * Create the owned directory and register late hooks only in callee probes.
      *
      * @param string $path Stream path.
      * @param int $mode Directory mode.
@@ -47,7 +56,7 @@ class NativeMkdirStream
     public function mkdir($path, $mode, $options)
     {
         self::$calls[] = $path;
-        if (count(self::$calls) === 1) {
+        if (count(self::$calls) === 1 && $GLOBALS['nativeMkdirScenario'] !== 'virtual') {
             eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; const DIR_WRITE_MODE = 0777; function mkdir($path, $mode) { $GLOBALS["nativeMkdirModes"][] = $mode; $GLOBALS["nativeMkdirHooks"][] = $path; return false; }');
         }
 
@@ -82,6 +91,14 @@ function write_file($path, $data)
 
     return file_put_contents(NativeMkdirStream::target($path), $data) !== false;
 }
+
+/**
+ * Read the actual stored bytes after the request cache is cleared.
+ *
+ * @param string $path Owned virtual path.
+ * @return string|false Native stored bytes.
+ */
+function read_file($path) { return file_get_contents(NativeMkdirStream::target($path)); }
 
 class NativeMkdirLoader
 {
@@ -142,9 +159,14 @@ try {
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/StaticCache.php';
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/PersistentCache.php';
     $value = Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::set('entry', 'stored');
-    echo json_encode(array('value' => $value, 'native' => NativeMkdirStream::$calls,
+    $result = array('value' => $value, 'native' => NativeMkdirStream::$calls,
         'hooks' => $GLOBALS['nativeMkdirHooks'], 'write_paths' => $GLOBALS['nativeMkdirWritePaths'], 'writes' => $GLOBALS['nativeMkdirWrites'],
-        'modes' => $GLOBALS['nativeMkdirModes'], 'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'))), "\n";
+        'modes' => $GLOBALS['nativeMkdirModes'], 'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'));
+    if ($nativeMkdirScenario === 'virtual') {
+        \Low\YearlyArchives\FluxCapacitor\Conduit\StaticCache::clear();
+        $result['cold'] = \Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::get('entry');
+    }
+    echo json_encode($result), "\n";
 } finally {
     stream_wrapper_unregister('nativemkdir');
     $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);

@@ -247,5 +247,14 @@
     "contract": "Restore only the original ArrayAccess offset @ expression. Actual pinned74/85 offsetGet returns reporting masks0/4437 as ordinary data, raw key unchanged; new strict owner controls still reject caught diagnostics.",
     "evidence": "getter-mask-before/results.json; native-callee GFS getter configured positive; original22 other member bytes retained",
     "review_protocol": "Independent09 Geo /10 Yearly findings supplied behavioral observations only; no reviewer implementation or permanent fixture copied."
+  },
+  "native_cache_searchability_repair": {
+    "author": "slot03 independently authored source and permanent virtual fixture",
+    "contract": "Only native filesystem and file:// directories receive the POSIX search-bit guard. Every destination still uses its original writable predicate. Other registered virtual stores can be writable without host search bits.",
+    "actual_proof": "Own original/current74/85 actual distributed cache with unmodified EE75 file helper, serialized disk bytes and cold read. Both candidate host/file://0200 controls stay false/log without diagnostics.",
+    "helper_source": "/Users/tomjaeger/Sites/ee75/system/ee/legacy/helpers/file_helper.php",
+    "helper_sha256": "b4fc48c4da65d32b4b69ca99c77bad77ac09bc6aa6eb91bfa0a41bcdf36c1d35",
+    "evidence": "virtual-cache-before/results.json; virtual-cache-regression-before/results.json; fresh after controls",
+    "lineage": "Root/01/08 reported behavior only. No peer implementation, permanent fixture or observer body copied."
   }
 }

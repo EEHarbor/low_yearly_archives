@@ -135,3 +135,10 @@ same operations in a small owned file fixture. No caller prelude is silently
 replaced. Generic caught file diagnostics and ignored inline commands have
 separate expected-failing owner controls. Native startup settings follow the accepted build flag; unsupported startup
 options cannot silently override the strict boundary.
+
+Writable registered virtual caches retain their original accepted behavior even
+when stream metadata has no host execute/search bits. The POSIX search-bit guard
+is confined to native filesystem paths and file:// URLs; every path still uses
+its original writable check. Actual original/current probes execute the unchanged
+EE75 file helper and verify serialized disk bytes plus a cold cache read. Native
+and file:// mode0200 directories retain their quiet false/log outcome.

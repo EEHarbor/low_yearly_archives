@@ -6,6 +6,23 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
 
     /**
+     * Retain writable virtual storage without imposing host directory search bits.
+     *
+     * @return void
+     */
+    public function testWritableVirtualCacheRemainsNative(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-mkdir-callees.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', 'virtual'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => true, 'native' => array('nativemkdir://root/cache/', 'nativemkdir://root/cache/low_yearly_archives/'),
+            'hooks' => array(), 'write_paths' => array('nativemkdir://root/cache/low_yearly_archives/' . sha1('entry')),
+            'writes' => array(serialize('stored')), 'modes' => array(), 'logged' => 0,
+            'module_exists' => true, 'cold' => 'stored'), json_decode($result[1], true));
+    }
+
+
+    /**
      * Keep the original ArrayAccess getter reporting context and raw key.
      *
      * @return void
