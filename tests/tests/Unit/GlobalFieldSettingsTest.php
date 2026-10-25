@@ -5,6 +5,100 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Supply clean native fractional and signed-word array key forms.
+     *
+     * @return array
+     */
+    public static function nativeFloatKeys(): array
+    {
+        return array(array('positive', 1), array('negative', -1), array('infinity', 0), array('negative-infinity', 0),
+            array('nan', 0), array('large', 0), array('negative-large', 0), array('word', PHP_INT_MIN));
+    }
+
+    /**
+     * Preserve original native array key identity for both reads and writes.
+     *
+     * @dataProvider nativeFloatKeys
+     * @param string $shape Native fractional key shape.
+     * @param int $nativeKey Original native signed-word key.
+     * @return void
+     */
+    public function testNativeFloatArrayKeys($shape, $nativeKey): void
+    {
+        $keys = array('positive' => 1.5, 'negative' => -1.5, 'infinity' => INF, 'negative-infinity' => -INF,
+            'nan' => NAN, 'large' => 1.0e100, 'negative-large' => -1.0e100, 'word' => 2.0 ** (PHP_INT_SIZE * 8 - 1));
+        $key = $keys[$shape];
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(array($nativeKey => 'old')))));
+        $settings = new GlobalFieldSettings();
+        self::assertSame('old', $settings->getSetting($key));
+        self::assertTrue($settings->updateSetting($key, 'new'));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize(array($nativeKey => 'new')))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Preserve the native first byte when a stored string receives a longer value.
+     *
+     * @return void
+     */
+    public function testLongStringOffsetValueUsesItsFirstByte(): void
+    {
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abc'))));
+        self::assertTrue((new GlobalFieldSettings())->updateSetting(1, 'long'));
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize('alc'))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Convert a native Stringable value once before storing its first byte.
+     *
+     * @return void
+     */
+    public function testStringOffsetValueConvertsOnce(): void
+    {
+        $value = new NativeOffsetStringValue();
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abc'))));
+        self::assertTrue((new GlobalFieldSettings())->updateSetting(-1, $value));
+        self::assertSame(1, $value->calls);
+        self::assertSame(array('update', array('fieldtypes', array('settings' => base64_encode(serialize('abl'))))), end($this->ee->db->calls));
+    }
+
+    /**
+     * Preserve a native Stringable exception before any database update.
+     *
+     * @return void
+     */
+    public function testStringOffsetValueExceptionIsPreserved(): void
+    {
+        $failure = new \RuntimeException('Native offset conversion failure');
+        $value = new NativeOffsetStringValue($failure);
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize('abc'))));
+        try {
+            (new GlobalFieldSettings())->updateSetting(1, $value);
+            self::fail('The native Stringable exception must propagate.');
+        } catch (\RuntimeException $caught) {
+            self::assertSame($failure, $caught);
+        }
+        self::assertSame(1, $value->calls);
+        self::assertSame(array(), array_values(array_filter($this->ee->db->calls, static function ($call) { return $call[0] === 'update'; })));
+    }
+
+    /**
+     * Leave ArrayAccess fractional keys and object values untouched.
+     *
+     * @return void
+     */
+    public function testArrayAccessOffsetsKeepNativeArguments(): void
+    {
+        NativeOffsetDictionary::$calls = array();
+        $this->ee->db->rows = array(array('settings' => base64_encode(serialize(new NativeOffsetDictionary()))));
+        $value = new NativeOffsetStringValue();
+        $settings = new GlobalFieldSettings();
+        self::assertSame('computed', $settings->getSetting(1.5));
+        self::assertTrue($settings->updateSetting(1.5, $value));
+        self::assertSame(array(array('get', 1.5), array('set', 1.5, $value)), NativeOffsetDictionary::$calls);
+        self::assertSame(0, $value->calls);
+    }
+
+    /**
      * Preserve direct ArrayAccess writes and the existing object serialization.
      *
      * @return void
@@ -257,4 +351,70 @@ class StoredSettingsArrayAccess implements \ArrayAccess
      */
     #[\ReturnTypeWillChange]
     public function offsetUnset($name) { self::$calls[] = 'unset:' . $name; }
+}
+
+class NativeOffsetStringValue
+{
+    public $calls = 0;
+    private $failure;
+
+    /**
+     * Select a legitimate callback failure for native conversion parity.
+     *
+     * @param \RuntimeException|null $failure
+     * @return void
+     */
+    public function __construct($failure = null) { $this->failure = $failure; }
+
+    /**
+     * Expose native first-byte conversion and callback ordering.
+     *
+     * @return string
+     * @throws \RuntimeException When the caller supplied a callback failure.
+     */
+    public function __toString()
+    {
+        $this->calls++;
+        if ($this->failure !== null) { throw $this->failure; }
+        return 'long';
+    }
+}
+
+class NativeOffsetDictionary implements \ArrayAccess
+{
+    public static $calls = array();
+
+    /**
+     * Keep computed keys independent of offset existence.
+     *
+     * @param mixed $key
+     * @return bool
+     */
+    public function offsetExists($key): bool { self::$calls[] = array('exists', $key); return false; }
+
+    /**
+     * Observe the original key and return a computed value.
+     *
+     * @param mixed $key
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($key) { self::$calls[] = array('get', $key); return 'computed'; }
+
+    /**
+     * Observe the original key and value without invoking string conversion.
+     *
+     * @param mixed $key
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($key, $value): void { self::$calls[] = array('set', $key, $value); }
+
+    /**
+     * Retain the native dictionary unset interface.
+     *
+     * @param mixed $key
+     * @return void
+     */
+    public function offsetUnset($key): void { self::$calls[] = array('unset', $key); }
 }

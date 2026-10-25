@@ -15,23 +15,25 @@ class GlobalFieldSettings
     }
 
     /**
-     * Read an existing global fieldtype setting without missing-key diagnostics.
+     * Read native array keys and string offsets without changing ArrayAccess dispatch.
      *
-     * @param string $name Setting key.
-     * @return mixed Setting value or null for an absent offset or non-indexable container.
-     * @throws \Throwable When an ArrayAccess callback fails.
+     * @param mixed $name Setting key or native byte offset.
+     * @return mixed Setting value or null when no ordinary offset is present.
+     * @throws \Throwable When a native ArrayAccess callback fails.
      */
     public function getSetting($name)
     {
         $ftSettings = $this->getSettings();
-        if ($ftSettings) {
-            if ($ftSettings instanceof \ArrayAccess) {
-                return $ftSettings[$name];
-            }
-            if (is_array($ftSettings) || is_string($ftSettings)) {
-                return isset($ftSettings[$name]) ? $ftSettings[$name] : null;
-            }
+        if ($ftSettings instanceof \ArrayAccess) {
+            return $ftSettings[$name];
         }
+        if (is_array($ftSettings) && is_float($name)) {
+            $name = self::nativeArrayKey($name);
+        }
+        if (is_array($ftSettings) || is_string($ftSettings)) {
+            return isset($ftSettings[$name]) ? $ftSettings[$name] : null;
+        }
+
         return null;
     }
 
@@ -58,18 +60,29 @@ class GlobalFieldSettings
     }
 
     /**
-     * Persist one global setting and return the actual write result.
+     * Persist a native array, ArrayAccess value or writable string byte.
      *
-     * @param string $key Setting key.
+     * @param mixed $key Setting key or native byte offset.
      * @param mixed $value Setting value.
      * @return bool Whether the settings row was successfully updated.
+     * @throws \Throwable When native conversion, serialization or a callback fails.
      */
     public function updateSetting($key, $value)
     {
         $ftSettings = $this->getSettings();
 
-        if ($ftSettings === null) {
+        if (!is_array($ftSettings) && !$ftSettings instanceof \ArrayAccess
+            && !self::canWriteStringOffset($ftSettings, $key)) {
             return false;
+        }
+        if (is_array($ftSettings) && is_float($key)) {
+            $key = self::nativeArrayKey($key);
+        }
+        if (is_string($ftSettings)) {
+            $value = (string) $value;
+            if (strlen($value) > 1) {
+                $value = $value[0];
+            }
         }
 
         $ftSettings[$key] = $value;
@@ -77,5 +90,50 @@ class GlobalFieldSettings
 
         return ee()->db->where('name', $this->fieldtype_name)
             ->update('fieldtypes', $settingsForDb);
+    }
+
+    /**
+     * Preserve native signed-word array keys without newer float-cast diagnostics.
+     *
+     * @param float $key
+     * @return int
+     */
+    private static function nativeArrayKey($key)
+    {
+        if (!is_finite($key)) {
+            return 0;
+        }
+
+        $range = 2.0 ** (PHP_INT_SIZE * 8);
+        $key = fmod($key, $range);
+        if ($key >= $range / 2) {
+            $key -= $range;
+        }
+        if ($key < -$range / 2) {
+            $key += $range;
+        }
+
+        return (int) $key;
+    }
+
+    /**
+     * Accept native integer string offsets without coercing invalid keys.
+     *
+     * @param mixed $settings
+     * @param mixed $key
+     * @return bool
+     */
+    private static function canWriteStringOffset($settings, $key)
+    {
+        if (!is_string($settings)) {
+            return false;
+        }
+
+        $pattern = PHP_VERSION_ID < 80000 ? '/^\s*[+-]?[0-9]+$/D' : '/^\s*[+-]?[0-9]+\s*$/D';
+        if (!is_int($key) && !(is_string($key) && preg_match($pattern, $key))) {
+            return false;
+        }
+
+        return $key >= -strlen($settings) && $key < PHP_INT_MAX;
     }
 }
