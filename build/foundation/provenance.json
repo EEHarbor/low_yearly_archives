@@ -255,6 +255,7 @@
     "helper_source": "/Users/tomjaeger/Sites/ee75/system/ee/legacy/helpers/file_helper.php",
     "helper_sha256": "b4fc48c4da65d32b4b69ca99c77bad77ac09bc6aa6eb91bfa0a41bcdf36c1d35",
     "evidence": "virtual-cache-before/results.json; virtual-cache-regression-before/results.json; fresh after controls",
-    "lineage": "Root/01/08 reported behavior only. No peer implementation, permanent fixture or observer body copied."
+    "lineage": "Root/01/08 reported behavior only. No peer implementation, permanent fixture or observer body copied.",
+    "opaque_operand_followup": "Only actual strings enter any new host predicate. Original is_writable dispatch stays first; Stringable path properties left by byref mkdir hooks retain native conversion count/ownership. Own original/current real EE helper proof7vs11 conversions, prototype permanent fixture likewise7vs11; no peer body copied."
   }
 }

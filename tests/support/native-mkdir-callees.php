@@ -7,6 +7,28 @@ register_shutdown_function(static function () {
 
 $nativeMkdirScenario = $argv[2] ?? 'late';
 
+$nativeMkdirConversions = 0;
+
+class NativeMkdirPathOperand
+{
+    private $path;
+
+    /**
+     * Retain the original path left by an application mkdir hook.
+     *
+     * @param string $path Native accepted path.
+     * @return void
+     */
+    public function __construct($path) { $this->path = $path; }
+
+    /**
+     * Observe only conversions performed by the original native consumers.
+     *
+     * @return string Native accepted path.
+     */
+    public function __toString() { $GLOBALS['nativeMkdirConversions']++; return $this->path; }
+}
+
 class NativeMkdirStream
 {
     public $context;
@@ -155,6 +177,10 @@ if (($argv[2] ?? '') === 'reference') {
     mkdir($root . '/root/cache', 0700);
     eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function mkdir(&$path, $mode) { $GLOBALS["nativeMkdirHooks"][] = $path; $GLOBALS["nativeMkdirModes"][] = $mode; \mkdir(\NativeMkdirStream::target($path), $mode); $path = "nativemkdir://root/cache/relocated/"; return \mkdir(\NativeMkdirStream::target($path), $mode); }');
 }
+if ($nativeMkdirScenario === 'opaque') {
+    mkdir($root . '/root/cache', 0700);
+    eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function mkdir(&$path, $mode) { $GLOBALS["nativeMkdirHooks"][] = $path; $GLOBALS["nativeMkdirModes"][] = $mode; $created = \mkdir(\NativeMkdirStream::target($path), $mode); $path = new \NativeMkdirPathOperand($path); return $created; }');
+}
 try {
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/StaticCache.php';
     require 'phar://' . $argv[1] . '/FluxCapacitor/Conduit/PersistentCache.php';
@@ -162,10 +188,11 @@ try {
     $result = array('value' => $value, 'native' => NativeMkdirStream::$calls,
         'hooks' => $GLOBALS['nativeMkdirHooks'], 'write_paths' => $GLOBALS['nativeMkdirWritePaths'], 'writes' => $GLOBALS['nativeMkdirWrites'],
         'modes' => $GLOBALS['nativeMkdirModes'], 'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'));
-    if ($nativeMkdirScenario === 'virtual') {
+    if ($nativeMkdirScenario === 'virtual' || $nativeMkdirScenario === 'opaque') {
         \Low\YearlyArchives\FluxCapacitor\Conduit\StaticCache::clear();
         $result['cold'] = \Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::get('entry');
     }
+    if ($nativeMkdirScenario === 'opaque') { $result['conversions'] = $nativeMkdirConversions; }
     echo json_encode($result), "\n";
 } finally {
     stream_wrapper_unregister('nativemkdir');

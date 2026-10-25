@@ -260,7 +260,7 @@ class PersistentCache
         }
 
         // Make sure the generic cache folder is writable.
-        if (!is_writable(self::$cache_path) || (\DIRECTORY_SEPARATOR === '/'
+        if (!is_writable(self::$cache_path) || (\is_string(self::$cache_path) && \DIRECTORY_SEPARATOR === '/'
             && (\preg_match('~^[a-z0-9+.-]{2,}://~i', self::$cache_path) !== 1 || \strncasecmp(self::$cache_path, 'file://', 7) === 0)
             && !\is_executable(self::$cache_path))) {
             ee()->load->library('logger');
@@ -281,7 +281,7 @@ class PersistentCache
         }
 
         // Make sure the module-specific cache folder is writable.
-        if (!is_writable(self::$module_cache_path) || (\DIRECTORY_SEPARATOR === '/'
+        if (!is_writable(self::$module_cache_path) || (\is_string(self::$module_cache_path) && \DIRECTORY_SEPARATOR === '/'
             && (\preg_match('~^[a-z0-9+.-]{2,}://~i', self::$module_cache_path) !== 1 || \strncasecmp(self::$module_cache_path, 'file://', 7) === 0)
             && !\is_executable(self::$module_cache_path))) {
             // If the path is wrong we'll turn off caching

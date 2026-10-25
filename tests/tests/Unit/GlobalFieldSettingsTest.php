@@ -6,6 +6,24 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
 
     /**
+     * Preserve native conversion effects for an opaque path left by a mkdir hook.
+     *
+     * @return void
+     */
+    public function testNativeCachePathOperandConversionsRemainNative(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-mkdir-callees.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', 'opaque'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => true, 'native' => array(),
+            'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'),
+            'write_paths' => array('nativemkdir://root/cache/low_yearly_archives/' . sha1('entry')),
+            'writes' => array(serialize('stored')), 'modes' => array(0700), 'logged' => 0,
+            'module_exists' => true, 'cold' => 'stored', 'conversions' => 7), json_decode($result[1], true));
+    }
+
+
+    /**
      * Retain writable virtual storage without imposing host directory search bits.
      *
      * @return void

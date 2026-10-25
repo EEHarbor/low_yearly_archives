@@ -142,3 +142,9 @@ is confined to native filesystem paths and file:// URLs; every path still uses
 its original writable check. Actual original/current probes execute the unchanged
 EE75 file helper and verify serialized disk bytes plus a cold cache read. Native
 and file:// mode0200 directories retain their quiet false/log outcome.
+
+Only actual string paths enter the additional host predicate. Opaque path
+operands left by by-reference mkdir hooks retain their original native consumers,
+conversion effects and ownership. An actual-artifact positive case checks the
+original seven conversions through set, disk persistence and a cold read; real EE
+file-helper original/current observations verify the same behavior.
