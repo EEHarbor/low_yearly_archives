@@ -65,15 +65,19 @@ class GlobalFieldSettings
             ->get('fieldtypes');
 
         if ((bool) $ftSettingsQuery->num_rows()) {
-            $hooks = SerializedData::storageHooks(__METHOD__, __NAMESPACE__);
+            $available = array(
+                'parser' => \function_exists(__NAMESPACE__ . '\\unserialize'),
+                'carrier' => \function_exists(__NAMESPACE__ . '\\base64_decode'),
+            );
+            $hooks = SerializedData::storageHooks(__METHOD__, $available);
             if ($hooks['parser']) {
                 $ftSettings = $hooks['carrier']
                     ? @unserialize(@base64_decode($ftSettingsQuery->row('settings')))
-                    : @unserialize(@base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings'))));
+                    : @unserialize(@\base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings'))));
             } else {
                 $ftSettings = @SerializedData::decode(SerializedData::nativeDecoded($hooks['carrier']
                     ? @base64_decode($ftSettingsQuery->row('settings'))
-                    : @base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
+                    : @\base64_decode(SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
             }
             $ftSettings = $ftSettings ?: array();
         } else {
@@ -123,13 +127,11 @@ class GlobalFieldSettings
             }
         }
         if ($stringOffset) {
-            $value = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
-            if (\strlen($value) > 1) {
-                $value = $value[0];
-            }
+            $offsetValue = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
+            $ftSettings[$key] = \strlen($offsetValue) > 1 ? $offsetValue[0] : $offsetValue;
+        } else {
+            $ftSettings[$key] = $value;
         }
-
-        $ftSettings[$key] = $value;
         $settingsForDb = array('settings' => base64_encode(serialize($ftSettings)));
 
         return ee()->db->where('name', $this->fieldtype_name)

@@ -174,17 +174,19 @@
     },
     "permissions_source": "Pinned original raw manifest flags; independent binary reader, not readonly PharFileInfo projection.",
     "native_mkdir_failure_contract": {
-        "rationale": "Coordinator-authorized exact native mkdir false/log handling preserves original alias spelling and chain evaluation; earlier availability resolver rejected valid trailing-target chains. No resolver or new @ retained.",
-        "scope": "E_WARNING only at own file and adjacent mkdir call line, exact six expected filesystem errno messages; forward every unexpected argument and restore in finally.",
+        "rationale": "Exact native mkdir false/log handling preserves original argument and alias spelling. Original @ reporting scopes are restored while the durable strict kernel retains unexpected diagnostics.",
+        "scope": "E_WARNING only at own file and adjacent active mkdir call line, exact seven expected filesystem errno messages; forward every unexpected argument and restore in finally.",
         "messages": [
             "Permission denied",
             "File exists",
             "Not a directory",
             "No such file or directory",
             "Too many levels of symbolic links",
-            "Read-only file system"
+            "Read-only file system",
+            "File name too long"
         ],
-        "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim."
+        "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim.",
+        "callee_lifetime_followup": "The local closure contains two distinct native mkdir expressions selected by original generic/module position. Native lookup caches remain independent, including initially unused sites, late callback registration and real pinned PHPUnit static restoration. No manual resolver or new legacy method/property. Own actual original/current all7 real EE file-helper proofs; own permanent native-mkdir-callees fixture uses an explicit narrow file-helper collaborator."
     },
     "native_offset_adaptation": {
         "author": "slot04",
@@ -228,13 +230,15 @@
         "author": "slot03",
         "protocol": "Root bounded Tag policy after actual original/current invalid-offset and real caller/pinned fixture audit; no implementation copied",
         "implementation": "Only verified quiet native writable string offsets receive first-byte preconversion. Original non-null assignment/value/failure remains for all other containers/keys; absent-row/null and genuine DB-failure false contracts retained.",
-        "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only"
+        "evidence": "invalid-offset-path-observation/results.json; new clean integer-string Stringable positive; natural strict negative controls external only",
+        "temporary_followup": "Retain original replacement parameter and convert only a separate byte local. Own actual original/current happy/DBthrow/destructor/both proof preserves convert\u2192DB\u2192destroy, DB payload, persistence and exception identity/previous chain; no root/10 implementation or probe copied into permanent fixture."
     },
     "native_callee_lifetime_repair": {
         "author": "slot03 independently authored source and permanent regression fixtures",
         "protocol": "Root requested original native callsite lifetime, temporary failure cleanup and operator-scope preservation. Observations only from slots06/07/05/10; no implementation or permanent fixture code copied.",
         "implementation": "First lexical method binding on the new SerializedData class, with uninitialized typed Closure state that matches original native cache lifetime across inherited calls and real pinned PHPUnit static restoration. Bind after positive row count and before row callback; no-row does not bind. Original nested @unserialize/@base64 and @mkdir callback-reporting scopes retained. Raw/decoded temporaries, conversion/destructor failure identity and shared hydrated references preserved. No additions to original22 named method/property surfaces.",
-        "evidence": "native-caller-prototype-1 and -2; native-frame-observation; own configured native-callee fixture; OriginalScopeDiagnosticTest negative checked controls",
-        "limits": "B1 prior-handler severity-mask/installed-state contract remains for temporary handlers; B2 hidden native Stringable S/prefix diagnostics remain failing, without a new diagnostic whitelist."
+        "evidence": "native-caller-prototype-1 and -2; native-frame-observation; own configured native-callee fixture; OriginalScopeDiagnosticTest negative checked controls; native-followup-after and mkdir-callee-additional/results.json",
+        "limits": "B1 prior-handler severity-mask/installed-state contract remains for temporary handlers; B2 hidden native Stringable S/prefix diagnostics remain failing, without a new diagnostic whitelist.",
+        "autoload_followup": "Capture original namespace availability in pure caller locals before the new helper can autoload; explicitly select the global carrier only when the original selection was native. Original hooks remain untouched when present. Actual original/current loader callback data witness and one configured positive prevent inserted autoload from changing first selection."
     }
 }

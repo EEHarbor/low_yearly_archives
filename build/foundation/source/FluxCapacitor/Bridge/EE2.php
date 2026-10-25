@@ -499,15 +499,19 @@ class EE2 extends AbstractBridge
             ->get('fieldtypes');
 
         if ((bool) $ftSettingsQuery->num_rows()) {
-            $hooks = \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::storageHooks(__METHOD__, __NAMESPACE__);
+            $available = array(
+                'parser' => \function_exists(__NAMESPACE__ . '\\unserialize'),
+                'carrier' => \function_exists(__NAMESPACE__ . '\\base64_decode'),
+            );
+            $hooks = \Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::storageHooks(__METHOD__, $available);
             if ($hooks['parser']) {
                 $ftSettings = $hooks['carrier']
                     ? @unserialize(@base64_decode($ftSettingsQuery->row('settings')))
-                    : @unserialize(@base64_decode(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::nativeCarrier($ftSettingsQuery->row('settings'))));
+                    : @unserialize(@\base64_decode(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::nativeCarrier($ftSettingsQuery->row('settings'))));
             } else {
                 $ftSettings = @\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::decode(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::nativeDecoded($hooks['carrier']
                     ? @base64_decode($ftSettingsQuery->row('settings'))
-                    : @base64_decode(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
+                    : @\base64_decode(\Low\YearlyArchives\FluxCapacitor\Conduit\SerializedData::nativeCarrier($ftSettingsQuery->row('settings')))));
             }
             $ftSettings = \is_array($ftSettings) ? $ftSettings : array();
         } else {

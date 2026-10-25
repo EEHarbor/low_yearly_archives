@@ -182,7 +182,8 @@ class PersistentCache
      */
     private static function serveCacheData($value)
     {
-        $hooks = SerializedData::storageHooks(__METHOD__, __NAMESPACE__);
+        $available = array('parser' => \function_exists(__NAMESPACE__ . '\\unserialize'), 'carrier' => false);
+        $hooks = SerializedData::storageHooks(__METHOD__, $available);
         if ($hooks['parser']) {
             return unserialize($value);
         }
@@ -202,10 +203,11 @@ class PersistentCache
          * Create native paths locally so legacy children retain their method names.
          *
          * @param string $path Original configured path spelling.
+         * @param bool $module Whether this is the original module creation site.
          * @return bool Whether native directory creation succeeded.
          * @throws \Throwable When an unrelated diagnostic or stream callback fails.
          */
-        $createDirectory = static function ($path) {
+        $createDirectory = static function ($path, $module) {
             $create_line = 0;
             $previous = null;
             $previous = \set_error_handler(static function ($severity, $message, $file, $line) use (&$create_line, &$previous) {
@@ -226,6 +228,12 @@ class PersistentCache
             }, -1);
 
             try {
+                // Separate native expressions retain each original callsite's lookup lifetime.
+                if ($module) {
+                    $create_line = __LINE__ + 1;
+                    return @mkdir($path, DIR_WRITE_MODE);
+                }
+
                 $create_line = __LINE__ + 1;
                 return @mkdir($path, DIR_WRITE_MODE);
             } finally {
@@ -238,7 +246,7 @@ class PersistentCache
 
         // If the generic cache folder doesn't exist, try to create it.
         if (! @is_dir(self::$cache_path)) {
-            if (!$createDirectory(self::$cache_path)) {
+            if (!$createDirectory(self::$cache_path, false)) {
                 ee()->load->library('logger');
                 ee()->logger->developer('Low Yearly Archives: Write Cache enabled but could not create cache folder: ' . self::$cache_path);
                 return false;
@@ -257,7 +265,7 @@ class PersistentCache
 
         // If the module-specific cache folder doesn't exist, try to create it.
         if (!@is_dir(self::$module_cache_path)) {
-            if (!$createDirectory(self::$module_cache_path)) {
+            if (!$createDirectory(self::$module_cache_path, true)) {
                 ee()->load->library('logger');
                 ee()->logger->developer('Low Yearly Archives: Write Cache enabled but could not create module cache folder: ' . self::$module_cache_path);
                 return false;

@@ -11,27 +11,24 @@ class SerializedData
      * Preserve each original lexical callsite's first namespace selection.
      *
      * @param string $caller Original declared method identity.
-     * @param string $namespace Original consumer namespace.
+     * @param array $available Native selections captured before this helper can autoload.
      * @return array Native parser and carrier selections shared by inherited calls.
      */
-    public static function storageHooks($caller, $namespace)
+    public static function storageHooks($caller, array $available)
     {
         if (!isset(self::$storageBindings)) {
-            self::$storageBindings = static function ($caller, $namespace) {
+            self::$storageBindings = static function ($caller, array $available) {
                 static $bindings = array();
 
                 if (!\array_key_exists($caller, $bindings)) {
-                    $bindings[$caller] = array(
-                        'parser' => \function_exists($namespace . '\\unserialize'),
-                        'carrier' => \function_exists($namespace . '\\base64_decode'),
-                    );
+                    $bindings[$caller] = $available;
                 }
 
                 return $bindings[$caller];
             };
         }
 
-        return (self::$storageBindings)($caller, $namespace);
+        return (self::$storageBindings)($caller, $available);
     }
 
     /**

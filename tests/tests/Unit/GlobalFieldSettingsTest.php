@@ -5,6 +5,21 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Preserve independent native resolution for generic and module creation sites.
+     *
+     * @return void
+     */
+    public function testNativeMkdirCalleesRemainIndependent(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-mkdir-callees.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => false, 'native' => array('nativemkdir://root/cache/'),
+            'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'), 'writes' => array(),
+            'logged' => 1, 'module_exists' => false), json_decode($result[1], true));
+    }
+
+    /**
      * Supply each original settings caller namespace.
      *
      * @return array
@@ -42,6 +57,7 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
 
         return array(
             array('initial', array('parser', 'parser', 'parser'), $both),
+            array('autoload-register', array(7, 7, 7), array()),
             array('inherited', array(7, 7, 7), array()),
             array('child-first', array(7, 7, 7), array()),
             array('no-row', array(null, 'parser', 'parser'), array('carrier', 'parser', 'carrier', 'parser')),
@@ -118,6 +134,33 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
                 self::assertSame(array('outcome' => $outcome, 'events' => $events, 'masks' => $masks), json_decode($result[1], true));
             }
         }
+    }
+
+    /**
+     * Supply successful and failing database/destructor lifetimes.
+     *
+     * @return array
+     */
+    public static function nativeSetterLifetimeCases(): array
+    {
+        return array(array('none'), array('db'), array('destructor'), array('both'));
+    }
+
+    /**
+     * Retain the original temporary parameter through update and exception cleanup.
+     *
+     * @dataProvider nativeSetterLifetimeCases
+     * @param string $scenario Owned callback failure boundary.
+     * @return void
+     */
+    public function testNativeSetterTemporarySurvivesDatabaseUpdate($scenario): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'setter', $scenario));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        $outcome = $scenario === 'none' ? array('value' => true) : array('exception' => $scenario === 'db' ? 'db' : 'destructor', 'previous_db' => $scenario === 'both');
+        $stored = in_array($scenario, array('none', 'destructor'), true) ? 'alc' : null;
+        self::assertSame(array('outcome' => $outcome, 'events' => array('convert', 'db', 'destroy'), 'updates' => array('alc'), 'stored' => $stored), json_decode($result[1], true));
     }
 
     /**

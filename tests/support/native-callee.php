@@ -18,6 +18,10 @@ $convertedByNative = false;
 $conversionFailure = new RuntimeException('Owned temporary conversion failure.');
 $destructorFailure = new RuntimeException('Owned temporary destructor failure.');
 $rowFailure = new RuntimeException('Owned row failure.');
+$setterDatabaseFailure = new RuntimeException('Owned setter database failure.');
+$setterDestructorFailure = new RuntimeException('Owned setter destructor failure.');
+$setterUpdates = array();
+$setterStored = null;
 
 /**
  * Register late caller hooks without replacing any distributed method.
@@ -91,6 +95,35 @@ class NativeCalleeTemporary
     }
 }
 
+class NativeSetterTemporary
+{
+    /**
+     * Supply one native-writable byte without retaining the temporary in its caller.
+     *
+     * @return string Replacement byte.
+     */
+    public function __toString()
+    {
+        $GLOBALS['observations'][] = 'convert';
+
+        return 'l';
+    }
+
+    /**
+     * Observe parameter release after the database operation, including unwind.
+     *
+     * @return void
+     * @throws RuntimeException When the owned destructor fails.
+     */
+    public function __destruct()
+    {
+        $GLOBALS['observations'][] = 'destroy';
+        if (in_array($GLOBALS['scenario'], array('destructor', 'both'), true)) {
+            throw $GLOBALS['setterDestructorFailure'];
+        }
+    }
+}
+
 class NativeCalleeQuery
 {
     public $number;
@@ -132,6 +165,7 @@ class NativeCalleeQuery
                 throw $GLOBALS['rowFailure'];
             }
         }
+        if ($GLOBALS['family'] === 'setter') { return base64_encode(serialize('abc')); }
         if ($GLOBALS['family'] === 'temporary') {
             return $GLOBALS['route'] === 'raw' ? new NativeCalleeTemporary() : 'decoded-by-hook';
         }
@@ -189,6 +223,27 @@ class NativeCalleeDatabase
      * @return NativeCalleeQuery
      */
     public function get($table) { return new NativeCalleeQuery(++$GLOBALS['databaseCalls']); }
+
+    /**
+     * Record the actual update boundary and its owned persistence or exception.
+     *
+     * @param string $table Updated table.
+     * @param array $data Native serialized update values.
+     * @return bool Whether this owned database accepted the update.
+     * @throws RuntimeException When the owned database callback fails.
+     */
+    public function update($table, $data)
+    {
+        $GLOBALS['observations'][] = 'db';
+        $decoded = unserialize(base64_decode($data['settings']));
+        $GLOBALS['setterUpdates'][] = $decoded;
+        if (in_array($GLOBALS['scenario'], array('db', 'both'), true)) {
+            throw $GLOBALS['setterDatabaseFailure'];
+        }
+        $GLOBALS['setterStored'] = $decoded;
+
+        return true;
+    }
 }
 
 /**
@@ -204,6 +259,9 @@ define('BASEPATH', __DIR__);
 define('PATH_THIRD', $root . '/');
 define('PATH_CACHE', sys_get_temp_dir() . '/');
 spl_autoload_register(static function ($class) use ($archive) {
+    if ($GLOBALS['scenario'] === 'autoload-register' && $class === 'Low\\YearlyArchives\\FluxCapacitor\\Conduit\\SerializedData') {
+        installNativeCalleeHooks();
+    }
     $prefix = 'Low\\YearlyArchives\\';
     if (strpos($class, $prefix) === 0) {
         $path = 'phar://' . $archive . '/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
@@ -223,6 +281,19 @@ $read = static function ($class) use ($caller) {
     \Low\YearlyArchives\FluxCapacitor\Conduit\StaticCache::clear();
     return (new $class(array('module' => 'low_yearly_archives', 'module_name' => 'owned')))->getSettings(true);
 };
+
+if ($family === 'setter') {
+    $settings = (new ReflectionClass($parent))->newInstanceWithoutConstructor();
+    $settings->fieldtype_name = 'low_yearly_archives';
+    try {
+        $outcome = array('value' => $settings->updateSetting(1, new NativeSetterTemporary()));
+    } catch (RuntimeException $error) {
+        if ($error !== $setterDatabaseFailure && $error !== $setterDestructorFailure) { throw $error; }
+        $outcome = array('exception' => $error === $setterDatabaseFailure ? 'db' : 'destructor', 'previous_db' => $error->getPrevious() === $setterDatabaseFailure);
+    }
+    echo json_encode(array('outcome' => $outcome, 'events' => $observations, 'updates' => $setterUpdates, 'stored' => $setterStored), JSON_THROW_ON_ERROR), "\n";
+    return;
+}
 
 if ($family === 'temporary') {
     list($route, $failure) = explode('-', $scenario);

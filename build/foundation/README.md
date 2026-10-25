@@ -84,7 +84,7 @@ boundary.
 
 Original GFS and EE2–5 carrier/parser hooks receive their untouched arguments.
 Each original declared method binds its first namespace selection after the
-row-count check and before row callbacks; inherited calls share that selection,
+row-count check and before helper autoload or row callbacks; inherited calls share that selection,
 and an absent row does not bind it. The new `SerializedData` class holds these
 process-lifetime selections in a closure rather than serializable application
 state. The actual pinned PHPUnit static restorer cannot reset native opcode
@@ -100,8 +100,11 @@ handler. Their native conversion frame can control the actual decoded value;
 pre-casting would change that value. Original parser hooks also receive the raw
 object. Ordinary byte strings retain the existing normalization path.
 
-Setter conversion is restricted to native-writable string offsets. Other keys
-and non-null containers retain the original assignment, value and native
+Setter conversion is restricted to native-writable string offsets. A separate
+byte scalar retains the original replacement parameter through the database
+operation and exception cleanup, preserving temporary destructor order and
+exception chains. Other keys and non-null containers retain the original assignment,
+value and native
 rejection ordering; only the original absent-row/null fallback returns false.
 Unsupported input diagnostics remain visible to strict validation.
 
@@ -110,6 +113,12 @@ reproduced prior-handler mask/installed-state limitation (B1). This checkpoint
 does not claim that native callback contract is repaired or permit publication.
 The opaque native Stringable path also retains real modern-runtime diagnostics
 for hidden escaped `S` wire data and trailing bytes (B2). Existing positive
-configured regressions remain failing for those unsupported native cases; no
-new diagnostic whitelist, cast-before-parser or alternate callback contract is
+configured regressions remain failing for those original-supported inputs on
+affected native runtimes; no new diagnostic whitelist, cast-before-parser or alternate callback contract is
 used to make them green.
+
+The original generic and module directory creation sites retain distinct native
+`mkdir` expressions inside the local closure. Each keeps its own first function
+selection, including when a stream callback registers a namespace hook before
+the other site first executes. Existing directories leave their unused site
+unbound; native opcode bindings survive application static-state restoration.
