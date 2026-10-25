@@ -124,6 +124,63 @@ class NativeSetterTemporary
     }
 }
 
+class NativeSetterOwnedArgument
+{
+    public $label;
+
+    /**
+     * Identify one original temporary setter argument.
+     *
+     * @param string $label Key or value identity.
+     * @return void
+     */
+    public function __construct($label) { $this->label = $label; }
+
+    /**
+     * Record native argument release after assignment and database persistence.
+     *
+     * @return void
+     */
+    public function __destruct() { $GLOBALS['observations'][] = $this->label; }
+}
+
+class NativeSetterDictionary implements ArrayAccess
+{
+    /**
+     * Report that the owned dictionary contains no retained keys.
+     *
+     * @param mixed $offset Original key.
+     * @return bool
+     */
+    public function offsetExists($offset): bool { return false; }
+
+    /**
+     * Supply the owned missing-key value.
+     *
+     * @param mixed $offset Original key.
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset) { return null; }
+
+    /**
+     * Observe assignment without retaining either temporary argument.
+     *
+     * @param mixed $offset Original key.
+     * @param mixed $value Original value.
+     * @return void
+     */
+    public function offsetSet($offset, $value): void { $GLOBALS['observations'][] = 'assign'; }
+
+    /**
+     * Leave the owned empty dictionary unchanged.
+     *
+     * @param mixed $offset Original key.
+     * @return void
+     */
+    public function offsetUnset($offset): void {}
+}
+
 class NativeCalleeQuery
 {
     public $number;
@@ -166,6 +223,7 @@ class NativeCalleeQuery
             }
         }
         if ($GLOBALS['family'] === 'argument') { return base64_encode(serialize(array(1 => 'old', '' => 'empty'))); }
+        if ($GLOBALS['family'] === 'key-temporary') { return base64_encode(serialize(new NativeSetterDictionary())); }
         if ($GLOBALS['family'] === 'setter') { return base64_encode(serialize('abc')); }
         if ($GLOBALS['family'] === 'temporary') {
             return $GLOBALS['route'] === 'raw' ? new NativeCalleeTemporary() : 'decoded-by-hook';
@@ -289,6 +347,14 @@ if ($family === 'argument') {
     $settings->fieldtype_name = 'low_yearly_archives';
     $value = $settings->updateSetting($scenario === 'null' ? null : 1.9, 'updated');
     echo json_encode(array('value' => $value, 'updates' => $setterUpdates), JSON_THROW_ON_ERROR), "\n";
+    return;
+}
+
+if ($family === 'key-temporary') {
+    $settings = (new ReflectionClass($parent))->newInstanceWithoutConstructor();
+    $settings->fieldtype_name = 'owned';
+    $value = $settings->updateSetting(new NativeSetterOwnedArgument('key'), new NativeSetterOwnedArgument('value'));
+    echo json_encode(array('value' => $value, 'events' => $observations), JSON_THROW_ON_ERROR), "\n";
     return;
 }
 

@@ -48,7 +48,7 @@ class NativeMkdirStream
     {
         self::$calls[] = $path;
         if (count(self::$calls) === 1) {
-            eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function mkdir($path, $mode) { $GLOBALS["nativeMkdirHooks"][] = $path; return false; }');
+            eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; const DIR_WRITE_MODE = 0777; function mkdir($path, $mode) { $GLOBALS["nativeMkdirModes"][] = $mode; $GLOBALS["nativeMkdirHooks"][] = $path; return false; }');
         }
 
         return mkdir(self::target($path), $mode);
@@ -124,6 +124,7 @@ mkdir($root, 0700);
 mkdir($root . '/root', 0700);
 NativeMkdirStream::$root = $root;
 $GLOBALS['nativeMkdirHooks'] = array();
+$GLOBALS['nativeMkdirModes'] = array();
 $GLOBALS['nativeMkdirWrites'] = array();
 $GLOBALS['nativeMkdirLogs'] = array();
 $GLOBALS['nativeMkdirEE'] = (object) array('load' => new NativeMkdirLoader(), 'logger' => new NativeMkdirLogger());
@@ -137,7 +138,7 @@ try {
     $value = Low\YearlyArchives\FluxCapacitor\Conduit\PersistentCache::set('entry', 'stored');
     echo json_encode(array('value' => $value, 'native' => NativeMkdirStream::$calls,
         'hooks' => $GLOBALS['nativeMkdirHooks'], 'writes' => $GLOBALS['nativeMkdirWrites'],
-        'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'))), "\n";
+        'modes' => $GLOBALS['nativeMkdirModes'], 'logged' => count($GLOBALS['nativeMkdirLogs']), 'module_exists' => is_dir($root . '/root/cache/low_yearly_archives'))), "\n";
 } finally {
     stream_wrapper_unregister('nativemkdir');
     $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);

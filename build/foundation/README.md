@@ -126,3 +126,8 @@ unbound; native opcode bindings survive application static-state restoration.
 Array-key normalization changes only a local assignment offset. The original
 public key parameter remains visible unchanged to existing serialization hooks,
 including fractional and null keys; original ArrayAccess arguments stay raw.
+
+Only primitive normalized array offsets create a local key value. Raw ArrayAccess
+object keys keep the original parameter ownership and key/value destruction order.
+The two native mkdir expressions also keep independent original write-mode
+constant lookups, so a first callback can define the unused site's mode.

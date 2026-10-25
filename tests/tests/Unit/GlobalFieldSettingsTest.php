@@ -5,6 +5,19 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Release raw ArrayAccess temporary key/value arguments in their native order.
+     *
+     * @return void
+     */
+    public function testNativeSetterTemporaryKeyOwnership(): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'key-temporary', 'none'));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        self::assertSame(array('value' => true, 'events' => array('assign', 'db', 'key', 'value')), json_decode($result[1], true));
+    }
+
+    /**
      * Supply quiet original array keys requiring native offset normalization.
      *
      * @return array
@@ -44,7 +57,7 @@ final class GlobalFieldSettingsTest extends LowYearlyTestCase
         self::assertSame('', $result[2]);
         self::assertSame(array('value' => false, 'native' => array('nativemkdir://root/cache/'),
             'hooks' => array('nativemkdir://root/cache/low_yearly_archives/'), 'writes' => array(),
-            'logged' => 1, 'module_exists' => false), json_decode($result[1], true));
+            'modes' => array(0777), 'logged' => 1, 'module_exists' => false), json_decode($result[1], true));
     }
 
     /**

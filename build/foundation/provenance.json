@@ -186,7 +186,7 @@
             "File name too long"
         ],
         "evidence": "cache-alias-spelling-native/results.json and retained focused-red proof; positive permanent tests assert actual public set/disk/reset roundtrip and handler restoration. Same-process link setup clears stale PHP realpath cache BEFORE source call, proven against original/current74/85 in cache-alias-roundtrip-clear/results.json. No product statcache change. Read-only filesystem message is explicit coordinator whitelist, not an owned mounted-filesystem claim.",
-        "callee_lifetime_followup": "The local closure contains two distinct native mkdir expressions selected by original generic/module position. Native lookup caches remain independent, including initially unused sites, late callback registration and real pinned PHPUnit static restoration. No manual resolver or new legacy method/property. Own actual original/current all7 real EE file-helper proofs; own permanent native-mkdir-callees fixture uses an explicit narrow file-helper collaborator."
+        "callee_lifetime_followup": "The local closure contains two distinct native mkdir expressions selected by original generic/module position. Native lookup caches remain independent, including initially unused sites, late callback registration and real pinned PHPUnit static restoration. No manual resolver or new legacy method/property. Own actual original/current all7 real EE file-helper proofs; own permanent native-mkdir-callees fixture uses an explicit narrow file-helper collaborator. Each native expression also retains its own original unqualified DIR_WRITE_MODE fetch; first callback registration of a namespaced mode is seen by the unused module site."
     },
     "native_offset_adaptation": {
         "author": "slot04",
@@ -200,7 +200,7 @@
             "nativeArrayKey": "1e486c64685c05cf43259850297784c8d2cd9c2ca32fd35ace1299f5c8be1718",
             "canWriteStringOffset": "58d52c36e01ae12e94d396b02461b5eb0e16c4da36dedfc6c247bf239d4c3b96"
         },
-        "public_argument_followup": "Retain original updateSetting $key parameter and normalize only a local assignment offset. Own actual original74/current hook-derived persisted values retain fractional/null public argument types; ArrayAccess raw arguments unchanged.02 supplied finding/protocol only; no implementation/probe copied."
+        "public_argument_followup": "Retain original updateSetting $key parameter and normalize only a local assignment offset. Own actual original74/current hook-derived persisted values retain fractional/null public argument types; ArrayAccess raw arguments unchanged.02 supplied finding/protocol only; no implementation/probe copied. Only primitive null/float ordinary-array offsets get a local; raw ArrayAccess object keys are never copied to another local owner. Own original/current destructor-effect proof and positive regression preserve assign/DB/key-release/value-release."
     },
     "legacy_class_surface_repair": {
         "author": "slot03",

@@ -1,5 +1,5 @@
 {
-    "archive_sha256": "fb641918e4eeff1e60a69d12c1e23f16f09dbfa5cea5bde9d6211b1154118663",
+    "archive_sha256": "2728e2bd54c6cd71f264debd51d2ba7c21f470ec1275a9864ef4d379567320bd",
     "loose_files": {
         "addon.setup.php": "a5e5c659f6787506df47776250150362911dbd281376a38bf9a3a826366211ea",
         "autoload.php": "c0dbd735d3d469883a600c17ba51994a7b4dbbd140954777f38a786b41a9dd92",
@@ -64,8 +64,8 @@
             "sha256": "68918fa4a16c6c6024b5e518eef52d5e52a2f4004fab8ad09af9d5a20725752b"
         },
         "FluxCapacitor/Conduit/GlobalFieldSettings.php": {
-            "bytes": 5284,
-            "sha256": "30970dfc88046a48b7d6536092f72a52b82c8b58012e63901b347c8be464d069"
+            "bytes": 5360,
+            "sha256": "928ff78c51f109f0c44cb1554f43ca8ce9a2b8236db33e3b713ba7dbd609decb"
         },
         "FluxCapacitor/Conduit/McpNav.php": {
             "bytes": 7842,

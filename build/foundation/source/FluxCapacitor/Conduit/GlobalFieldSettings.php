@@ -98,21 +98,21 @@ class GlobalFieldSettings
     public function updateSetting($key, $value)
     {
         $ftSettings = $this->getSettings();
-        $offsetKey = $key;
 
         $stringOffset = false;
         if (\is_string($ftSettings)) {
             $pattern = \PHP_VERSION_ID < 80000 ? '/^\s*[+-]?[0-9]+$/D' : '/^\s*[+-]?[0-9]+\s*$/D';
-            $stringOffset = (\is_int($offsetKey) || (\is_string($offsetKey) && \preg_match($pattern, $offsetKey)))
-                && $offsetKey >= -\strlen($ftSettings) && $offsetKey < \PHP_INT_MAX;
+            $stringOffset = (\is_int($key) || (\is_string($key) && \preg_match($pattern, $key)))
+                && $key >= -\strlen($ftSettings) && $key < \PHP_INT_MAX;
         }
         if ($ftSettings === null) {
             return false;
         }
-        if (\is_array($ftSettings) && $offsetKey === null) {
+        if (\is_array($ftSettings) && $key === null) {
             $offsetKey = '';
         }
-        if (\is_array($ftSettings) && \is_float($offsetKey)) {
+        if (\is_array($ftSettings) && \is_float($key)) {
+            $offsetKey = $key;
             if (!\is_finite($offsetKey)) {
                 $offsetKey = 0;
             } else {
@@ -129,9 +129,13 @@ class GlobalFieldSettings
         }
         if ($stringOffset) {
             $offsetValue = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
-            $ftSettings[$offsetKey] = \strlen($offsetValue) > 1 ? $offsetValue[0] : $offsetValue;
+            $ftSettings[$key] = \strlen($offsetValue) > 1 ? $offsetValue[0] : $offsetValue;
         } else {
-            $ftSettings[$offsetKey] = $value;
+            if (isset($offsetKey)) {
+                $ftSettings[$offsetKey] = $value;
+            } else {
+                $ftSettings[$key] = $value;
+            }
         }
         $settingsForDb = array('settings' => base64_encode(serialize($ftSettings)));
 
