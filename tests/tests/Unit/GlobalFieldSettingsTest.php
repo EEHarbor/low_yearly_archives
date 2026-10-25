@@ -5,6 +5,34 @@ use Low\YearlyArchives\FluxCapacitor\Conduit\GlobalFieldSettings;
 final class GlobalFieldSettingsTest extends LowYearlyTestCase
 {
     /**
+     * Supply quiet original array keys requiring native offset normalization.
+     *
+     * @return array
+     */
+    public static function nativeSetterArgumentCases(): array
+    {
+        return array(array('fraction', 'double', 1.9), array('null', 'NULL', null));
+    }
+
+    /**
+     * Retain public arguments visible to an original namespace serialization hook.
+     *
+     * @dataProvider nativeSetterArgumentCases
+     * @param string $scenario Native original key shape.
+     * @param string $type Original public key type.
+     * @param mixed $key Original public key argument.
+     * @return void
+     */
+    public function testNativeSetterRetainsPublicKeyArgument($scenario, $type, $key): void
+    {
+        $result = LowYearlyNativeProcess::run(array(dirname(__DIR__, 2) . '/support/native-callee.php', dirname(__DIR__, 3) . '/low_yearly_archives/low_yearly_archives.phar', dirname(__DIR__, 3), 'GFS', 'argument', $scenario));
+        self::assertSame(0, $result[0]);
+        self::assertSame('', $result[2]);
+        $stored = $scenario === 'null' ? array(1 => 'old', '' => 'updated') : array(1 => 'updated', '' => 'empty');
+        self::assertSame(array('value' => true, 'updates' => array(array('argument_type' => $type, 'argument' => $key, 'value' => $stored))), json_decode($result[1], true));
+    }
+
+    /**
      * Preserve independent native resolution for generic and module creation sites.
      *
      * @return void

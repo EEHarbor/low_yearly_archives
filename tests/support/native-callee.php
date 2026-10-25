@@ -165,6 +165,7 @@ class NativeCalleeQuery
                 throw $GLOBALS['rowFailure'];
             }
         }
+        if ($GLOBALS['family'] === 'argument') { return base64_encode(serialize(array(1 => 'old', '' => 'empty'))); }
         if ($GLOBALS['family'] === 'setter') { return base64_encode(serialize('abc')); }
         if ($GLOBALS['family'] === 'temporary') {
             return $GLOBALS['route'] === 'raw' ? new NativeCalleeTemporary() : 'decoded-by-hook';
@@ -281,6 +282,15 @@ $read = static function ($class) use ($caller) {
     \Low\YearlyArchives\FluxCapacitor\Conduit\StaticCache::clear();
     return (new $class(array('module' => 'low_yearly_archives', 'module_name' => 'owned')))->getSettings(true);
 };
+
+if ($family === 'argument') {
+    eval('namespace Low\YearlyArchives\FluxCapacitor\Conduit; function serialize($value) { $key = \debug_backtrace(0, 2)[1]["args"][0]; return \serialize(array("argument_type" => \gettype($key), "argument" => $key, "value" => $value)); }');
+    $settings = (new ReflectionClass($parent))->newInstanceWithoutConstructor();
+    $settings->fieldtype_name = 'low_yearly_archives';
+    $value = $settings->updateSetting($scenario === 'null' ? null : 1.9, 'updated');
+    echo json_encode(array('value' => $value, 'updates' => $setterUpdates), JSON_THROW_ON_ERROR), "\n";
+    return;
+}
 
 if ($family === 'setter') {
     $settings = (new ReflectionClass($parent))->newInstanceWithoutConstructor();

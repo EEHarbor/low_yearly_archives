@@ -122,3 +122,7 @@ The original generic and module directory creation sites retain distinct native
 selection, including when a stream callback registers a namespace hook before
 the other site first executes. Existing directories leave their unused site
 unbound; native opcode bindings survive application static-state restoration.
+
+Array-key normalization changes only a local assignment offset. The original
+public key parameter remains visible unchanged to existing serialization hooks,
+including fractional and null keys; original ArrayAccess arguments stay raw.

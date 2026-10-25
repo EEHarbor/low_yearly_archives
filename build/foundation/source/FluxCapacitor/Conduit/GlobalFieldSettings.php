@@ -98,39 +98,40 @@ class GlobalFieldSettings
     public function updateSetting($key, $value)
     {
         $ftSettings = $this->getSettings();
+        $offsetKey = $key;
 
         $stringOffset = false;
         if (\is_string($ftSettings)) {
             $pattern = \PHP_VERSION_ID < 80000 ? '/^\s*[+-]?[0-9]+$/D' : '/^\s*[+-]?[0-9]+\s*$/D';
-            $stringOffset = (\is_int($key) || (\is_string($key) && \preg_match($pattern, $key)))
-                && $key >= -\strlen($ftSettings) && $key < \PHP_INT_MAX;
+            $stringOffset = (\is_int($offsetKey) || (\is_string($offsetKey) && \preg_match($pattern, $offsetKey)))
+                && $offsetKey >= -\strlen($ftSettings) && $offsetKey < \PHP_INT_MAX;
         }
         if ($ftSettings === null) {
             return false;
         }
-        if (\is_array($ftSettings) && $key === null) {
-            $key = '';
+        if (\is_array($ftSettings) && $offsetKey === null) {
+            $offsetKey = '';
         }
-        if (\is_array($ftSettings) && \is_float($key)) {
-            if (!\is_finite($key)) {
-                $key = 0;
+        if (\is_array($ftSettings) && \is_float($offsetKey)) {
+            if (!\is_finite($offsetKey)) {
+                $offsetKey = 0;
             } else {
                 $range = 2.0 ** (\PHP_INT_SIZE * 8);
-                $key = \fmod($key, $range);
-                if ($key >= $range / 2) {
-                    $key -= $range;
+                $offsetKey = \fmod($offsetKey, $range);
+                if ($offsetKey >= $range / 2) {
+                    $offsetKey -= $range;
                 }
-                if ($key < -$range / 2) {
-                    $key += $range;
+                if ($offsetKey < -$range / 2) {
+                    $offsetKey += $range;
                 }
-                $key = (int) $key;
+                $offsetKey = (int) $offsetKey;
             }
         }
         if ($stringOffset) {
             $offsetValue = \is_float($value) && \is_nan($value) ? 'NAN' : (string) $value;
-            $ftSettings[$key] = \strlen($offsetValue) > 1 ? $offsetValue[0] : $offsetValue;
+            $ftSettings[$offsetKey] = \strlen($offsetValue) > 1 ? $offsetValue[0] : $offsetValue;
         } else {
-            $ftSettings[$key] = $value;
+            $ftSettings[$offsetKey] = $value;
         }
         $settingsForDb = array('settings' => base64_encode(serialize($ftSettings)));
 
