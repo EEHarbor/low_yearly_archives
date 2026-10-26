@@ -225,7 +225,6 @@ final class LowYearlyDatabase
     public $tableRows = array();
     public $resultQueues = array();
     public $cloneObserver;
-    public $writeResult = true;
 
     /**
      * Expose cloned query objects for tests without sharing their mutable query state.
@@ -274,9 +273,6 @@ final class LowYearlyDatabase
         }
         if ($method === 'count_all_results') {
             return $this->count;
-        }
-        if (in_array($method, array('insert', 'update', 'delete'), true)) {
-            return $this->writeResult;
         }
 
         return $this;

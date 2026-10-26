@@ -1,168 +1,35 @@
-# PHP compatibility repair
+# Current add-on compatibility scope
 
 The pinned tests baseline is `1cbdc3dac0cf51dff4976deff5341ac68f49a6f8`;
-develop is `0f61057a193e7a7e82156038bfe892f87f95bbaa`. Work uses an isolated
-`php-compat-fixes-2026` worktree. The primary checkout and earlier historical
-status/coverage evidence remain intact.
+local develop is `0f61057a193e7a7e82156038bfe892f87f95bbaa`.
 
-Before production changes, the complete strict suite ran 248 tests on all seven
-Herd runtimes. This includes one added actual parent/native startup-settings case.
+The current product change is the plugin `_explode_param` null-to-empty guard.
+The distributed Foundation PHAR is restored byte-for-byte to develop/original
+SHA256 `3959e83638da756c85860d736bb13b52d735526ec817f0bfad4f7d7383ed5356`.
+No Foundation source, build, copied decoder, loader repair or new Foundation-only
+regression is part of this candidate. Original baseline Foundation tests remain
+configured; their diagnostics and assertion failures remain visible and block a
+complete passing suite. They belong to separate future Foundation work.
 
-| PHP | Assertions | Errors | Failures |
-| --- | ---: | ---: | ---: |
-| 7.4.33 | 1384 | 21 | 22 |
-| 8.0.30 | 1352 | 24 | 20 |
-| 8.1.33 | 1349 | 26 | 20 |
-| 8.2.30–8.5.0 | 1334 | 29 | 20 |
+Run the complete suite with an explicit runtime:
 
-Warnings, risky, skipped and incomplete categories were zero. There is one XML
-configuration; native EE2–EE7, CP, legacy bootstrap/settings/views/URLs, loader,
-fallback and compilation contexts belong to its complete suite.
+```sh
+PHP_BIN='/absolute/path/to/php' tests/.phpunit/run-phpunit.sh -c phpunit.xml
+```
 
-The plugin's null parameter now retains the legacy empty-token result without
-passing null to native string functions. Foundation fixes preserve static plugin
-metadata, extension alias arguments, literal zero values and key components,
-decoded cache reads/warm hits, processed-key lookups, license existence/table
-health state, optional extension/navigation files, deleted entry lookups,
-short route segments and valid settings arrays. Legacy URL arguments are encoded
-independently, persistent invalidation uses the same backend as reads/writes,
-and pagination clamps the page to one before applying offsets.
+The checked launcher preserves pinned PHPUnit 9.6.38 and sets error_reporting=-1,
+display_errors=stderr and display_startup_errors=1 before discovery/providers.
+The durable handler and parent/native ownership checks still reject caught or
+ignored diagnostics, startup/native stderr and unexpected process outcomes.
+Generic transport/deadline/output and caller-prelude controls remain. No product
+diagnostic is filtered or expected away. No tests are excluded to obtain green.
+SOURCE_MANIFEST binds original archive members plus the current loose plugin.
+No coverage collection or global PHP/INI/service change is required.
 
-License writes retain existing site/add-on predicates and serialized fields.
-Integer and string forms of the same database site ID compare consistently;
-structured license inputs are rejected before writes. Cache writes guard known
-directory/unwritable destinations before invoking EE's false-return file helper.
-Global settings return the actual database write result.
-
-Native serialized types, objects, custom callbacks and references remain native.
-Historical escaped `S` string tokens are normalized by a length-aware token
-rewriter before hydration; ordinary strings and custom payload bytes are left
-intact. Complete value prefixes retain PHP 7.4 trailing-byte tolerance. Only exact
-native parse-failure/extra-data messages from the decoder's own file and callsite
-are handled locally; unexpected callback diagnostics reach the prior handler,
-which is restored in finally. Stored disk/base64 bytes and writers stay intact.
-Regressions cover binary strings, references, custom payloads, malformed input,
-callback-origin native warnings, actual disk/reset/warm reads and global settings.
-
-The historical tools Foundation 4.10.0 source reproduces all 22 original members
-after the documented tokens and exact shipped validation JavaScript. The common
-source adaptations were retargeted from this author's Geotagger work only after
-all 22 original members matched. The escaped-string normalizer originates in
-Fieldpack `e1b07ae668c405ff214d006f718d3f56eb07c571`. The original `L = true`,
-version, SHA-256 signature algorithm, alias, raw mixed 0755/0644 member modes,
-compression and metadata remain. New build timestamps are expected. The scoped
-builder releases archive references before reopening the renamed artifact and
-refreshes the complete source manifest. See `build/foundation/README.md`.
-
-Extraction refuses linked computed roots/containers before realpath or mutation.
-Cleanup includes nested and hidden entries and unlinks contained links without
-traversing their targets. Actual direct/fallback regressions verify separate
-sentinels, working directories and owned fixture cleanup. Concurrent hostile path
-replacement and other platform behavior remain unverified.
-
-Three inherited fixtures were corrected against actual contracts: template `0`
-remains `0`; manually primed processed cache keys use the hash generated by real
-writers; Active Record writes return booleans rather than fluent query objects.
-Original case identities and ordinary assertions remain, with genuine new
-failed-write, logical-key collision, storage and artifact regressions.
-
-The checked launcher exports its selected `PHP_BIN` and explicitly sets
-`error_reporting=-1`, `display_errors=stderr`, `display_startup_errors=1` before
-loading pinned PHPUnit 9.6.38. The earliest handler verifies those settings,
-records diagnostics before throwing and rejects caught events at checked process
-completion. Native stderr is propagated into the parent ledger on every cleanup
-path, including caught deadlines/output failures. Finite native transport/output-limit fixtures are admitted only for their exact
-owning test methods, arguments and complete observed outcome; arbitrary calls
-cannot use those tooling controls. Other outcomes remain strict. Manual severity tests exercise the
-same exception formatter; external checked main/provider/native controls prove
-the installed handler's durable behavior. No source diagnostic is expected away.
-
-Run `PHP_BIN=/explicit/php tests/.phpunit/run-phpunit.sh -c phpunit.xml`.
-`python3 -m unittest discover -s tests -p test_process.py -v` checks process
-ownership and actual caught native deadline/output diagnostics on 7.4/8.5.
-ArchiveBuildTest compares every distributed member with build source and raw
-layout, verifies the complete manifest and rebuilds an owned copy on the selected
-runtime. All 28 distributed PHP/stub units receive native compilation checks.
-
-CLI fixtures do not establish installed EE/SQL/template rendering, real licensing
-or browser/transport behavior, complete coverage, other-user permissions, other
-filesystems/platforms or PHP below 7.4. No global PHP, INI or services change.
-
-Native API probes cover actual original and candidate archive consumers before
-and after the bounded native correction. New regressions preserve controller
-visibility/magic hooks, native signed O/C counts, positive/negative integer
-clamps, malformed-tail callbacks/exceptions/context, ArrayAccess and non-strict
-base64 carriers. Public getSettings retains truthy values; getSetting admits
-valid string byte offsets and uses null for missing/invalid offsets or
-non-indexable containers, with direct ArrayAccess callbacks remaining strict.
-The legacy base MCP alone has a scoped dynamic-property attribute after the
-native extension-consumer proof. No new property rollout or magic is introduced.
-
-Additional actual-artifact regressions cover oversized string/class/custom wire
-lengths after queued callbacks (ordinary, exception and diagnostic), leading-zero
-lengths, signed-zero custom payloads, direct cleanup of existing/dangling root
-links and POSIX backslash names, non-searchable writable cache parents, and exact
-native stored-string byte/ArrayAccess writes. The parser's narrow diagnostic
-classification and durable unexpected-diagnostic policy are unchanged.
-
-Trusted cache alias regressions cover absolute/relative targets at both generic
-and module boundaries, targets that already exist, two-hop/cyclic aliases,
-missing/read-only/non-searchable target parents and target files. Existing mode0200
-cache/module directories return false/log through get/set/delete/clear without
-warnings. Actual original/candidate external probes use the unchanged EE75 file
-helper and complete per-process file-mode constants.
-
-The bounded getter correction restores the original ArrayAccess offset `@`
-expression: callback-returned reporting masks remain native0/4437 with the raw
-key unchanged. This does not waive diagnostics. The ledger now uses process-local
-function-static storage, surviving pinned PHPUnit class-static restoration.
-Owned native abnormal exits, signals and captured owner failures remain rejecting
-even when an ordinary test ignores the result or catches its exception.
-`tests/fixtures/AuthorityDiagnosticTest.php` provides separate checked negative
-controls for backup rollback and quiet native exit; these are tooling failures,
-not configured tests expecting a product warning.
-
-B1 prior-handler registered-mask/installed-state preservation and B2 opaque
-Stringable hidden serialized wire remain blocked. The unchanged five positive
-native Stringable cases still report genuine modern diagnostics; no exclusions,
-expected product errors, warning whitelist or pre-cast workaround makes them green.
-
-The native adapter supports existing file and lint targets plus the exact
-`-d phar.readonly=0` flag needed by its owned build check. It prepends its checked diagnostic guard to executed files; unsupported
-inline/server forms and caller `auto_prepend_file` overrides fail explicitly.
-The former pure inline settings/transport/output-limit checks now execute the
-same operations in a small owned file fixture. No caller prelude is silently
-replaced. Generic caught file diagnostics and ignored inline commands have
-separate expected-failing owner controls. Native startup settings follow the accepted build flag; unsupported startup
-options cannot silently override the strict boundary.
-
-Writable registered virtual caches retain their original accepted behavior even
-when stream metadata has no host execute/search bits. The POSIX search-bit guard
-is confined to native filesystem paths and file:// URLs; every path still uses
-its original writable check. Actual original/current probes execute the unchanged
-EE75 file helper and verify serialized disk bytes plus a cold cache read. Native
-and file:// mode0200 directories retain their quiet false/log outcome.
-
-Only actual string paths enter the additional host predicate. Opaque path
-operands left by by-reference mkdir hooks retain their original native consumers,
-conversion effects and ownership. An actual-artifact positive case checks the
-original seven conversions through set, disk persistence and a cold read; real EE
-file-helper original/current observations verify the same behavior.
-
-The reviewed native-startup follow-up preserves the interpreter's effective default
-prelude. A bounded inline configuration query runs with the same native binary,
-environment and strict options; its original lookup occurs before composition.
-A private exclusive file in the physical child cwd installs diagnostics and then
-requires the selected prelude in global scope. The original main file and argv
-remain native. Configuration and execution share one 15-second deadline; held
-inode and complete-byte checks precede removal of only the owned composition.
-The public adapter still accepts only its existing file/lint/PHAR-build forms.
-
-A present unreadable optional extension follows the quiet missing-extension path;
-a readable extension retains its native update callback. Actual-artifact positives
-cover readable, unreadable and missing files. The configured native-startup
-regression records the fixed Herd profile's actual dump-loader/configuration
-startup effects, with direct prior/current native observations retained outside
-the candidate. Diagnostics.php is unchanged and retains the independent root
-whole-file approval. Native B1/B2 limitations remain blockers; no complete
-compatibility or publication claim is made.
+Earlier Foundation implementation/results are historical at checkpoint
+`4b9b5f90140edc14026efa46b3b9db32a9da8367`; recovery snapshots and complete
+scope-correction results are retained in the campaign evidence. Those prior green
+results do not certify the restored original Foundation or this current candidate.
+Current final matrix results are reported externally without weakening inherited
+oracles. CLI fixtures do not establish live EE, SQL, templates, licensing, browser
+or other filesystem/platform behavior.

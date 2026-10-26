@@ -262,6 +262,7 @@ final class PluginTest extends LowYearlyTestCase
             array('notable', array(array('notable'), true)),
             array('0', array(array('0'), true)),
             array('', array(array(''), true)),
+            'null' => array(null, array(array(''), true)),
             array(false, array(array(''), true)),
             array(42, array(array('42'), true)),
             array(1.5, array(array('1.5'), true)),

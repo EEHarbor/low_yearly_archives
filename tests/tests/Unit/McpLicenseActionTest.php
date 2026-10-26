@@ -18,13 +18,6 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         self::assertSame(0, $status, $stdout . $stderr);
         self::assertSame('', $stderr);
         $result = json_decode($stdout, true, 512, JSON_THROW_ON_ERROR);
-        if (!empty($input['native_input'])) {
-            self::assertSame('EE_Input', $result['input_class']);
-            self::assertSame(!isset($input['post']['license_key']) || $input['post']['license_key'] === false, $result['missing_license']);
-        }
-        if (isset($input['stringable_license'])) {
-            self::assertSame(1, $result['stringable_conversions']);
-        }
         self::assertSame('addons/settings/low_yearly_archives/license', $result['redirect']);
         $actualWrites = array_values(array_filter($result['database'], function ($call) { return in_array($call[0], array('insert', 'update', 'delete'), true); }));
         self::assertSame($writes, $actualWrites);
@@ -77,19 +70,6 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         $insert['license_key'] = 'low-yearly-archives-ignore-site-1';
         $insert['ignore_site'] = 1;
         $cases['ignore site'] = array($input, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-        $native = $input;
-        $native['native_input'] = true;
-        unset($native['post']['license_key']);
-        $cases['native absent license ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-        $native['post']['license_key'] = null;
-        $cases['native null POST ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-        foreach (array('empty' => array(), 'strings' => array(' clean_1 ', 'key-2'), 'scalars' => array(123, 12.5, true, false), 'null' => array(null), 'mixed null' => array('clean', null)) as $shape => $values) {
-            $native['post']['license_key'] = $values;
-            $cases['native ' . $shape . ' array ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-        }
-        $native['stringable_license'] = 'key-1';
-        $native['array_license'] = true;
-        $cases['native Stringable array ignore site'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
         $input['licenses'] = array($same);
         $input['check_key_rows'] = array();
         $input['count'] = 1;
@@ -131,25 +111,6 @@ final class McpLicenseActionTest extends LowYearlyTestCase
         $insert = $data;
         $insert['license_key'] = '';
         $cases['clear ordinary key'] = array($input, array(array('update', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-
-        foreach (array('integer' => array(123, '123'), 'float' => array(12.5, '125'), 'boolean' => array(true, '1')) as $shape => $pair) {
-            $native = $base;
-            $native['native_input'] = true;
-            $native['post']['license_key'] = $pair[0];
-            $native['lookup'] = $pair[1];
-            $insert = $data;
-            $insert['license_key'] = $pair[1];
-            $cases['native ' . $shape . ' license'] = array($native, array(array('insert', array('eeharbor_licenses', $insert))), $success, 'asSuccess');
-        }
-        $native = $base;
-        $native['native_input'] = true;
-        $native['stringable_license'] = 'key-1';
-        $cases['native Stringable license'] = array($native, array(array('insert', array('eeharbor_licenses', $data))), $success, 'asSuccess');
-        $native = $base;
-        $native['native_input'] = true;
-        $native['post']['license_key'] = array('bad');
-        $native['lookup'] = null;
-        $cases['native structured license rejected'] = array($native, array(), 'Invalid License Key', 'asIssue');
 
         return $cases;
     }

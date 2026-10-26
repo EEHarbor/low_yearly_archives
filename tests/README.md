@@ -1,3 +1,11 @@
+Terminal capture follow-up: a killed direct child is polled for at most one second before proc_close, retaining actual terminal status separately from the close return. Already observed terminal statuses are preserved on PHP7.4. An unobserved terminal state is an explicit rejected outcome, never successful evidence. Previous capture matrices with running:true/proc_close9 remain superseded history.
+
+Current scope correction (2026-10-26): the distributed Foundation archive and
+shared loader are original develop bytes. Only add-on fixes and strict runner work
+remain; inherited Foundation tests stay configured and may fail. The compatibility
+document gives the current boundary. Earlier Foundation repair/results below are
+historical and are not a current passing claim.
+
 Current production compatibility work and validation: see [COMPATIBILITY.md](COMPATIBILITY.md). Historical source-red/coverage evidence below remains a record of the earlier tests-only campaign.
 
 # Low Yearly Archives PHPUnit tests
@@ -11,6 +19,8 @@ python3 tests/run-matrix.py
 ```
 
 Set `PHP_BIN` to an explicit PHP executable for the launcher. The matrix uses the Herd binaries under `~/Library/Application Support/Herd/bin` without changing global PHP or services; `HERD_PHP_DIRECTORY` can override that directory. Every matrix run creates a fresh directory under `tests/reports/`, executes the complete configured suite on PHP 7.4–8.5, and rejects missing/empty JUnit reports. A nonzero exit is expected while documented source regressions remain.
+
+Every native configuration, lint and execution attempt also retains an exclusive `tests/reports/native-*` slot: literal command bytes, owner/PID/deadline, complete binary stdout/stderr and post-reap terminal status. The process joins issued slots and verifies retained bytes at shutdown even if callers ignore a result or catch a failure. These files survive disposal of the child temporary tree. Earlier scope-cleanup matrices retained outer streams only and do not establish this child-capture contract.
 
 The EE doubles mirror the contracts inspected in `ee_repo_2/system/ee/legacy`: template fetch normalization, Active Record chaining/results, fieldtype `content_id()`, localize-month language keys, helper file IO and the CP service boundaries. Parser rendering and actual SQL execution are outside these unit tests; their passed data and operations are asserted directly. Native subprocess checks execute the distributed PHAR, bridge dispatcher, direct-access guard, missing-file paths, legacy URLs and self-extracting fallback. Each child has a 15-second deadline, file-backed stdout/stderr capped at 128 KiB per stream, and its own temporary tree removed in `finally`. Linting archive entries uses verified byte-identical temporary copies because PHP CLI `-l` does not accept `phar://` input filenames.
 

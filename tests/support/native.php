@@ -1,54 +1,14 @@
 <?php
 
-require_once __DIR__ . '/Diagnostics.php';
+require_once __DIR__ . "/Diagnostics.php";
+
+error_reporting(E_ALL);
 date_default_timezone_set('UTC');
 $root = dirname(__DIR__, 2);
 $scenario = $argv[1];
 register_shutdown_function(static function () {
     if (LowYearlyDiagnostics::events() !== array()) { exit(1); }
 });
-
-if (strpos($scenario, 'optional-extension-') === 0) {
-    $fixture = sys_get_temp_dir() . '/low-yearly-optional-' . bin2hex(random_bytes(8));
-    mkdir($fixture, 0700);
-    mkdir($fixture . '/low_yearly_archives', 0700);
-    $extension = $fixture . '/low_yearly_archives/ext.low_yearly_archives.php';
-    $GLOBALS['extensionCalls'] = array();
-    if ($scenario !== 'optional-extension-missing') {
-        file_put_contents($extension, '<?php class Low_yearly_archives_ext { /** @param string $current @return void */ public function updateExtension($current) { $GLOBALS["extensionCalls"][] = $current; } }');
-        chmod($extension, $scenario === 'optional-extension-unreadable' ? 0000 : 0600);
-    }
-    define('PATH_THIRD', $fixture . '/');
-    try {
-        require 'phar://' . $root . '/low_yearly_archives/low_yearly_archives.phar/FluxCapacitor/Base/Upd.php';
-        $updater = (new ReflectionClass('Low\\YearlyArchives\\FluxCapacitor\\Base\\Upd'))->newInstanceWithoutConstructor();
-        $updater->version = '4.1.1';
-        $updater->module_name = 'Low_yearly_archives';
-        echo json_encode(array('result' => $updater->update('4.0.0'), 'calls' => $GLOBALS['extensionCalls']));
-    } finally {
-        if (is_file($extension)) { chmod($extension, 0600); unlink($extension); }
-        rmdir($fixture . '/low_yearly_archives');
-        rmdir($fixture);
-    }
-    exit;
-}
-
-if (strpos($scenario, 'cleanup-root-') === 0) {
-    $mode = $scenario;
-    require __DIR__ . '/cleanup-roots.php';
-    exit;
-}
-if (strpos($scenario, 'mcp-api-') === 0) {
-    $mode = $scenario;
-    require __DIR__ . '/mcp-api.php';
-    exit;
-}
-
-if (strpos($scenario, 'extraction-link-') === 0) {
-    $mode = $scenario;
-    require __DIR__ . '/extraction-links.php';
-    exit;
-}
 
 if (in_array($scenario, array('caught-diagnostic', 'caught-diagnostic-timeout', 'caught-diagnostic-output'), true)) {
     try {
@@ -60,6 +20,15 @@ if (in_array($scenario, array('caught-diagnostic', 'caught-diagnostic-timeout', 
     echo 'CAUGHT';
     exit;
 }
+set_error_handler(function ($severity, $message, $file, $line) use ($root) {
+    $source = strpos($file, $root . '/low_yearly_archives/') !== false;
+    $deprecation = $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED;
+    if ($source || $deprecation || (error_reporting() & $severity)) {
+        throw new ErrorException(($source ? '' : 'Test support diagnostic: ') . $message, 0, $severity, $file, $line);
+    }
+
+    return false;
+});
 
 if ($scenario === 'guard') {
     include $root . '/low_yearly_archives/pi.low_yearly_archives.php';
@@ -146,20 +115,6 @@ if ($scenario === 'legacy-view') {
     require $archive . 'EE2.php';
 } else {
     require $root . '/low_yearly_archives/autoload.php';
-}
-
-if ($scenario === 'original-scope-callback') {
-    require __DIR__ . '/original-scope-callback.php';
-    OriginalScopeStoredCallback::run();
-    echo 'CAUGHT';
-    exit;
-}
-
-if ($scenario === 'malformed-callback') {
-    require __DIR__ . '/malformed-callback.php';
-    MalformedStoredCallback::run();
-    echo 'CAUGHT';
-    exit;
 }
 
 if ($scenario === 'legacy-view') {
@@ -268,46 +223,6 @@ if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
     );
     ee()->config->values['site_id'] = $input['site_id'];
     ee()->input->values = $input['post'];
-    if (!empty($input['native_input'])) {
-        require __DIR__ . '/../fixtures/ee/Input.php';
-        $_POST = $input['post'];
-        ee()->input = (new ReflectionClass('EE_Input'))->newInstanceWithoutConstructor();
-        ee()->services['Security/XSS'] = new class {
-            /**
-             * Keep the native input accessor independent of XSS filtering.
-             *
-             * @param mixed $value
-             * @return mixed
-             */
-            public function clean($value) { return $value; }
-        };
-    }
-    $GLOBALS['low_yearly_license_conversions'] = 0;
-    if (isset($input['stringable_license'])) {
-        $_POST['license_key'] = new class($input['stringable_license']) {
-            private $value;
-            /**
-             * Retain the value supplied by a native Stringable input collaborator.
-             *
-             * @param string $value
-             * @return void
-             */
-            public function __construct($value) { $this->value = $value; }
-            /**
-             * Observe the action's native string conversion count.
-             *
-             * @return string
-             */
-            public function __toString()
-            {
-                $GLOBALS['low_yearly_license_conversions']++;
-                return $this->value;
-            }
-        };
-        if (!empty($input['array_license'])) {
-            $_POST['license_key'] = array($_POST['license_key']);
-        }
-    }
     ee()->db->tableExists = true;
     ee()->db->queryRows = array(array('Column_name' => 'license_key', 'Non_unique' => '0'));
     ee()->db->count = $input['count'];
@@ -322,9 +237,7 @@ if ($scenario === 'save-license' || $scenario === 'mcp-constructor') {
          */
         public function redirect($url)
         {
-            echo json_encode(array('redirect' => $url->path, 'database' => ee()->db->calls, 'alerts' => ee()->alert->calls,
-                'input_class' => get_class(ee()->input), 'missing_license' => ee()->input->post('license_key', true) === false,
-                'stringable_conversions' => $GLOBALS['low_yearly_license_conversions']), JSON_THROW_ON_ERROR);
+            echo json_encode(array('redirect' => $url->path, 'database' => ee()->db->calls, 'alerts' => ee()->alert->calls), JSON_THROW_ON_ERROR);
             exit;
         }
     };

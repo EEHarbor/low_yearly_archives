@@ -1,6 +1,10 @@
 <?php
 
 $mode = $argv[1];
+if ($mode === 'binary' || $mode === 'empty') {
+    echo $mode === 'binary' ? "\x00\xffowned\n" : '';
+    exit;
+}
 if ($mode === 'prelude') {
     $files = array_values(array_filter(array_map('basename', get_included_files()), static function ($name) {
         return in_array($name, array('dump-loader.php', 'HerdConfiguration.php'), true);
