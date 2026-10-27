@@ -31,7 +31,6 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
         );
         $GLOBALS['low_yearly_ee'] = $this->ee;
         set_error_handler(array(self::class, 'handleSourceDiagnostic'));
-        LowYearlyBranchCoverage::start();
         StaticCache::clear();
     }
 
@@ -43,7 +42,6 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
     protected function tearDown(): void
     {
         StaticCache::clear();
-        LowYearlyBranchCoverage::stop();
         restore_error_handler();
         error_reporting($this->previousErrorReporting);
         unset($GLOBALS['low_yearly_ee']);
@@ -61,8 +59,7 @@ abstract class LowYearlyTestCase extends PHPUnit\Framework\TestCase
      */
     public static function handleSourceDiagnostic($severity, $message, $file, $line)
     {
-        $source = strpos($file, PATH_THIRD . 'low_yearly_archives/') !== false
-            || strpos($file, PATH_THIRD . 'tests/.coverage-source/') !== false;
+        $source = strpos($file, PATH_THIRD . 'low_yearly_archives/') !== false;
         $deprecation = $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED;
         if ($source || $deprecation || (error_reporting() & $severity)) {
             throw new ErrorException(($source ? '' : 'Test support diagnostic: ') . $message, 0, $severity, $file, $line);

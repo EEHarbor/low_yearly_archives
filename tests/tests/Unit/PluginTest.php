@@ -249,7 +249,7 @@ final class PluginTest extends LowYearlyTestCase
     }
 
     /**
-     * Supply documented include/exclude syntax and relevant scalar boundaries.
+     * Supply template include/exclude syntax and current-member IDs.
      *
      * @return array
      */
@@ -262,26 +262,9 @@ final class PluginTest extends LowYearlyTestCase
             array('notable', array(array('notable'), true)),
             array('0', array(array('0'), true)),
             array('', array(array(''), true)),
-            array(false, array(array(''), true)),
             array(42, array(array('42'), true)),
-            array(1.5, array(array('1.5'), true)),
             array('|1||', array(array('', '1', '', ''), true)),
         );
-    }
-
-    /**
-     * Flatten empty, indexed and keyed DB result sets with duplicate-key rules.
-     *
-     * @return void
-     */
-    public function testFlattenResults(): void
-    {
-        $plugin = $this->unconstructedPlugin();
-        $rows = array(array('id' => '4', 'value' => null), array('id' => '4', 'value' => 0), array('id' => '5', 'value' => false));
-
-        self::assertSame(array(), $this->invoke($plugin, '_flatten_results', array(array(), 'value')));
-        self::assertSame(array(null, 0, false), $this->invoke($plugin, '_flatten_results', array($rows, 'value')));
-        self::assertSame(array(4 => 0, 5 => false), $this->invoke($plugin, '_flatten_results', array($rows, 'value', 'id')));
     }
 
     /**

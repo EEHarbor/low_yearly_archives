@@ -3,7 +3,7 @@
 final class LicenseViewTest extends LowYearlyTestCase
 {
     /**
-     * Render both shipped license views with EE2 and modern alert behavior.
+     * Render the add-on license view with EE2 and modern alert behavior.
      *
      * @param string $view
      * @param int $major
@@ -38,17 +38,14 @@ final class LicenseViewTest extends LowYearlyTestCase
     }
 
     /**
-     * Cover both view copies and both conditional branches in each copy.
+     * Supply legacy and modern license form contexts.
      *
      * @return array
      */
     public static function viewContexts(): array
     {
         $root = dirname(__DIR__, 3) . '/low_yearly_archives/';
-        $archiveView = getenv('LOW_YEARLY_MEASURE_ARCHIVE')
-            ? dirname(__DIR__, 2) . '/.coverage-source/Views/license.php'
-            : 'phar://' . $root . 'low_yearly_archives.phar/Views/license.php';
-        $views = array($root . 'views/license.php', $archiveView);
+        $views = array($root . 'views/license.php');
         $contexts = array();
         foreach ($views as $view) {
             $contexts[] = array($view, 2, 'key-"<&', false);

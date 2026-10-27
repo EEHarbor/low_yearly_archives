@@ -5,13 +5,6 @@
       <directory suffix="Test.php">tests/tests/Unit</directory>
     </testsuite>
   </testsuites>
-  <coverage processUncoveredFiles="true" pathCoverage="true">
-    <include>
-      <directory suffix=".php">low_yearly_archives</directory>
-      <directory suffix=".php">tests/.coverage-source</directory>
-      <file>low_yearly_archives/low_yearly_archives.phar</file>
-    </include>
-  </coverage>
   <php>
     <ini name="error_reporting" value="-1"/>
     <ini name="display_errors" value="1"/>
