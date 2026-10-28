@@ -1,0 +1,99 @@
+{
+    "archive_sha256": "3959e83638da756c85860d736bb13b52d735526ec817f0bfad4f7d7383ed5356",
+    "loose_files": {
+        "addon.setup.php": "a5e5c659f6787506df47776250150362911dbd281376a38bf9a3a826366211ea",
+        "autoload.php": "c0dbd735d3d469883a600c17ba51994a7b4dbbd140954777f38a786b41a9dd92",
+        "pi.low_yearly_archives.php": "224b940c4818700d0f2fa558ef7394742897a30c2d5ea584b1aec6f4054b251e",
+        "views/license.php": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46"
+    },
+    "files": {
+        "FluxCapacitor/Base/Ext.php": {
+            "bytes": 5441,
+            "sha256": "210c9a68226b1f680411c478c68cbce380e6ac7b343f89c83669792feb5268ae"
+        },
+        "FluxCapacitor/Base/Ft.php": {
+            "bytes": 5150,
+            "sha256": "232af5e891db95bd15c3a5c6ccc457f6a593d370bed725df716743962f12d93e"
+        },
+        "FluxCapacitor/Base/Mcp.php": {
+            "bytes": 7425,
+            "sha256": "7a52e77512cf5930fade5c0518de880344c82e405dc73afd186327a505c1ba50"
+        },
+        "FluxCapacitor/Base/Mod.php": {
+            "bytes": 1226,
+            "sha256": "4ecb6ae9c36ad8a459d370a8c579b4ac54265cadcd99488b9dd09c1bd609f651"
+        },
+        "FluxCapacitor/Base/Pi.php": {
+            "bytes": 959,
+            "sha256": "1bcdcb11e66602780cb41de7c8e53e61c0ff8a143d7875b57cea3a41d9c59964"
+        },
+        "FluxCapacitor/Base/Tab.php": {
+            "bytes": 2060,
+            "sha256": "b8582b1ae7a974b5d205889b893a067e3e01fe320d0a0eb1eb7a8f5e0d3f065e"
+        },
+        "FluxCapacitor/Base/Upd.php": {
+            "bytes": 3847,
+            "sha256": "4b1b15d4eefb06812002fe81b89201f4b17251249a2fe0bc5ab69f739c08063e"
+        },
+        "FluxCapacitor/Bridge/AbstractBridge.php": {
+            "bytes": 3436,
+            "sha256": "b744061c22d6e0af9fcbccbdfbd0c5ed0af4d619a2dbc8177d6a07640153499e"
+        },
+        "FluxCapacitor/Bridge/EE.php": {
+            "bytes": 2222,
+            "sha256": "a4e58820c2cb0567f586a3fea455db9838a9d4f0cf8ff34c191b5708cf9b9777"
+        },
+        "FluxCapacitor/Bridge/EE2.php": {
+            "bytes": 16106,
+            "sha256": "4d48600020d38058ae0cf413c5cdfabf4c3f0e50573f954fa26f9ca998ae9c7e"
+        },
+        "FluxCapacitor/Bridge/EE3.php": {
+            "bytes": 16973,
+            "sha256": "6d306348fdb3bb82a89185f8deeb0623d0d8eae63d8fbf0c9bda6cbf6d32120c"
+        },
+        "FluxCapacitor/Bridge/EE4.php": {
+            "bytes": 17057,
+            "sha256": "bdd1d2b07f0f01da1372225d9f4f43caf2ff74d0ae716d6d9c887addd0fcd7d9"
+        },
+        "FluxCapacitor/Bridge/EE5.php": {
+            "bytes": 17057,
+            "sha256": "26dace9fc292881669fee1b09ef9929f0a4f7e58f0b00407fe7c8c2174db1815"
+        },
+        "FluxCapacitor/Bridge/EE6.php": {
+            "bytes": 449,
+            "sha256": "68918fa4a16c6c6024b5e518eef52d5e52a2f4004fab8ad09af9d5a20725752b"
+        },
+        "FluxCapacitor/Conduit/GlobalFieldSettings.php": {
+            "bytes": 1449,
+            "sha256": "05bc0b157aa07bbe5f860e6fa88ca48260ba1385e5e9cf7bf23a1279fb260d44"
+        },
+        "FluxCapacitor/Conduit/McpNav.php": {
+            "bytes": 7767,
+            "sha256": "a506c3fc7088ef7ea6bb34feadce824df5386fa490f8f1ddc7a99c37da1ea746"
+        },
+        "FluxCapacitor/Conduit/PersistentCache.php": {
+            "bytes": 8077,
+            "sha256": "90558b934a17f4494310bc25de1182d51e9b74807427b702faef07a5769b64d7"
+        },
+        "FluxCapacitor/Conduit/StaticCache.php": {
+            "bytes": 3828,
+            "sha256": "2f22f898cc12acb1ad4f88376fa9b74ac43612c7becbe71afa2e6bc0916d222b"
+        },
+        "FluxCapacitor/Conduit/Version.php": {
+            "bytes": 24811,
+            "sha256": "95d395a820966bc4aff5a25439890c3c94b60654863f748102715f3fab51a0c4"
+        },
+        "FluxCapacitor/FluxCapacitor.php": {
+            "bytes": 583,
+            "sha256": "e10542fc9f3ecd88a3557f37205aa73d434649689acd962bccfa114c4daed98e"
+        },
+        "Views/license.php": {
+            "bytes": 10730,
+            "sha256": "6a8d67a96c4a3edac3cc1ff9b9607505ff58e5a3888896a324b8e2d824a7ea46"
+        },
+        "index.php": {
+            "bytes": 920,
+            "sha256": "a1f14dd768f8033574b1b84eae3c2b8ef2383cc5f46b6fedb016b2ce5141d888"
+        }
+    }
+}
