@@ -1,32 +1,27 @@
 ---
 title: Examples
 ---
-
-<h1>Example</h1>
-
-<pre>
-    <code>
-        {exp:low_yearly_archives channel="blog" start_month="1" status="not closed" sort="desc"}
-        {if year_count == 1}&LT;ul>{/if}
-        &LT;li>
-            {year}
-            &LT;ul>
-            {months}
-            &LT;li>
-            {if num_entries != 0}
-                &LT;a href="{path=blog/archive}{year}/{month_num}/"
-                title="{num_entries} entries in {month} {year}">{month_short}&LT;/a>
-            {if:else}
-                {month_short}
-            {/if}
-            &LT;/li>
-            {/months}
-            &LT;/ul>
-        &LT;/li>
-        {if year_count == total_years}&LT;/ul>{/if}
-        {/exp:low_yearly_archives}
-    </code>
-</pre>
-
-
-
+<h1>Archive list example</h1>
+<p>This example groups months under their year. Months with matching entries link to an archive template; months without matching entries display their abbreviated name without a link. Change <code>blog</code> to your channel name and <code>blog/archive</code> to your archive template.</p>
+<p>The example uses <code>status="open"</code>. The older <code>status="not closed"</code> example also includes other non-closed statuses, which may be unsuitable for a public archive.</p>
+<pre><code class="language-html"><span class="tag">{exp:low_yearly_archives channel=&quot;blog&quot; start_month=&quot;1&quot; status=&quot;open&quot; sort=&quot;desc&quot;}</span>
+    <span class="tag">{if year_count == 1}</span>&lt;ul&gt;<span class="tag">{/if}</span>
+    &lt;li&gt;
+        <span class="tag">{year}</span>
+        &lt;ul&gt;
+            <span class="tag">{months}</span>
+                &lt;li&gt;
+                    <span class="tag">{if num_entries != 0}</span>
+                        &lt;a href=&quot;<span class="tag">{path=&#x27;blog/archive&#x27;}</span>/<span class="tag">{year}</span>/<span class="tag">{month_num}</span>/&quot;
+                           title=&quot;<span class="tag">{num_entries}</span> entries in <span class="tag">{month}</span> <span class="tag">{year}</span>&quot;&gt;<span class="tag">{month_short}</span>&lt;/a&gt;
+                    <span class="tag">{if:else}</span>
+                        <span class="tag">{month_short}</span>
+                    <span class="tag">{/if}</span>
+                &lt;/li&gt;
+            <span class="tag">{/months}</span>
+        &lt;/ul&gt;
+    &lt;/li&gt;
+    <span class="tag">{if year_count == total_years}</span>&lt;/ul&gt;<span class="tag">{/if}</span>
+<span class="tag">{/exp:low_yearly_archives}</span></code></pre>
+<p><code>start_month="1"</code> displays months from January in the starting year. <code>sort="desc"</code> lists the newest year first; the default month order is ascending.</p>
+<p>See the <a href="/low-yearly-archives/documentation/tags">Tag Reference</a> for the existing parameters and year/month variables.</p>
